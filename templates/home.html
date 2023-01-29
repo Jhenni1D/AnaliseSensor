@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagina inicial</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+</head>
+<body>
+<!-- As a heading -->
+<nav class="navbar navbar-light bg-light">
+  <div class="container-fluid">
+    <span class="navbar-brand mb-0 h1">Jhenni</span>
+  </div>
+</nav>
+<div class="bd-example">
+  <div class="row">
+    <div class="col-4">
+        <div id="list-example" class="list-group">
+          <a class="list-group-item list-group-item-action" href="#list-item-1">Rota /dado </a>
+          <a class="list-group-item list-group-item-action" href="#list-item-2">Rota /baixar_dado</a>
+          <a class="list-group-item list-group-item-action" href="#list-item-3">Rota /visualizar_dado</a>
+        </div>
+    </div>
+<div class="col-8">
+    <div data-bs-spy="scroll" data-bs-target="#list-example" data-bs-offset="0" class="scrollspy-example" tabindex="0">
+  <h4 id="list-item-1">/dado</h4>
+  <p>A rota /dado é uma rota do tipo post onde deverá ser enviado um json seguindo o formato a seguir: <br>
+  {"data": <valor>, "hora": <valor>, "sensor": <valor>}
+  </p>
+  <h4 id="list-item-2">/baixar_dado</h4>
+  <p>A rota /baixar_dado é uma rota do tipo get que retornará o arquivo csv do banco de dados</p>
+  <h4 id="list-item-3">/visualizar_dado</h4>
+  <p>A rota /visualizar_dado é uma rota do tipo get que retornará os dados do banco de dados em formato json</p>
+ </div>
+</div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+</body>
+</html>
