@@ -2,8 +2,10 @@ from flask import Flask, request, send_file, render_template, jsonify
 import os
 from app_service import pegar_data_formatada, pegar_hora_formatada, escrever_dados_arquivo_csv, registrar_dado_no_bd, \
    pegar_dados_do_sensor, pegar_todos_dados_bd, pegar_ultimo_dado_do_sensor
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__) #nome
+io = SocketIO(app)
 
 #primeira rota
 @app.route('/')
@@ -11,6 +13,7 @@ def home(): #def = função
    return render_template("home.html")
 
 #segunda rota
+#@io.on('receber', namespace='/dados')
 @app.route('/dados',methods = ['POST']) #dizer o metodo da rota, nesse caso é post
 def receber(): #o tipo da função
    dado = request.json#requisitando um arquivo json
@@ -19,6 +22,7 @@ def receber(): #o tipo da função
    dado_armazenar["data"] = pegar_data_formatada()
    dado_armazenar["hora"] = pegar_hora_formatada()
    print(dado_armazenar)
+   io.emit("test", dado_armazenar)
    registrar_dado_no_bd(dado_armazenar, dado["sensor"])
    return "deu tudo certo"
 
@@ -37,10 +41,12 @@ def visualizar_dado ():
 def ultimo_dado_sensor (sensor):
    return jsonify(pegar_ultimo_dado_do_sensor(sensor))
 
+
+
 #cors = CORS(app, resource={r"/*": {"origins": "*"}})
 
 def main():
-    app.run(host="0.0.0.0", port=5000)
+    io.run(app=app,debug=True,host="0.0.0.0", port=5000, allow_unsafe_werkzeug=True)
 
 if __name__ == "__main__":
     main()
