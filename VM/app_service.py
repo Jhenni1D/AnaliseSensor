@@ -6,7 +6,7 @@ import os
 import shutil
 from datetime import date
 from requests import get, post
-from AnaliseSensor.VM.log_handler import write_log
+from log_handler import write_log
 from firebase_admin import credentials, initialize_app, storage
 link_bd = "https://itutor-32257-default-rtdb.firebaseio.com/medicoes/{}/.json"
 link_bd_todos_sensores = "https://itutor-32257-default-rtdb.firebaseio.com/medicoes/.json"

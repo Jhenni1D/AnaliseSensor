@@ -18,7 +18,7 @@ io = SocketIO(app)
 # primeira rota
 @app.route('/')
 def home():  # def = função
-  return "aqui"
+  return render_template("home.html")
 
 
 @app.route('/nova-simulacao')
