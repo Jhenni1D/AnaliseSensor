@@ -1,0 +1,29 @@
+<html>
+  <head>
+    
+  </head>
+  <body>
+    <h1> Gráficos das medições </h1>
+    <h2 id="progresso">Progresso: 0.0%</h2>
+    <br>
+    <div id="m_container">
+      Simulando M...
+    </div>
+    <div id="t_container">
+      Simulando T...
+    </div>
+    <div id="termico">
+      Simulando Termico...
+    </div>
+    <script>
+      var dado = JSON.parse("{{data}}".replaceAll("&#39;", '"'))
+      console.log("Aloooooo")
+      console.log(dado)
+    </script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+  </body>
+
+  
+</html>

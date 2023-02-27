@@ -1,0 +1,30 @@
+{
+ "0": {
+  "done": false,
+  "in_queue": true,
+  "range": 2
+ },
+ "1": {
+  "done": false,
+  "in_queue": true,
+  "range": 3.2
+ },
+ "2": {
+  "done": false,
+  "in_queue": true,
+  "range": 3.9
+ },
+ "3": {
+  "done": false,
+  "in_queue": true,
+  "range": 4
+ },
+ "4": {
+  "done": false,
+  "in_queue": true,
+  "range": 4.3
+ },
+ "actual_simulation": 0,
+ "index_queue": 5,
+ "folder_name": ""
+}
