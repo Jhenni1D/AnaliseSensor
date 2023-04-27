@@ -37,6 +37,8 @@ class SimulationController:
             "folder_name": ""
         }
         self.femm.reset()
+        if os.path.exists("femm_generate_files") is False:
+            os.mkdir("femm_generate_files")
         for file in os.listdir("femm_generate_files"):
             os.remove(f"./femm_generate_files/{file}")
         for file in os.listdir("../"):
@@ -85,44 +87,70 @@ class SimulationController:
 
     def start_simulation(self, range, sensor):
         start = time.time()
-        self.load_simulation()
-        self.reset_config_if_index_out_of_range()
+        try:
+            self.load_simulation()
+            self.reset_config_if_index_out_of_range()
+        except Exception as e:
+            print("Exception in load_simulation or reset_config: ", e.args)
+
 
         if (self.is_can_start_simulation(range) is False and sensor != "SensorA"):  # sai da simulaçao e define sensor
             return
 
-        if self.simulations["actual_simulation"] == 0:
-            new_folder = self.hash_generate()
-            os.mkdir(new_folder)
-            self.simulations["folder_name"] = new_folder
-            write_log(f"-Criou pasta com o nome: {self.simulations['folder_name']}\n", folder=self.simulations["folder_name"], create=True)
+        try:
+            if self.simulations["actual_simulation"] == 0:
+                new_folder = self.hash_generate()
+                os.mkdir(new_folder)
+                self.simulations["folder_name"] = new_folder
+                write_log(f"-Criou pasta com o nome: {self.simulations['folder_name']}\n", folder=self.simulations["folder_name"], create=True)
 
-            with open("folder_name.txt", "w") as file:
-                file.write(new_folder)
-        write_log(f"# INICIO DA SIMULAÇÃO {self.simulations['actual_simulation']}: {pegar_data_formatada()}_{pegar_hora_formatada()}\n", folder=self.simulations["folder_name"])
-        sensorB = float(pegar_ultimo_dado_do_sensor("SensorB")["medicao"])
-        sensorC = float(pegar_ultimo_dado_do_sensor("SensorC")["medicao"])
-        write_log(
-            f"# MEDICAO_A: {range} | B: {sensorB} | C: {sensorC}")
-        self.femm.set_femm_atributes(ca=range, cb=sensorB, cc=sensorC,
-                                     index=self.simulations["actual_simulation"],
-                                     first=self.simulations["actual_simulation"] == 0,
-                                     folder_name=self.simulations["folder_name"])
+                with open("folder_name.txt", "w") as file:
+                    file.write(new_folder)
+        except Exception as e:
+            msg = f"Exception in create folder: {e.args}"
+            print(msg)
+            write_log(f"\n{msg}")
 
-        self.femm.iniciar_femm()
+        try:
+            write_log(f"# INICIO DA SIMULAÇÃO {self.simulations['actual_simulation']}: {pegar_data_formatada()}_{pegar_hora_formatada()}\n", folder=self.simulations["folder_name"])
+            sensorB = float(pegar_ultimo_dado_do_sensor("SensorB")["medicao"])
+            sensorC = float(pegar_ultimo_dado_do_sensor("SensorC")["medicao"])
+            write_log(
+                f"# MEDICAO_A: {range} | B: {sensorB} | C: {sensorC}")
+            self.femm.set_femm_atributes(ca=range, cb=sensorB, cc=sensorC,
+                                         index=self.simulations["actual_simulation"],
+                                         first=self.simulations["actual_simulation"] == 0,
+                                         folder_name=self.simulations["folder_name"])
+        except Exception as e:
+            msg = f"Exception in get SensorB/C and set femm attributes: {e.args}"
+            print(msg)
+            write_log(f"\n# MEDICAO_A: {range} | B: {sensorB} | C: {sensorC}\n{msg}")
 
-        write_log(f"-Finalizou simulação\n")
-        self.simulations[str(self.simulations["actual_simulation"])]["done"] = True
-        self.simulations["actual_simulation"] += 1
-        enviar_pasta_dos_resultados_simulacao(self.simulations["folder_name"])
-        write_log(f"-Finalizou de enviar imagens para o Firebase\n")
-        print("Finalizou:", self.simulations["folder_name"])
-        with open("simulation.json", "w") as file:
-            file.write(json.dumps(self.simulations, indent=1))
-        write_log(f"-Atualizou o arquivo simulation.json\n")
-        write_log(f"-arquivo simulation.json: {json.dumps(self.simulations)}\n")
-        finish = time.time()
-        write_log(f"# FIM DA SIMULACAO: {pegar_data_formatada()}_{pegar_hora_formatada()} - TEMPO DE EXECUÇÃO: {second_to_hour_minute(finish - start)}\n")
+
+        try:
+            self.femm.iniciar_femm()
+        except Exception as e:
+            msg = f"Exception when try init femm: {e.args}"
+            print(msg)
+            write_log(f"\n{msg}")
+
+        try:
+            write_log(f"-Finalizou simulação\n")
+            self.simulations[str(self.simulations["actual_simulation"])]["done"] = True
+            self.simulations["actual_simulation"] += 1
+            enviar_pasta_dos_resultados_simulacao(self.simulations["folder_name"])
+            write_log(f"-Finalizou de enviar imagens para o Firebase\n")
+            print("Finalizou:", self.simulations["folder_name"])
+            with open("simulation.json", "w") as file:
+                file.write(json.dumps(self.simulations, indent=1))
+            write_log(f"-Atualizou o arquivo simulation.json\n")
+            write_log(f"-arquivo simulation.json: {json.dumps(self.simulations)}\n")
+            finish = time.time()
+            write_log(f"# FIM DA SIMULACAO: {pegar_data_formatada()}_{pegar_hora_formatada()} - TEMPO DE EXECUÇÃO: {second_to_hour_minute(finish - start)}\n")
+        except Exception as e:
+            msg = f"Exception in finalize: {e.args}"
+            print(msg)
+            write_log(f"\n{msg}")
 
 
 def main(args):
@@ -130,9 +158,9 @@ def main(args):
     try:
         data = json.loads(args[1])
         rangeA, sensor = float(data[0]), data[1]
-        s.start_simulation(rangeA, sensor)
     except Exception as e:
-        print("Excpetion:", e.args)
+        print("Excpetion in main:", e.args)
+    s.start_simulation(rangeA, sensor)
 
 
 if __name__ == "__main__":
