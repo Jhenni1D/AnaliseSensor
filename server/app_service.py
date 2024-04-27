@@ -8,9 +8,12 @@ from datetime import date
 from requests import get, post
 from log_handler import write_log
 from firebase_admin import credentials, initialize_app, storage
-link_bd = "https://itutor-32257-default-rtdb.firebaseio.com/medicoes/{}/.json"
-link_bd_todos_sensores = "https://itutor-32257-default-rtdb.firebaseio.com/medicoes/.json"
-link_bd_image = "gs://itutor-32257.appspot.com/"
+
+link_bd_base = "https://sensorjhenni-default-rtdb.firebaseio.com/"
+
+link_bd = link_bd_base+"/medicoes/{}/.json"
+link_bd_todos_sensores = link_bd_base+"/medicoes/.json"
+link_bd_image = "gs://sensorjhenni.appspot.com"
 
 def pegar_data_formatada():
     data_atual = date.today()  # date é a lib
@@ -56,11 +59,11 @@ def UploadBlob(folder):
 
     try:
         cred = credentials.Certificate("C:/Users/elielson/PycharmProjects/SMAM/cred.json")
-        initialize_app(cred, {'storageBucket': 'itutor-32257.appspot.com/'})
+        initialize_app(cred, {'storageBucket': 'sensorjhenni.appspot.com'})
     except:
         pass
 
-    bucket = storage.bucket("itutor-32257.appspot.com")
+    bucket = storage.bucket("sensorjhenni.appspot.com")
 
     data_send_socket = []
     for file in os.listdir(folder):
