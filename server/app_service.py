@@ -6,7 +6,7 @@ import os
 import shutil
 from datetime import date
 from requests import get, post
-from log_handler import write_log
+from server.log_handler import write_log
 from firebase_admin import credentials, initialize_app, storage
 
 link_bd_base = "https://sensorjhenni-default-rtdb.firebaseio.com/"
