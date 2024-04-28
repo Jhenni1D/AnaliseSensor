@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, request, send_file, render_template, jsonify
 import os
 from server.app_service import pegar_data_formatada, \
@@ -164,5 +167,8 @@ def att_data_image(data_img):
 def progress(prog_value):
   io.emit("progress_value", prog_value)
 
+
+if __name__ == "__main__":
+  io.run(app, allow_unsafe_werkzeug=True)
 
 # cors = CORS(app, resource={r"/*": {"origins": "*"}})
