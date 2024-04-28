@@ -166,15 +166,3 @@ def progress(prog_value):
 
 
 # cors = CORS(app, resource={r"/*": {"origins": "*"}})
-
-
-def main():
-  io.run(app=app,
-         debug=True,
-         host="0.0.0.0",
-         port=5000,
-         allow_unsafe_werkzeug=True)
-
-
-if __name__ == "__main__":
-  main()
