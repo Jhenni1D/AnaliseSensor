@@ -106,6 +106,7 @@ class FEMMSimulationController():
         except Exception as e:
             print(e)
 
+    # Função para criar materiais SIMULAÇÃO MAGNETICA
     def criando_materiais(self):
         # Cobre para o estator
         for j in range(36):  # faz isso pras 36 ranhuras do motor
@@ -114,6 +115,161 @@ class FEMMSimulationController():
             femm.mi_addmaterial('Copper_' + str(j) + '_estator', 1, 1, 0, 0, 58, 0, 0, 1, 3, 0, 0, 1, 0.45466985972222)
             # Alumínio para o rotor
         femm.mi_addmaterial('Aluminio_rotor', 1, 1, 0, 0, 34.45, 0, 0, 1, 3, 0, 0, 1, 1)
+        femm.mi_getmaterial("Pure Iron")  # pega um material da biblioteca do femm
+        femm.mi_getmaterial("Air")  # precisa colocar o nome correto
+        femm.mi_getmaterial("M-45 Steel")
+
+    def criando_materiais_Estator(self):
+        # ranhuras
+        t1 = 5
+        for j in range(36):
+            k = j - 1
+            m = k * 10
+            theta1 = t1 + m
+            x1 = 5.3278 * math.cos(theta1 * self.degrau)
+            y1 = 5.3278 * math.sin(theta1 * self.degrau)
+            femm.mi_addblocklabel(x1, y1)
+            femm.mi_selectlabel(x1, y1)
+            femm.mi_setblockprop('Copper_' + str(j) + '_estator', 1, 0, '', 1, 1)
+            femm.mi_clearselected()
+        # nucleo
+        x2 = 0
+        y2 = 6.59
+        femm.mi_addblocklabel(x2, y2)  # Cria o ponto que receberá o material
+        femm.mi_selectlabel(x2, y2)  # Seleciona o ponto criado
+        femm.mi_setblockprop('M-45 Steel', 1, 0, '<None>', 0, 1, 1)  # Define o material do ponto
+        femm.mi_clearselected()  # limpa a seleção, sempre colocar ele
+
+    def criando_materiais_Rotor(self):
+        # Ranhuras
+        theta2 = 0
+        for k in range(28):
+            theta2 = 12.86 * k
+            x3 = 3.6923 * math.cos(theta2 * self.degrau)
+            y3 = 3.6923 * math.sin(theta2 * self.degrau)
+            femm.mi_addblocklabel(x3, y3)
+            femm.mi_selectlabel(x3, y3)
+            femm.mi_setblockprop('Aluminio_rotor', 1, 0, '<None>', 0, 1, 1)
+            femm.mi_clearselected()
+        # Nucleo
+        x4 = 2
+        y4 = 1.59
+        femm.mi_addblocklabel(x4, y4)  # Cria o ponto que receberá o material
+        femm.mi_selectlabel(x4, y4)  # Seleciona o ponto criado
+        femm.mi_setblockprop('M-45 Steel', 1, 0, '<None>', 0, 1, 1)  # Define o material do ponto
+        femm.mi_clearselected()  # limpa a seleção, sempre colocar ele
+        x5 = 0
+        y5 = 0
+        femm.mi_addblocklabel(x5, y5)  # Cria o ponto que receberá o material
+        femm.mi_selectlabel(x5, y5)  # Seleciona o ponto criado
+        femm.mi_setblockprop('M-45 Steel', 1, 0, '<None>', 0, 1, 1)  # Define o material do ponto
+        femm.mi_clearselected()  # limpa a seleção, sempre colocar ele
+
+    def criando_materiais_externo(self):
+        # Camisa
+        x6 = 0
+        y6 = 8.3
+        femm.mi_addblocklabel(x6, y6)  # Cria o ponto que receberá o material
+        femm.mi_selectlabel(x6, y6)  # Seleciona o ponto criado
+        femm.mi_setblockprop('Pure Iron', 1, 0, '<None>', 0, 1, 1)  # Define o material do ponto
+        femm.mi_clearselected()  # limpa a seleção, sempre colocar ele
+        # entreferro
+        x7 = 0
+        y7 = 4.62
+        femm.mi_addblocklabel(x7, y7)  # Cria o ponto que receberá o material
+        femm.mi_selectlabel(x7, y7)  # Seleciona o ponto criado
+        femm.mi_setblockprop('Air', 1, 0, '<None>', 0, 1, 1)  # Define o material do ponto
+        femm.mi_clearselected()  # limpa a seleção, sempre colocar ele
+        # ambiente
+        x8 = 0
+        y8 = 10
+        femm.mi_addblocklabel(x8, y8)  # Cria o ponto que receberá o material
+        femm.mi_selectlabel(x8, y8)  # Seleciona o ponto criado
+        femm.mi_setblockprop('Air', 1, 0, '<None>', 0, 1, 1)  # Define o material do ponto
+        femm.mi_clearselected()  # limpa a seleção, sempre colocar ele
+
+    def criando_circuito(self):
+        femm.mi_addcircprop("A", 0, 1)
+        femm.mi_addcircprop("B", 0, 1)
+        femm.mi_addcircprop("C", 0, 1)
+
+    # Função para criar materiais SIMULAÇÃO TERMICA
+    def criando_materiais_TERMICA(self):
+        femm.hi_getmaterial("Copper, Pure")  # pega um material da biblioteca do femm
+        femm.hi_getmaterial("Air")  # precisa colocar o nome correto
+        femm.hi_getmaterial("Aluminum, Pure")
+        femm.hi_getmaterial("Iron, Pure")
+        femm.hi_addmaterial("Núcleo", 23, 23, 0, 3)
+
+    # fazer os outros materias
+    def criando_materiais_Estator_TERMICA(self):
+        # ranhuras
+        t1 = 5
+        for j in range(36):
+            k = j - 1
+            m = k * 10
+            theta1 = t1 + m
+            x10 = 5.3278 * math.cos(theta1 * self.degrau)
+            y10 = 5.3278 * math.sin(theta1 * self.degrau)
+            femm.hi_addblocklabel(x10, y10)
+            femm.hi_selectlabel(x10, y10)
+            femm.hi_setblockprop('Copper, Pure', 1, 1, 1)
+            femm.hi_clearselected()
+        # nucleo
+        x20 = 0
+        y20 = 6.59
+        femm.hi_addblocklabel(x20, y20)  # Cria o ponto que receberá o material
+        femm.hi_selectlabel(x20, y20)  # Seleciona o ponto criado
+        femm.hi_setblockprop('Núcleo', 1, 1, 1)  # Define o material do ponto
+        femm.hi_clearselected()  # limpa a seleção, sempre colocar ele Conitar a
+
+    def criando_materiais_Rotor_TERMICA(self):
+        # Ranhuras
+        theta2 = 0
+        for k in range(28):
+            theta2 = 12.86 * k
+            x30 = 3.6923 * math.cos(theta2 * self.degrau)
+            y30 = 3.6923 * math.sin(theta2 * self.degrau)
+            femm.hi_addblocklabel(x30, y30)
+            femm.hi_selectlabel(x30, y30)
+            femm.hi_setblockprop('Aluminum, Pure', 1, 1, 1)
+            femm.hi_clearselected()
+        # Nucleo
+        x40 = 2
+        y40 = 1.59
+        femm.hi_addblocklabel(x40, y40)  # Cria o ponto que receberá o material
+        femm.hi_selectlabel(x40, y40)  # Seleciona o ponto criado
+        femm.hi_setblockprop('Núcleo', 1, 1, 1)  # Define o material do ponto
+        femm.hi_clearselected()  # limpa a seleção, sempre colocar ele
+        x50 = 0
+        y50 = 0
+        femm.hi_addblocklabel(x50, y50)  # Cria o ponto que receberá o material
+        femm.hi_selectlabel(x50, y50)  # Seleciona o ponto criado
+        femm.hi_setblockprop('Núcleo', 1, 1, 1)  # Define o material do ponto
+        femm.hi_clearselected()  # limpa a seleção, sempre colocar ele
+
+    def criando_materiais_externo_TERMICA(self):
+        # Camisa
+        x60 = 0
+        y60 = 8.3
+        femm.hi_addblocklabel(x60, y60)  # Cria o ponto que receberá o material
+        femm.hi_selectlabel(x60, y60)  # Seleciona o ponto criado
+        femm.hi_setblockprop('Iron, Pure', 1, 1, 1)  # Define o material do ponto
+        femm.hi_clearselected()  # limpa a seleção, sempre colocar ele
+        # entreferro
+        x70 = 0
+        y70 = 4.62
+        femm.hi_addblocklabel(x70, y70)  # Cria o ponto que receberá o material
+        femm.hi_selectlabel(x70, y70)  # Seleciona o ponto criado
+        femm.hi_setblockprop('Air', 1, 1, 1)  # VERIFICAR SE TÁ CERTO ESSE FATOR
+        femm.hi_clearselected()  # limpa a seleção, sempre colocar ele
+        # ambiente
+        x80 = 0
+        y80 = 10
+        femm.hi_addblocklabel(x80, y80)  # Cria o ponto que receberá o material
+        femm.hi_selectlabel(x80, y80)  # Seleciona o ponto criado
+        femm.hi_setblockprop('Air', 1, 1, 1)  # Define o material do ponto
+        femm.hi_clearselected()  # limpa a seleção, sempre colocar ele
 
     def iniciar_femm(self):
         progresso = 4.54
@@ -122,34 +278,33 @@ class FEMMSimulationController():
         self.load_data()
 
         femm.openfemm()
-        #print("Iniciou FEMM")
+
         if self.primeira_simulacao:
-            femm.opendocument(f'./{self.femm_files}/MOTOR.fem')
+            femm.opendocument(f'./{self.femm_files}/Motor_Teste1.fem')
             femm.mi_saveas(f'./{self.femm_files}/temp.fem')
             self.criando_materiais()
+            self.criando_materiais_Rotor()
+            self.criando_materiais_Estator()
+            self.criando_materiais_externo()
+            self.criando_circuito()
+
         else:
-            #femm.opendocument(f'./{self.femm_files}/MOTOR.fem')
             femm.opendocument(f'./{self.femm_files}/temp.fem')
             for j in range(36):
                 femm.mi_modifymaterial('Copper_' + str(j) + '_estator', 5, self.cond_est[j])
 
             femm.mi_modifymaterial('Aluminio_rotor', 5, self.cond_enr_rotor[self.index_simulacao - 2])
 
-        self.cond_est.clear()  # zera a self.cond_est
+        self.cond_est.clear()  # zera a cond_est
 
         # Atualização dos materiais dos enrolamentos de cobre
-        write_log("-Atualização dos materiais dos enrolamentos de cobre")
         t1 = 5
         for j in range(1, 37):
             k = j - 1
             m = k * 10
             self.theta1 = t1 + m
-            #x1 = 48 * math.cos(self.theta1 * self.degrau)
-            #y1 = 48 * math.sin(self.theta1 * self.degrau)
             x1 = 5.3278 * math.cos(self.theta1 * self.degrau)
             y1 = 5.3278 * math.sin(self.theta1 * self.degrau)
-            #print(x1)
-            #print(y1)
             femm.mi_selectlabel(x1, y1)
             # diz qual o sentido do enrolamento
             # o que é ess 44
@@ -173,7 +328,7 @@ class FEMMSimulationController():
                 femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'B', 0, 1, -44)
                 femm.mi_clearselected()
             femm.mi_clearselected()
-            progresso += 0.12 #tava dentro do for
+            progresso += 0.12  # tava dentro do for
         self.save_progress_simulation(progresso)
 
         progresso += 4.54
@@ -186,10 +341,6 @@ class FEMMSimulationController():
             self.theta2 = 12.86 * k
             x3 = 3.6923 * math.cos(self.theta2 * self.degrau)
             y3 = 3.6923 * math.sin(self.theta2 * self.degrau)
-            #x3 = 33 * math.cos(self.theta2 * self.degrau)
-            #y3 = 33 * math.sin(self.theta2 * self.degrau)
-            #print(x3)
-            #print(y3)
             femm.mi_selectlabel(x3, y3)
             femm.mi_setblockprop('Aluminio_rotor', 1, 0, '<None>', 0, 1, 1)
             femm.mi_clearselected()
@@ -199,32 +350,26 @@ class FEMMSimulationController():
         progresso += 4.54
         self.save_progress_simulation(progresso)
 
-        # Modificando o parâmetro ho_blockintegralde corrente do circuito
+        # Modificando o parâmetro de corrente do circuito
         write_log("-Modificando o parâmetro ho_blockintegralde corrente do circuito")
-        femm.mi_modifycircprop('A', 1, self.correnteA)
+        femm.mi_modifycircprop('A', 1, self.correnteA)  # verificar se no final n ta pegando o mesmo valor
         femm.mi_modifycircprop('B', 1, self.correnteB)
-        femm.mi_modifycircprop('C', 1, self.correnteC)
-        #print(self.correnteA)
-        #print(self.correnteB)
-        #print(self.correnteC)
+        femm.mi_modifycircprop('C', 1, self.correnteB)
+
         # Solucionando o problema
         progresso += 4.54
         self.save_progress_simulation(progresso)
 
         write_log("-Criando arquivo temporário M")
-        femm.mi_zoomnatural()
-        femm.mi_saveas(f'./{self.femm_files}/temp.fem')
-        femm.mi_saveas(f'./{self.femm_generate_files}/MAG' + str(60) + str(self.index_simulacao) + '.fem')
-        femm.smartmesh(1)  # malha pronta
-        femm.mi_analyze(1)
-        progresso += 4.54
-        self.save_progress_simulation(progresso)
-
-        write_log("-Criando Imagem do resultado colorido")
+        femm.mi_createmesh()  # cria a malha
+        femm.mi_analyze(0)
         femm.mi_loadsolution()  # carrega e exibe a solução correspondente à geometria atual
         femm.mo_showdensityplot(1, 0, 0, 2.774, 'mag')  # Verificar como fica a distribuição de campo
         femm.mo_savebitmap(f'./{self.folder_name}/M{self.index_simulacao}.png')  # salva o resultado em imagem
         femm.mo_hidedensityplot()
+        femm.mi_zoomnatural()
+        femm.mi_saveas(f'./{self.femm_files}/temp.fem')
+        femm.mi_saveas(f'./{self.femm_generate_files}/MAG' + str(60) + str(self.index_simulacao) + '.fem')
         progresso += 4.54
         self.save_progress_simulation(progresso)
 
@@ -235,16 +380,11 @@ class FEMMSimulationController():
         for j in range(1, 37):
             m = (j - 1) * 10
             self.theta1 = t1 + m
-            #x1 = 48 * math.cos(self.theta1 * self.degrau)
-            #y1 = 48 * math.sin(self.theta1 * self.degrau)
             x1 = 5.3278 * math.cos(self.theta1 * self.degrau)
             y1 = 5.3278 * math.sin(self.theta1 * self.degrau)
-            #print(x1)
-            #print(y1)
             femm.mo_seteditmode('area')  #
             femm.mo_selectblock(x1, y1)
             aux = femm.mo_blockintegral(4)
-            #print(aux)
             femm.mo_clearblock()
             self.p_estator.append(aux)
             m_estator = m_estator + aux
@@ -255,7 +395,6 @@ class FEMMSimulationController():
         self.save_progress_simulation(progresso)
 
         m_estator = m_estator / 36
-        #print(m_estator)
         self.media_enr_estator.append(m_estator)
 
         # Perdas nos enrolamentos do rotor
@@ -264,8 +403,6 @@ class FEMMSimulationController():
         write_log("-Lendo perdas no rotor")
         for j in range(0, 28):
             self.theta2 = 12.86 * j
-            #x3 = 33 * math.cos(self.theta2 * self.degrau)
-            #y3 = 33 * math.sin(self.theta2 * self.degrau)
             x3 = 3.6923 * math.cos(self.theta2 * self.degrau)
             y3 = 3.6923 * math.sin(self.theta2 * self.degrau)
             femm.mo_seteditmode('area')
@@ -281,7 +418,6 @@ class FEMMSimulationController():
         self.save_progress_simulation(progresso)
 
         m_rotor = m_rotor / 28  # Valores das barras da gaiola do rotor
-        #print(m_rotor)
         self.media_enr_rotor.append(m_rotor)
 
         # Perdas no estator
@@ -304,14 +440,19 @@ class FEMMSimulationController():
 
         femm.mo_close()
         femm.mi_close()
+        #femm.closefemm()
 
         ################################################
         # Simulação Térmica
         ################################################
+        #femm.openfemm()
         write_log("-Iniciou simulação térmica")
-        femm.opendocument(f'./{self.femm_files}/TERMICO.feh')
+        femm.opendocument(f'./{self.femm_files}/Termico_Teste1.FEH')
+        self.criando_materiais_TERMICA()
+        self.criando_materiais_Estator_TERMICA()
+        self.criando_materiais_Rotor_TERMICA()
+        self.criando_materiais_externo_TERMICA()
         femm.hi_saveas(f'./{self.femm_generate_files}/term_atual.feh')
-
         femm.hi_probdef('centimeters', 'planar', 1E-8, 30, 30)
         femm.hi_addboundprop("Heat flux", 1, 0, 278000, 0, 0, 0)
         femm.hi_addboundprop("Heat flux1", 1, 0, 0, 0, 0, 0)
@@ -319,10 +460,8 @@ class FEMMSimulationController():
 
         progresso += 4.54
         self.save_progress_simulation(progresso)
-
         # INSERINDO CONDIÇÃO DE CONTORNO REFERENTE ÀS PERDAS NOS ENROLAMENTOS DO ESTATOR
 
-        #print(self.p_estator)
         # na proxima colocar um comparador da temp interna
         write_log("-Inserindo condição de contorno referente às perdas nos enrolamentos do estator")
         try:
@@ -335,50 +474,48 @@ class FEMMSimulationController():
 
                 femm.hi_selectarcsegment(5.7692 * math.cos((self.theta1 + 2) * self.degrau),
                                          5.7692 * math.sin((self.theta1 + 2) * self.degrau))  # Superior 1
-                femm.hi_setarcsegmentprop(1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")  # pq é 4?
+                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")  # pq é 4?
                 femm.hi_clearselected()
 
                 femm.hi_selectarcsegment(5.8846 * math.cos((self.theta1 + 0.4) * self.degrau),
                                          5.8846 * math.sin((self.theta1 + 0.4) * self.degrau))  # Superior 2
-                femm.hi_setarcsegmentprop(1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
+                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
                 femm.hi_clearselected()
 
                 femm.hi_selectarcsegment(5.8846 * math.cos((self.theta1 - 0.4) * self.degrau),
                                          5.8846 * math.sin((self.theta1 - 0.4) * self.degrau))  # Superior 3
-                femm.hi_setarcsegmentprop(1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
+                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
                 femm.hi_clearselected()
 
                 femm.hi_selectarcsegment(5.7692 * math.cos((self.theta1 - 2) * self.degrau),
                                          5.7692 * math.sin((self.theta1 - 2) * self.degrau))  # Superior 4
-                femm.hi_setarcsegmentprop(1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
+                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
                 femm.hi_clearselected()
 
                 femm.hi_selectarcsegment(5 * math.cos((self.theta1 + 0.5) * self.degrau),
                                          5 * math.sin((self.theta1 + 0.5) * self.degrau))  # Inferior 1
-                femm.hi_setarcsegmentprop(1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
+                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
                 femm.hi_clearselected()
 
                 femm.hi_selectarcsegment(5 * math.cos((self.theta1 - 0.5) * self.degrau),
                                          5 * math.sin((self.theta1 - 0.5) * self.degrau))  # Inferior 2
-                femm.hi_setarcsegmentprop(1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
+                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
                 femm.hi_clearselected()
 
                 femm.hi_selectsegment(4.8 * math.cos((self.theta1 + 0.3) * self.degrau),
                                       4.8 * math.sin((self.theta1 + 0.3) * self.degrau))  # Inferior 3
-                femm.hi_setarcsegmentprop(1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
+                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
                 femm.hi_clearselected()
 
                 femm.hi_selectsegment(5.3278 * math.cos((self.theta1 + 0.3) * self.degrau),
                                       5.3278 * math.sin((self.theta1 + 0.3) * self.degrau))  # Lado 1
-                femm.hi_setarcsegmentprop(1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
+                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
                 femm.hi_clearselected()
 
                 femm.hi_selectsegment(5.3278 * math.cos((self.theta1 - 0.3) * self.degrau),
                                       5.3278 * math.sin((self.theta1 - 0.3) * self.degrau))  # Lado 2
-                femm.hi_setarcsegmentprop(1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
+                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
                 femm.hi_clearselected()
-                progresso += 0.12
-                self.save_progress_simulation(progresso)
         except Exception as e:
             print("Deu erro no FOR mesmo")
             print(e)
@@ -391,6 +528,7 @@ class FEMMSimulationController():
         write_log("-Calculo temperatura geral")
         for j in range(28):
             self.theta3 = 12.86 * j
+            # O X3 e Y3 deveriam tá sendo usado em algum lugar?
             x3 = 3.6923 * math.cos(self.theta3 * self.degrau)
             y3 = 3.6923 * math.sin(self.theta3 * self.degrau)
 
@@ -400,42 +538,42 @@ class FEMMSimulationController():
                                      3.6923 * math.sin((self.theta3 + 2) * self.degrau))
 
             # arco superior 1
-            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectarcsegment(3.6923 * math.cos((self.theta3 - 2) * self.degrau),
                                      3.6923 * math.sin((self.theta3 - 2) * self.degrau))  # arco superior 2
-            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectsegment(4.5 * math.cos((self.theta3 + 0.2) * self.degrau),
                                   4.5 * math.sin((self.theta3 + 0.2) * self.degrau))  # segmento superior 1
-            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectsegment(4.5 * math.cos((self.theta3 - 0.2) * self.degrau),
                                   4.5 * math.sin((self.theta3 - 0.2) * self.degrau))  # segmento superior 2
-            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectsegment(3.6923 * math.cos((self.theta3 - 1) * self.degrau),
                                   3.6923 * math.sin((self.theta3 - 1) * self.degrau))  # segmento lado 1
-            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectsegment(3.6923 * math.cos((self.theta3 + 1) * self.degrau),
                                   3.6923 * math.sin((self.theta3 + 1) * self.degrau))  # segmento lado 2
-            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectarcsegment(2.93 * math.cos((self.theta3 + 0.2) * self.degrau),
                                      2.93 * math.sin((self.theta3 + 0.2) * self.degrau))  # arco inferior 1
-            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectarcsegment(2.93 * math.cos((self.theta3 - 0.2) * self.degrau),
                                      2.93 * math.sin((self.theta3 - 0.2) * self.degrau))  # arco inferior 2
-            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
             progresso += 0.16
             self.save_progress_simulation(progresso)
@@ -444,93 +582,41 @@ class FEMMSimulationController():
 
         progresso += 4.54
         self.save_progress_simulation(progresso)
-
         femm.hi_addconductorprop("Perdas_" + str(self.index_simulacao - 1) + "_Estator", 0,
                                  self.pestator[self.index_simulacao - 1], 0)
-        femm.hi_addboundprop("Ambiente", 2, 0, 0, 300, 52, 0)
-        # adicionar a temperatura ambiente
-        # Perdas no ferro do estator
+
         write_log("-Setando condições de contorno")
-        # Perdas no ferro do estator
-        femm.hi_selectarcsegment(5, 5.3)
-        femm.hi_setarcsegmentprop(1, "<None>", 0, 4, "Perdas_" + str(self.index_simulacao - 1) + "_Estator")
+        temp_sensor = 32
+        femm.hi_addboundprop("Camisa", 2, 0, 0, 300, temp_sensor, 0)  # verificar esses 300
+        femm.hi_selectgroup(10)
+        femm.hi_setsegmentprop("", 0, 1, 1, "Camisa")
+
+        femm.hi_addboundprop("Ambiente", 2, 0, 0, 300, 25, 0)  # verificar esses 300 e 25 pq ta na temperatura ambiente
+        femm.hi_selectarcsegment(0, 18.9)  # o q é
+        femm.hi_setarcsegmentprop(1, "Ambiente", 0, 4, "<None>")  # parte de fora
         femm.hi_clearselected()
 
-        femm.hi_selectarcsegment(5, -5.3)
-        femm.hi_setarcsegmentprop(1, "<None>", 0, 4, "Perdas_" + str(self.index_simulacao - 1) + "_Estator")
+        femm.hi_selectarcsegment(18.9, 0)
+        femm.hi_setarcsegmentprop(1, "Ambiente", 0, 4, "<None>")  # parte de fora
         femm.hi_clearselected()
-
-        femm.hi_selectarcsegment(-5, -5.3)
-        femm.hi_setarcsegmentprop(1, "<None>", 0, 4, "Perdas_" + str(self.index_simulacao - 1) + "_Estator")
-        femm.hi_clearselected()
-
-        femm.hi_selectarcsegment(-5, 5.3)
-        femm.hi_setarcsegmentprop(1, "<None>", 0, 4, "Perdas_" + str(self.index_simulacao - 1) + "_Estator")
-        femm.hi_clearselected()
-
-        # Condição de contorno do ambiente
-        femm.hi_selectarcsegment(0, 7.6)
-        femm.hi_setarcsegmentprop(1, "Ambiente", 0, 4, "<None>")
-        femm.hi_clearselected()
-
-        femm.hi_selectarcsegment(0, -7.6)
-        femm.hi_setarcsegmentprop(1, "Ambiente", 0, 4, "<None>")
-        femm.hi_clearselected()
-
-        # COMENTADO PARA SETAR O QUE FOI POSTO EM CIMA
-        # femm.hi_selectarcsegment(5, 5.3)  # o q é
-        # femm.hi_setarcsegmentprop(1, "Ambiente", 0, 4, "<None>")  # parte de fora
-        # femm.hi_clearselected()
-        # progresso += 4.54
-        # self.save_progress_simulation(progresso)
-        #
-        # # adicionar a tempera ambiente
-        # write_log("-Setando temperatura 2")
-        # femm.hi_selectarcsegment(5, -5.3)
-        # femm.hi_setarcsegmentprop(1, "Ambiente", 0, 4, "<None>")  # parte de fora
-        # femm.hi_clearselected()
-        # progresso += 4.54
-        # self.save_progress_simulation(progresso)
-        #
-        # # adicionar a tempera ambiente
-        # write_log("-Setando temperatura 3")
-        # femm.hi_selectarcsegment(-5, -5.3)
-        # femm.hi_setarcsegmentprop(1, "Ambiente", 0, 4, "<None>")  # parte de fora
-        # femm.hi_clearselected()
-        # progresso += 4.54
-        # self.save_progress_simulation(progresso)
-        #
-        # # adicionar a tempera ambiente
-        # write_log("-Setando temperatura 4")
-        # femm.hi_selectarcsegment(-5, 5.3)
-        # femm.hi_setarcsegmentprop(1, "Ambiente", 0, 4, "<None>")  # parte de fora
-        # femm.hi_clearselected()
-        # progresso += 4.54
-        # self.save_progress_simulation(progresso)
 
         # Salvar e Resolver
         write_log("-Salvando arquivo temp")
-        femm.hi_zoomnatural()
-        femm.hi_saveas(f"./{self.femm_generate_files}/term_atual" + str(self.index_simulacao) + ".feh")  # result termico
-        femm.hi_analyze(1)
+        femm.hi_createmesh()
+        femm.hi_analyze(0)
         femm.hi_loadsolution()
-        progresso += 4.54
-        self.save_progress_simulation(progresso)
-
-        write_log("-Gerando imagens T e Térmico")
-        femm.ho_showdensityplot(1, 0, 0, 400, 600)
-        femm.ho_savebitmap(f"./{self.folder_name}/T{self.index_simulacao}.png")
-        femm.ho_savebitmap(f'./{self.folder_name}/TERMICO.png')
         femm.ho_hidedensityplot()
+        femm.hi_zoomnatural()
+        femm.ho_savebitmap(f"./{self.folder_name}/T{self.index_simulacao}.png")
+        femm.hi_saveas(f"./{self.femm_generate_files}/term_atual" + str(self.index_simulacao) + ".feh")  # result termico
         progresso += 4.54
         self.save_progress_simulation(progresso)
 
-        # pulo do gato, aqui ocorre o acoplamento
         md_testator = 0
         md_condestator = 0
         # Calculando condutividade dos enrolamentos do estator
         a_cu = 0.0040
-        ro_cu = 1 / (58 * 1000000)
+        ro_cu = 1 / (58)
         t1 = 5
         aux = 0
         self.cond_est.clear()
@@ -541,18 +627,16 @@ class FEMMSimulationController():
             self.theta1 = t1 + m
             x1 = 5.3278 * math.cos(self.theta1 * self.degrau)
             y1 = 5.3278 * math.sin(self.theta1 * self.degrau)
-            #x1 = 48 * math.cos(self.theta1 * self.degrau)
-            #y1 = 48 * math.sin(self.theta1 * self.degrau)
+
             femm.ho_seteditmode('area')
             femm.ho_selectblock(x1, y1)
-
-            #print(f"x1: {x1} | y1: {y1}")
 
             aux3 = femm.ho_blockintegral(0)
             aux2 = aux3[0]
             self.t_estator.append(aux2)
             femm.ho_clearblock()
-            aux = 1 / (1000000 * (ro_cu * (1 + a_cu * (aux2 - 300))))
+            aux = ro_cu * (1 + a_cu * (aux2 - 293))  # Está em MS/m
+            aux = 1 / aux
             self.cond_est.append(aux)
 
             md_testator = md_testator + aux2
@@ -571,7 +655,7 @@ class FEMMSimulationController():
 
         # Calculando condutividade dos enrolamentos do rotor
         a_al = 0.0040
-        ro_al = 1 / (34.45 * 1000000)
+        ro_al = 1 / (34.45)
         self.theta2 = 0
         md_trotor = 0
         self.t_rotor.clear()
@@ -582,15 +666,15 @@ class FEMMSimulationController():
             self.theta2 = 12.86 * j
             x3 = 3.6923 * math.cos(self.theta2 * self.degrau)
             y3 = 3.6923 * math.sin(self.theta2 * self.degrau)
-            #x3 = 33 * math.cos(self.theta2 * self.degrau)
-            #y3 = 33 * math.sin(self.theta2 * self.degrau)
+
             femm.ho_seteditmode('area')
             femm.ho_selectblock(x3, y3)
             aux3 = femm.ho_blockintegral(0)
             aux2 = aux3[0]
             self.t_rotor.append(aux2)
             femm.ho_clearblock()
-            aux = 1 / (1000000 * (ro_al * (1 + a_al * (aux2 - 300))))
+            aux = ro_al * (1 + a_al * (aux2 - 293))
+            aux = 1 / aux
             self.cond_rotor.append(aux)
 
             md_condrotor = md_condrotor + aux
@@ -608,10 +692,10 @@ class FEMMSimulationController():
         femm.hi_close()
         femm.closefemm()
 
-        # salvar os parametros simulados no arquivo csv
         write_log("-Salvando arquivos e fechando simulação")
         data = {'Rotor Temp': self.temperatura_enr_rotor, 'Stator Temp': self.temperatura_enr_estator,
                 'Conductivity Rotor': self.cond_enr_rotor, 'Conductivity Stator': self.cond_enr_estator}
+
         df1 = pd.DataFrame(data=data)
         df1.to_csv(f'./{self.femm_generate_files}/Resultados.csv')
 
@@ -621,6 +705,12 @@ class FEMMSimulationController():
 
         df3 = np.asarray(self.p_estator)
         np.savetxt(f"./{self.femm_generate_files}/" + "p_estator" + str(self.index_simulacao) + ".csv", df3, delimiter=",")
+
+        df4 = np.asarray(self.cond_rotor)
+        np.savetxt(f"./{self.femm_generate_files}/" + 'cond_rotor' + str(self.index_simulacao) + '.csv', df4, delimiter=",")
+
+        df5 = np.asarray(self.cond_est)
+        np.savetxt(f"./{self.femm_generate_files}/" + 'cond_est' + str(self.index_simulacao) + '.csv', df5, delimiter=",")
 
         self.p_rotor.clear()
         self.p_estator.clear()
