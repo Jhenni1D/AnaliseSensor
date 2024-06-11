@@ -293,7 +293,7 @@ class FEMMSimulationController():
             for j in range(36):
                 femm.mi_modifymaterial('Copper_' + str(j) + '_estator', 5, self.cond_est[j])
 
-            femm.mi_modifymaterial('Aluminio_rotor', 5, self.cond_enr_rotor[self.index_simulacao - 2])
+            # REMOVIDO VERIFICAR COM JHENNI femm.mi_modifymaterial('Aluminio_rotor', 5, self.cond_enr_rotor[self.index_simulacao - 2])
 
         self.cond_est.clear()  # zera a cond_est
 
@@ -364,7 +364,7 @@ class FEMMSimulationController():
         femm.mi_createmesh()  # cria a malha
         femm.mi_analyze(0)
         femm.mi_loadsolution()  # carrega e exibe a solução correspondente à geometria atual
-        femm.mo_showdensityplot(1, 0, 0, 2.774, 'mag')  # Verificar como fica a distribuição de campo
+        femm.mo_showdensityplot(1, 0, 0, 2.0, 'mag')  # Verificar como fica a distribuição de campo
         femm.mo_savebitmap(f'./{self.folder_name}/M{self.index_simulacao}.png')  # salva o resultado em imagem
         femm.mo_hidedensityplot()
         femm.mi_zoomnatural()
@@ -372,6 +372,12 @@ class FEMMSimulationController():
         femm.mi_saveas(f'./{self.femm_generate_files}/MAG' + str(60) + str(self.index_simulacao) + '.fem')
         progresso += 4.54
         self.save_progress_simulation(progresso)
+
+        # Cálculo do torque
+        femm.mo_seteditmode('group')
+        femm.mo_groupselectblock(2)  # Seleciona o grupo 2 (rotor)
+        torque = femm.mo_blockintegral(22)
+        torques.append(torque)
 
         # Perdas resistivas no enrolamento do estator
         m_estator = 0  # t1 = ângulo inicial do estator
@@ -463,6 +469,7 @@ class FEMMSimulationController():
         # INSERINDO CONDIÇÃO DE CONTORNO REFERENTE ÀS PERDAS NOS ENROLAMENTOS DO ESTATOR
 
         # na proxima colocar um comparador da temp interna
+        # Trocar os valores auqi embaixo. Ajustar valores
         write_log("-Inserindo condição de contorno referente às perdas nos enrolamentos do estator")
         try:
             t1 = 5
@@ -524,7 +531,7 @@ class FEMMSimulationController():
         self.theta3 = 0
         progresso += 4.54
         self.save_progress_simulation(progresso)
-
+        #Mudou os valores aqui embaixo - Ajustar valores
         write_log("-Calculo temperatura geral")
         for j in range(28):
             self.theta3 = 12.86 * j
@@ -582,22 +589,48 @@ class FEMMSimulationController():
 
         progresso += 4.54
         self.save_progress_simulation(progresso)
-        femm.hi_addconductorprop("Perdas_" + str(self.index_simulacao - 1) + "_Estator", 0,
-                                 self.pestator[self.index_simulacao - 1], 0)
+        # Não tem no novo código ver com Jhenni femm.hi_addconductorprop("Perdas_" + str(self.index_simulacao - 1) + "_Estator", 0,
+                                 #self.pestator[self.index_simulacao - 1], 0)
 
         write_log("-Setando condições de contorno")
         temp_sensor = 32
         femm.hi_addboundprop("Camisa", 2, 0, 0, 300, temp_sensor, 0)  # verificar esses 300
-        femm.hi_selectgroup(10)
-        femm.hi_setsegmentprop("", 0, 1, 1, "Camisa")
+        for j in range(36):
+            m = j * 10
+            theta1 = t1 + m
+            femm.hi_selectarcsegment(5.7692 * math.cos((theta1 + 2) * self.degrau), 5.7692 * math.sin((theta1 + 2) * self.degrau))
+            # temperatura externa
+            femm.hi_setarcsegmentprop(1, "Camisa", 0, 10, "<None>")
+            femm.hi_selectgroup(10)
+            # femm.hi_setsegmentprop("", 0, 1, 1, "Camisa")
+            femm.hi_setsegmentprop("Camisa", 0, 1, 0, 10, "<None>")  # ja testei com 20, vamo com 10
+            femm.hi_clearselected()
+        femm.hi_clearselected()
+        # Perdas no ferro do estator NOVO
+        femm.hi_addconductorprop("Perdas_" + str(self.index_simulacao - 1) + "_Estator", 0, self.pestator[self.index_simulacao - 1], 0)
+        femm.hi_selectarcsegment(5, 5.3)
+        femm.hi_setarcsegmentprop(1, "<None>", 0, 40, "Perdas_" + str(self.index_simulacao - 1) + "_Estator")
+        femm.hi_clearselected()
 
-        femm.hi_addboundprop("Ambiente", 2, 0, 0, 300, 25, 0)  # verificar esses 300 e 25 pq ta na temperatura ambiente
+        femm.hi_selectarcsegment(5, -5.3)
+        femm.hi_setarcsegmentprop(1, "<None>", 0, 40, "Perdas_" + str(self.index_simulacao - 1) + "_Estator")
+        femm.hi_clearselected()
+
+        femm.hi_selectarcsegment(-5, -5.3)
+        femm.hi_setarcsegmentprop(1, "<None>", 0, 40, "Perdas_" + str(self.index_simulacao - 1) + "_Estator")
+        femm.hi_clearselected()
+
+        femm.hi_selectarcsegment(-5, 5.3)
+        femm.hi_setarcsegmentprop(1, "<None>", 0, 40, "Perdas_" + str(self.index_simulacao - 1) + "_Estator")
+        femm.hi_clearselected()
+
+        femm.hi_addboundprop("Abiente", 2, 0, 0, 300, 25, 0)  # verificar esses 300 e 25 pq ta na temperatura ambiente
         femm.hi_selectarcsegment(0, 18.9)  # o q é
-        femm.hi_setarcsegmentprop(1, "Ambiente", 0, 4, "<None>")  # parte de fora
+        femm.hi_setarcsegmentprop(1, "Ambiente", 0, 50, "<None>")  # parte de fora
         femm.hi_clearselected()
 
         femm.hi_selectarcsegment(18.9, 0)
-        femm.hi_setarcsegmentprop(1, "Ambiente", 0, 4, "<None>")  # parte de fora
+        femm.hi_setarcsegmentprop(1, "Ambiente", 0, 50, "<None>")  # parte de fora
         femm.hi_clearselected()
 
         # Salvar e Resolver
@@ -605,7 +638,7 @@ class FEMMSimulationController():
         femm.hi_createmesh()
         femm.hi_analyze(0)
         femm.hi_loadsolution()
-        femm.ho_hidedensityplot()
+        # Removido no novo código. Ver com Jhenni femm.ho_hidedensityplot()
         femm.hi_zoomnatural()
         femm.ho_savebitmap(f"./{self.folder_name}/T{self.index_simulacao}.png")
         femm.hi_saveas(f"./{self.femm_generate_files}/term_atual" + str(self.index_simulacao) + ".feh")  # result termico
@@ -630,7 +663,6 @@ class FEMMSimulationController():
 
             femm.ho_seteditmode('area')
             femm.ho_selectblock(x1, y1)
-
             aux3 = femm.ho_blockintegral(0)
             aux2 = aux3[0]
             self.t_estator.append(aux2)
@@ -711,6 +743,9 @@ class FEMMSimulationController():
 
         df5 = np.asarray(self.cond_est)
         np.savetxt(f"./{self.femm_generate_files}/" + 'cond_est' + str(self.index_simulacao) + '.csv', df5, delimiter=",")
+
+        df6 = np.asarray(torques);
+        np.savetxt('Resultados/torque' + str(i) + '.csv', df6, delimiter=",")
 
         self.p_rotor.clear()
         self.p_estator.clear()
@@ -1098,19 +1133,19 @@ class FEMMSimulationController():
         self.p_estator.clear()
 # Para testar simulações
 
-# dados_teste= {
-#         0:{"A": 2.5, "B": 2.5, "C": 2.5},
-#         1:{"A": 3.7, "B": 3.7, "C": 3.75},
-#         2:{"A": 4, "B": 4.1, "C": 4},
-#         3:{"A": 4.4, "B": 4.3, "C": 4.4},
-#     }
-# femm_simulacao = FEMMSimulationController()
-# femm_simulacao.set_femm_atributes(ca=dados_teste[0]["A"], cb=dados_teste[0]["B"], cc=dados_teste[0]["C"],
-#                                      index=0,
-#                                      first=True,
-#                                      folder_name="TesteFEMM")
-#
-# femm_simulacao.iniciar_femm()
+dados_teste= {
+        0:{"A": 2.5, "B": 2.5, "C": 2.5},
+        1:{"A": 3.7, "B": 3.7, "C": 3.75},
+        2:{"A": 4, "B": 4.1, "C": 4},
+        3:{"A": 4.4, "B": 4.3, "C": 4.4},
+    }
+femm_simulacao = FEMMSimulationController()
+femm_simulacao.set_femm_atributes(ca=dados_teste[0]["A"], cb=dados_teste[0]["B"], cc=dados_teste[0]["C"],
+                                     index=0,
+                                     first=True,
+                                     folder_name="TesteFEMM")
+
+femm_simulacao.iniciar_femm()
 # for teste in dados_teste:
 #      femm_simulacao.set_femm_atributes(dados_teste[teste]["A"], dados_teste[teste]["B"], dados_teste[teste]["C"],teste,teste==0,teste)
 #      femm_simulacao.iniciar_femm()
