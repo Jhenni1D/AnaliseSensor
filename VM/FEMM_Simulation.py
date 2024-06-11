@@ -477,52 +477,52 @@ class FEMMSimulationController():
                 m = j * 10
                 self.theta1 = t1 + m
 
-                femm.hi_addconductorprop("Enr_" + str(j) + "_Estator", 0, self.p_estator[j], 0)
+            femm.hi_addconductorprop("Enr_" + str(j) + "_Estator", 0, self.p_estator[j], 0)
 
-                femm.hi_selectarcsegment(5.7692 * math.cos((self.theta1 + 2) * self.degrau),
-                                         5.7692 * math.sin((self.theta1 + 2) * self.degrau))  # Superior 1
-                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")  # pq é 4?
-                femm.hi_clearselected()
+            femm.hi_selectarcsegment(5.7692 * math.cos((self.theta1 + 2) * self.degrau),
+                                     5.7692 * math.sin((self.theta1 + 2) * self.degrau))  # Superior 1
+            femm.hi_setarcsegmentprop(1, "Heat flux", 0, 1, "Enr_" + str(j) + "_Estator")
+            femm.hi_clearselected()
 
-                femm.hi_selectarcsegment(5.8846 * math.cos((self.theta1 + 0.4) * self.degrau),
-                                         5.8846 * math.sin((self.theta1 + 0.4) * self.degrau))  # Superior 2
-                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
-                femm.hi_clearselected()
+            femm.hi_selectarcsegment(5.8846 * math.cos((self.theta1 + 0.4) * self.degrau),
+                                     5.8846 * math.sin((self.theta1 + 0.4) * self.degrau))  # Superior 2
+            femm.hi_setarcsegmentprop(1, "Heat flux", 0, 2, "Enr_" + str(j) + "_Estator")
+            femm.hi_clearselected()
 
-                femm.hi_selectarcsegment(5.8846 * math.cos((self.theta1 - 0.4) * self.degrau),
-                                         5.8846 * math.sin((self.theta1 - 0.4) * self.degrau))  # Superior 3
-                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
-                femm.hi_clearselected()
+            femm.hi_selectarcsegment(5.8846 * math.cos((self.theta1 - 0.4) * self.degrau),
+                                     5.8846 * math.sin((self.theta1 - 0.4) * self.degrau))  # Superior 3
+            femm.hi_setarcsegmentprop(1, "Heat flux", 0, 3, "Enr_" + str(j) + "_Estator")
+            femm.hi_clearselected()
 
-                femm.hi_selectarcsegment(5.7692 * math.cos((self.theta1 - 2) * self.degrau),
-                                         5.7692 * math.sin((self.theta1 - 2) * self.degrau))  # Superior 4
-                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
-                femm.hi_clearselected()
+            femm.hi_selectarcsegment(5.7692 * math.cos((self.theta1 - 2) * self.degrau),
+                                     5.7692 * math.sin((self.theta1 - 2) * self.degrau))  # Superior 4
+            femm.hi_setarcsegmentprop(1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
+            femm.hi_clearselected()
 
-                femm.hi_selectarcsegment(5 * math.cos((self.theta1 + 0.5) * self.degrau),
-                                         5 * math.sin((self.theta1 + 0.5) * self.degrau))  # Inferior 1
-                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
-                femm.hi_clearselected()
+            femm.hi_selectarcsegment(5 * math.cos((self.theta1 + 0.5) * self.degrau),
+                                     5 * math.sin((self.theta1 + 0.5) * self.degrau))  # Inferior 1
+            femm.hi_setarcsegmentprop(1, "Heat flux", 0, 5, "Enr_" + str(j) + "_Estator")
+            femm.hi_clearselected()
 
-                femm.hi_selectarcsegment(5 * math.cos((self.theta1 - 0.5) * self.degrau),
-                                         5 * math.sin((self.theta1 - 0.5) * self.degrau))  # Inferior 2
-                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
-                femm.hi_clearselected()
+            femm.hi_selectarcsegment(5 * math.cos((self.theta1 - 0.5) * self.degrau),
+                                     5 * math.sin((self.theta1 - 0.5) * self.degrau))  # Inferior 2
+            femm.hi_setarcsegmentprop(1, "Heat flux", 0, 6, "Enr_" + str(j) + "_Estator")
+            femm.hi_clearselected()
 
-                femm.hi_selectsegment(4.8 * math.cos((self.theta1 + 0.3) * self.degrau),
-                                      4.8 * math.sin((self.theta1 + 0.3) * self.degrau))  # Inferior 3
-                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
-                femm.hi_clearselected()
+            femm.hi_selectsegment(4.8 * math.cos((self.theta1 + 0.3) * self.degrau),
+                                  4.8 * math.sin((self.theta1 + 0.3) * self.degrau))  # Inferior 3
+            femm.hi_setarcsegmentprop(1, "Heat flux", 0, 7, "Enr_" + str(j) + "_Estator")
+            femm.hi_clearselected()
 
-                femm.hi_selectsegment(5.3278 * math.cos((self.theta1 + 0.3) * self.degrau),
-                                      5.3278 * math.sin((self.theta1 + 0.3) * self.degrau))  # Lado 1
-                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
-                femm.hi_clearselected()
+            femm.hi_selectsegment(5.3278 * math.cos((self.theta1 + 0.3) * self.degrau),
+                                  5.3278 * math.sin((self.theta1 + 0.3) * self.degrau))  # Lado 1
+            femm.hi_setarcsegmentprop(1, "Heat flux", 0, 8, "Enr_" + str(j) + "_Estator")
+            femm.hi_clearselected()
 
-                femm.hi_selectsegment(5.3278 * math.cos((self.theta1 - 0.3) * self.degrau),
-                                      5.3278 * math.sin((self.theta1 - 0.3) * self.degrau))  # Lado 2
-                femm.hi_setarcsegmentprop(0.1, "Heat flux", 0, 4, "Enr_" + str(j) + "_Estator")
-                femm.hi_clearselected()
+            femm.hi_selectsegment(5.3278 * math.cos((self.theta1 - 0.3) * self.degrau),
+                                  5.3278 * math.sin((self.theta1 - 0.3) * self.degrau))  # Lado 2
+            femm.hi_setarcsegmentprop(1, "Heat flux", 0, 9, "Enr_" + str(j) + "_Estator")
+            femm.hi_clearselected()
         except Exception as e:
             print("Deu erro no FOR mesmo")
             print(e)
@@ -544,43 +544,42 @@ class FEMMSimulationController():
             femm.hi_selectarcsegment(3.6923 * math.cos((self.theta3 + 2) * self.degrau),
                                      3.6923 * math.sin((self.theta3 + 2) * self.degrau))
 
-            # arco superior 1
-            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 11, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectarcsegment(3.6923 * math.cos((self.theta3 - 2) * self.degrau),
                                      3.6923 * math.sin((self.theta3 - 2) * self.degrau))  # arco superior 2
-            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 12, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectsegment(4.5 * math.cos((self.theta3 + 0.2) * self.degrau),
                                   4.5 * math.sin((self.theta3 + 0.2) * self.degrau))  # segmento superior 1
-            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 13, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectsegment(4.5 * math.cos((self.theta3 - 0.2) * self.degrau),
                                   4.5 * math.sin((self.theta3 - 0.2) * self.degrau))  # segmento superior 2
-            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 14, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectsegment(3.6923 * math.cos((self.theta3 - 1) * self.degrau),
                                   3.6923 * math.sin((self.theta3 - 1) * self.degrau))  # segmento lado 1
-            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 15, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectsegment(3.6923 * math.cos((self.theta3 + 1) * self.degrau),
                                   3.6923 * math.sin((self.theta3 + 1) * self.degrau))  # segmento lado 2
-            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 16, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectarcsegment(2.93 * math.cos((self.theta3 + 0.2) * self.degrau),
                                      2.93 * math.sin((self.theta3 + 0.2) * self.degrau))  # arco inferior 1
-            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 17, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
 
             femm.hi_selectarcsegment(2.93 * math.cos((self.theta3 - 0.2) * self.degrau),
                                      2.93 * math.sin((self.theta3 - 0.2) * self.degrau))  # arco inferior 2
-            femm.hi_setarcsegmentprop(0.1, "Heat flux1 ", 0, 4, "Enr_" + str(j) + "_Rotor")
+            femm.hi_setarcsegmentprop(1, "Heat flux1 ", 0, 18, "Enr_" + str(j) + "_Rotor")
             femm.hi_clearselected()
             progresso += 0.16
             self.save_progress_simulation(progresso)
