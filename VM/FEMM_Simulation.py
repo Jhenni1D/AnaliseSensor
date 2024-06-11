@@ -343,7 +343,7 @@ class FEMMSimulationController():
             x3 = 3.6923 * math.cos(self.theta2 * self.degrau)
             y3 = 3.6923 * math.sin(self.theta2 * self.degrau)
             femm.mi_selectlabel(x3, y3)
-            femm.mi_setblockprop('Aluminio_rotor', 1, 0, '<None>', 0, 1, 1)
+            femm.mi_setblockprop('Aluminio_rotor', 1, 0, '<None>', 0, 2, 1)
             femm.mi_clearselected()
             progresso += 0.16
             self.save_progress_simulation(progresso)
@@ -375,7 +375,7 @@ class FEMMSimulationController():
         self.save_progress_simulation(progresso)
 
         # Cálculo do torque
-        femm.mo_seteditmode('group')
+        #femm.mo_seteditmode('group')
         femm.mo_groupselectblock(2)  # Seleciona o grupo 2 (rotor)
         torque = femm.mo_blockintegral(22)
         self.torques.append(torque)
@@ -454,7 +454,7 @@ class FEMMSimulationController():
         ################################################
         #femm.openfemm()
         write_log("-Iniciou simulação térmica")
-        femm.opendocument(f'./{self.femm_files}/Termico_Teste1.FEH')
+        femm.opendocument(f"./{self.femm_files}/Termico_Teste1.FEH")
         self.criando_materiais_TERMICA()
         self.criando_materiais_Estator_TERMICA()
         self.criando_materiais_Rotor_TERMICA()
@@ -732,20 +732,20 @@ class FEMMSimulationController():
         df1.to_csv(f'./{self.femm_generate_files}/Resultados.csv')
 
         df2 = np.asarray(self.p_rotor)
-        np.savetxt(f"./{self.femm_generate_files}/" + "protor" + str(self.index_simulacao) + ".csv", df2,
+        np.savetxt(f"./{self.femm_generate_files}/protor{self.index_simulacao}.csv", df2,
                    delimiter=",")
 
         df3 = np.asarray(self.p_estator)
-        np.savetxt(f"./{self.femm_generate_files}/" + "p_estator" + str(self.index_simulacao) + ".csv", df3, delimiter=",")
+        np.savetxt(f"./{self.femm_generate_files}/p_estator{self.index_simulacao}.csv", df3, delimiter=",")
 
         df4 = np.asarray(self.cond_rotor)
-        np.savetxt(f"./{self.femm_generate_files}/" + 'cond_rotor' + str(self.index_simulacao) + '.csv', df4, delimiter=",")
+        np.savetxt(f"./{self.femm_generate_files}/cond_rotor{self.index_simulacao}.csv", df4, delimiter=",")
 
         df5 = np.asarray(self.cond_est)
-        np.savetxt(f"./{self.femm_generate_files}/" + 'cond_est' + str(self.index_simulacao) + '.csv', df5, delimiter=",")
+        np.savetxt(f"./{self.femm_generate_files}/cond_est{self.index_simulacao}.csv", df5, delimiter=",")
 
         df6 = np.asarray(self.torques)
-        np.savetxt('Resultados/torque' + str(self.index_simulacao) + '.csv', df6, delimiter=",")
+        np.savetxt(f"./{self.femm_generate_files}/torque{self.index_simulacao}.csv", df6, delimiter=",")
 
         self.p_rotor.clear()
         self.p_estator.clear()
