@@ -23,6 +23,7 @@ class FEMMSimulationController():
         self.degrau = math.pi / 180.0
         self.media_enr_estator = []
         self.media_enr_rotor = []
+        self.torques = []
 
         self.p_rotor = []
         self.pestator = []
@@ -377,7 +378,7 @@ class FEMMSimulationController():
         femm.mo_seteditmode('group')
         femm.mo_groupselectblock(2)  # Seleciona o grupo 2 (rotor)
         torque = femm.mo_blockintegral(22)
-        torques.append(torque)
+        self.torques.append(torque)
 
         # Perdas resistivas no enrolamento do estator
         m_estator = 0  # t1 = ângulo inicial do estator
@@ -743,8 +744,8 @@ class FEMMSimulationController():
         df5 = np.asarray(self.cond_est)
         np.savetxt(f"./{self.femm_generate_files}/" + 'cond_est' + str(self.index_simulacao) + '.csv', df5, delimiter=",")
 
-        df6 = np.asarray(torques);
-        np.savetxt('Resultados/torque' + str(i) + '.csv', df6, delimiter=",")
+        df6 = np.asarray(self.torques)
+        np.savetxt('Resultados/torque' + str(self.index_simulacao) + '.csv', df6, delimiter=",")
 
         self.p_rotor.clear()
         self.p_estator.clear()
