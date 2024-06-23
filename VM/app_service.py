@@ -8,9 +8,9 @@ from datetime import date
 from requests import get, post
 from log_handler import write_log
 from firebase_admin import credentials, initialize_app, storage
-link_bd = "https://itutor-32257-default-rtdb.firebaseio.com/medicoes/{}/.json"
-link_bd_todos_sensores = "https://itutor-32257-default-rtdb.firebaseio.com/medicoes/.json"
-link_bd_image = "gs://itutor-32257.appspot.com/"
+link_bd = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/{}/.json"
+link_bd_todos_sensores = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/.json"
+link_bd_image = "gs://simulacao-femm.appspot.com"
 
 def pegar_data_formatada():
     data_atual = date.today()  # date é a lib

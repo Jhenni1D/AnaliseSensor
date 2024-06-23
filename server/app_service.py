@@ -9,11 +9,11 @@ from requests import get, post
 from server.log_handler import write_log
 from firebase_admin import credentials, initialize_app, storage
 
-link_bd_base = "https://sensorjhenni-default-rtdb.firebaseio.com/"
+link_bd_base = "https://simulacao-femm-default-rtdb.firebaseio.com/"
 
 link_bd = link_bd_base+"/medicoes/{}/.json"
 link_bd_todos_sensores = link_bd_base+"/medicoes/.json"
-link_bd_image = "gs://sensorjhenni.appspot.com"
+link_bd_image = "gs://simulacao-femm.appspot.com"
 
 def pegar_data_formatada():
     data_atual = date.today()  # date é a lib
