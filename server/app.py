@@ -13,7 +13,7 @@ from server.app_service import pegar_data_formatada, \
 from flask_socketio import SocketIO
 import json
 from requests import get
-
+import time
 app = Flask(__name__)  # nome
 io = SocketIO(app)
 
