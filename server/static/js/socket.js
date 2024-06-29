@@ -32,14 +32,17 @@ $(document).ready(function () {
         for (d of dado) {
           if (d["name"] in m_images) {
             m_images[d["name"]].src = `/static/image_test/${d["name"]}.png`;
+            m_images[d["name"]].classList.remove('placeholder')
           }
 
            if (d["name"] in t_images) {
              t_images[d["name"]].src = `/static/image_test/${d["name"]}.png`;
+             t_images[d["name"]].classList.remove('placeholder')
            }
 
            if (d["name"] == "TERMICO") {
              termico_image.src = `/static/image_test/${d["name"]}.png`;
+             termico_image.classList.remove('placeholder')
            }
         }
       }
