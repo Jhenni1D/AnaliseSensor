@@ -167,6 +167,64 @@ def att_data_image(data_img):
 def progress(prog_value):
   io.emit("progress_value", prog_value)
 
+@io.event
+def progress_test():
+  progress_value = 0
+  data = [
+    {
+      "type": "M",
+      "name": "M0",
+      "img": "M0"
+    },
+    {
+      "type": "M",
+      "name": "M1",
+      "img": "M1"
+    },
+    {
+      "type": "M",
+      "name": "M2",
+      "img": "M2"
+    },
+    {
+      "type": "M",
+      "name": "M3",
+      "img": "M3"
+    },
+    {
+      "type": "T",
+      "name": "T0",
+      "img": "T0"
+    },
+    {
+      "type": "T",
+      "name": "T1",
+      "img": "T1"
+    },
+    {
+      "type": "T",
+      "name": "T2",
+      "img": "T2"
+    },
+    {
+      "type": "T",
+      "name": "T3",
+      "img": "T3"
+    },
+    {
+      "type": "TERMICO",
+      "name": "TERMICO",
+      "img": "TERMICO"
+    }
+  ]
+  for d in range(len(data)):
+    while progress_value < 100:
+      io.emit("progress_value", round(progress_value, 2))
+      progress_value += 1
+      time.sleep(0.15)
+    progress_value = 0
+    io.emit("update_image", data[0:d+1])
+
 
 if __name__ == "__main__":
   io.run(app, allow_unsafe_werkzeug=True)
