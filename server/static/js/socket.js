@@ -24,22 +24,26 @@ $(document).ready(function () {
   console.log(dado)
   console.log(host)
 
-  if (dado.length !== 0) {
-    for (d of dado) {
-      if (d["name"] in m_images) {
-        m_images[d["name"]].src = `/static/image_test/${d["name"]}.png`;
+  UpdateImages();
+
+  function UpdateImages()
+  {
+      if (dado.length !== 0) {
+        for (d of dado) {
+          if (d["name"] in m_images) {
+            m_images[d["name"]].src = `/static/image_test/${d["name"]}.png`;
+          }
+
+           if (d["name"] in t_images) {
+             t_images[d["name"]].src = `/static/image_test/${d["name"]}.png`;
+           }
+
+           if (d["name"] == "TERMICO") {
+             termico_image.src = `/static/image_test/${d["name"]}.png`;
+           }
+        }
       }
-
-      // if (d["name"] in t_images) {
-      //   m_images[d["name"]].src = img_source.replace("img_name", d["img"])
-      // }
-
-      // if (d["name"] == "TERMICO") {
-      //   termico_image.src = img_source.replace("img_name", d["img"])
-      // }
-    }
   }
-
   /*
       LÓGICA DO SOCKETIO ABAIXO.
   */
@@ -52,8 +56,9 @@ $(document).ready(function () {
   });
 
 
-  socket.on('plot_image', function (image_data) {
-    // TODO: inserir lógica de por imagens aqui
+  socket.on('update_image', function (data_updated) {
+    dado = data_updated;
+    UpdateImages();
   });
 
 
