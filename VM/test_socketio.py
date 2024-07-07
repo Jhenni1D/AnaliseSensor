@@ -69,7 +69,7 @@ def send_img_loop():
         if img_file_name in dir_list:
             try:
                 with open(img_file_name) as file:
-                    sio.emit('att_data_image', json.loads(file.read()))
+                    sio.emit('request_update_image', json.loads(file.read()))
                 os.remove(img_file_name)
             except:
                 print("Quebrou ao tentar abrir arquivo das imagens")
