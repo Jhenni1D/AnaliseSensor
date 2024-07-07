@@ -384,12 +384,15 @@ def start_simulation_loop():
 
 @io.event
 def request_update_image(data_img):
-    io.emit("plot_image", data_img)
+    print(data_img)
+    io.emit("update_image", data_img)
 
 
 @io.event
 def progress(prog_value):
-    io.emit("progress_value", prog_value)
+    prog = round(float(prog_value), 2)
+    prog = max(0.0, min(prog, 100.0))
+    io.emit("progress_value", prog)
 
 
 @io.event
