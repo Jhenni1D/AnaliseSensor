@@ -158,9 +158,10 @@ def main(args):
     try:
         data = json.loads(args[1])
         rangeA, sensor = float(data[0]), data[1]
+        s.start_simulation(rangeA, sensor)
     except Exception as e:
         print("Excpetion in main:", e.args)
-    s.start_simulation(rangeA, sensor)
+
 
 
 if __name__ == "__main__":
