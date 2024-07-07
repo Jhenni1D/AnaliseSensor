@@ -19,12 +19,22 @@ $(document).ready(function () {
     "T3": document.querySelector("#t3")
   }
 
-  let termico_image = document.querySelector("#termico")
+  let graficos_images = {
+    "TERMICO": document.querySelector("#termico"),
+    "TENSAO": document.querySelector("#tensao"),
+    "TEMPERATURA": document.querySelector("#temperatura"),
+    "EFICIENCIA": document.querySelector("#eficiencia"),
+    "VELOCIDADE": document.querySelector("#velocidade"),
+  }
+
+  let modal_img = document.querySelector("#modal_img")
+  let modal_title = document.querySelector("#title_modal")
 
   console.log(dado)
   console.log(host)
 
   UpdateImages();
+  RegisterActions();
 
   function UpdateImages()
   {
@@ -40,16 +50,37 @@ $(document).ready(function () {
              t_images[d["name"]].classList.remove('placeholder')
            }
 
-           if (d["name"] == "TERMICO") {
-             termico_image.src = `/static/image_test/${d["name"]}.png`;
-             termico_image.classList.remove('placeholder')
+           if (d["name"] in graficos_images) {
+             graficos_images[d["name"]].src = `/static/image_test/${d["name"]}.png`;
+             graficos_images[d["name"]].classList.remove('placeholder')
            }
         }
       }
   }
-  /*
-      LÓGICA DO SOCKETIO ABAIXO.
-  */
+  function RegisterActions()
+  {
+      for (img in m_images)
+      {
+        m_images[img].addEventListener('click', ShowModalImage);
+      }
+
+      for (img in t_images)
+      {
+        t_images[img].addEventListener('click', ShowModalImage);
+      }
+
+      for (img in graficos_images)
+      {
+        graficos_images[img].addEventListener('click', ShowModalImage);
+      }
+  }
+
+  function ShowModalImage(event)
+  {
+    modal_img.src = event.srcElement.src;
+    modal_title.innerHTML = event.srcElement.id.toUpperCase();
+  }
+
 
   let socket = io();
 
@@ -67,8 +98,8 @@ $(document).ready(function () {
 
 
   socket.on('progress_value', function (prog_value) {
-    progresso.style["width"] = `${prog_value}%`;
-    progresso.innerHTML = `${prog_value}%`;
+    //progresso.style["width"] = `${prog_value}%`;
+    //progresso.innerHTML = `${prog_value}%`;
   });
 
   socket.on('disconnect', function () {
