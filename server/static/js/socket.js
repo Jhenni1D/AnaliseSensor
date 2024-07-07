@@ -41,17 +41,17 @@ $(document).ready(function () {
       if (dado.length !== 0) {
         for (d of dado) {
           if (d["name"] in m_images) {
-            m_images[d["name"]].src = `/static/image_test/${d["name"]}.png`;
+            m_images[d["name"]].src = d["img"];
             m_images[d["name"]].classList.remove('placeholder')
           }
 
            if (d["name"] in t_images) {
-             t_images[d["name"]].src = `/static/image_test/${d["name"]}.png`;
+             t_images[d["name"]].src = d["img"];
              t_images[d["name"]].classList.remove('placeholder')
            }
 
            if (d["name"] in graficos_images) {
-             graficos_images[d["name"]].src = `/static/image_test/${d["name"]}.png`;
+             graficos_images[d["name"]].src = d["img"];
              graficos_images[d["name"]].classList.remove('placeholder')
            }
         }
@@ -98,8 +98,8 @@ $(document).ready(function () {
 
 
   socket.on('progress_value', function (prog_value) {
-    //progresso.style["width"] = `${prog_value}%`;
-    //progresso.innerHTML = `${prog_value}%`;
+    progresso.style["width"] = `${prog_value}%`;
+    progresso.innerHTML = `${prog_value}%`;
   });
 
   socket.on('disconnect', function () {
