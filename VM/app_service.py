@@ -60,6 +60,7 @@ def UploadBlob(folder):
         cred = credentials.Certificate("./cred.json")
         initialize_app(cred, {'storageBucket': f'{link_bd_image}/'})
     except:
+        print("ERRO AO INICIALIZAR APP FIREBASE")
         pass
 
     bucket = storage.bucket(f"{link_bd_image}")
@@ -72,7 +73,7 @@ def UploadBlob(folder):
         blob.make_public()
         write_log(f"-Upload file: {file_name} | link: {blob.public_url}\n")
         type = "TERMICO" if "TERMICO" in file else "T" if "T" in file else "M"
-        data_send_socket.append({"type": type, "name": file, "img": blob.public_url})
+        data_send_socket.append({"type": type, "name": file.split(".")[0], "img": blob.public_url})
     with open("img_send.json", "w") as file:
         file.write(json.dumps(data_send_socket))
 
