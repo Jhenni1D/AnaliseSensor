@@ -65,7 +65,7 @@ def send_img_loop():
     while True:
         simulation_state.files_running = True
         time.sleep(3)
-        dir_list = os.listdir("../")
+        dir_list = os.listdir("./")
         if img_file_name in dir_list:
             try:
                 with open(img_file_name) as file:
