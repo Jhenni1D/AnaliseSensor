@@ -94,7 +94,7 @@ class SimulationController:
             print("Exception in load_simulation or reset_config: ", e.args)
 
 
-        if (self.is_can_start_simulation(range) is False and sensor != "SensorA"):  # sai da simulaçao e define sensor
+        if (self.is_can_start_simulation(range) is False and sensor.lower() != "sensora"):  # sai da simulaçao e define sensor
             # Isso aqui serve pra ele iniciar a simulação apenas com o sensorA.
             # Devido a isso, todos os outros dados devem ser setados anteriormente.
             # SensorA deve ser enviado por último.
@@ -114,6 +114,8 @@ class SimulationController:
             print(msg)
             write_log(f"\n{msg}")
 
+        sensorB = -1
+        sensorC = -1
         try:
             write_log(f"# INICIO DA SIMULAÇÃO {self.simulations['actual_simulation']}: {pegar_data_formatada()}_{pegar_hora_formatada()}\n", folder=self.simulations["folder_name"])
             sensorB = float(pegar_ultimo_dado_do_sensor("SensorB")["medicao"])
