@@ -95,6 +95,9 @@ class SimulationController:
 
 
         if (self.is_can_start_simulation(range) is False and sensor != "SensorA"):  # sai da simulaçao e define sensor
+            # Isso aqui serve pra ele iniciar a simulação apenas com o sensorA.
+            # Devido a isso, todos os outros dados devem ser setados anteriormente.
+            # SensorA deve ser enviado por último.
             return
 
         try:
