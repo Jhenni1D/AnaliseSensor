@@ -10,7 +10,9 @@ from log_handler import write_log
 from firebase_admin import credentials, initialize_app, storage
 link_bd = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/{}/.json"
 link_bd_todos_sensores = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/.json"
-link_bd_image = "gs://simulacao-femm.appspot.com"
+
+link_bd_image = "simulacao-femm.appspot.com"
+link_bd_image_gs = f"gs://{link_bd_image}"
 
 def pegar_data_formatada():
     data_atual = date.today()  # date é a lib
@@ -55,12 +57,12 @@ def enviar_pasta_dos_resultados_simulacao(pasta):
 def UploadBlob(folder):
 
     try:
-        cred = credentials.Certificate("C:/Users/elielson/PycharmProjects/SMAM/cred.json")
-        initialize_app(cred, {'storageBucket': 'itutor-32257.appspot.com/'})
+        cred = credentials.Certificate("./cred.json")
+        initialize_app(cred, {'storageBucket': f'{link_bd_image}/'})
     except:
         pass
 
-    bucket = storage.bucket("itutor-32257.appspot.com")
+    bucket = storage.bucket(f"{link_bd_image}")
 
     data_send_socket = []
     for file in os.listdir(folder):
