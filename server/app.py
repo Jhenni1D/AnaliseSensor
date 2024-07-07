@@ -1,5 +1,5 @@
-import eventlet
-eventlet.monkey_patch()
+#import eventlet
+#eventlet.monkey_patch()
 
 from flask import Flask, request, send_file, render_template, jsonify
 import os
@@ -81,7 +81,6 @@ def visualizar_pasta(pasta):
   folder_exist = get(link_folder).status_code.real != 404
 
   if folder_exist:
-    print("PAsta existe")
     link = f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{pasta}%2F{'{}'}.png?alt=media&token=eec1cda6-c13b-43af-a475-84d1b4518c33"
     data = [
       {
@@ -131,7 +130,288 @@ def visualizar_pasta(pasta):
       },
     ]
     return render_template("medicoes.html", data=data)
+  data = [
+    {
+      "type": "M",
+      "name": "M0",
+      "img": "M0"
+    },
+    {
+      "type": "M",
+      "name": "M1",
+      "img": "M1"
+    },
+    {
+      "type": "M",
+      "name": "M2",
+      "img": "M2"
+    },
+    {
+      "type": "M",
+      "name": "M3",
+      "img": "M3"
+    },
+    {
+      "type": "T",
+      "name": "T0",
+      "img": "T0"
+    },
+    {
+      "type": "T",
+      "name": "T1",
+      "img": "T1"
+    },
+    {
+      "type": "T",
+      "name": "T2",
+      "img": "T2"
+    },
+    {
+      "type": "T",
+      "name": "T3",
+      "img": "T3"
+    },
+    {
+      "type": "TERMICO",
+      "name": "TERMICO",
+      "img": "TERMICO"
+    },
+  ]
   return render_template("medicoes.html", data=[])
+
+
+@app.route("/visualizar2/<pasta>")
+def visualizar_pasta2(pasta):
+  link_folder = f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{pasta}%2FM0.png"
+
+  folder_exist = get(link_folder).status_code.real != 404
+
+  if folder_exist:
+    link = f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{pasta}%2F{'{}'}.png?alt=media&token=eec1cda6-c13b-43af-a475-84d1b4518c33"
+    data = [
+      {
+        "type": "M",
+        "name": "M0",
+        "img": link.format("M0")
+      },
+      {
+        "type": "M",
+        "name": "M1",
+        "img": link.format("M1")
+      },
+      {
+        "type": "M",
+        "name": "M2",
+        "img": link.format("M2")
+      },
+      {
+        "type": "M",
+        "name": "M3",
+        "img": link.format("M3")
+      },
+      {
+        "type": "T",
+        "name": "T0",
+        "img": link.format("T0")
+      },
+      {
+        "type": "T",
+        "name": "T1",
+        "img": link.format("T1")
+      },
+      {
+        "type": "T",
+        "name": "T2",
+        "img": link.format("T2")
+      },
+      {
+        "type": "T",
+        "name": "T3",
+        "img": link.format("T3")
+      },
+      {
+        "type": "TERMICO",
+        "name": "TERMICO",
+        "img": link.format("TERMICO")
+      },
+    ]
+    return render_template("medicoes2.html", data=data)
+  data = [
+    {
+      "type": "M",
+      "name": "M0",
+      "img": "M0"
+    },
+    {
+      "type": "M",
+      "name": "M1",
+      "img": "M1"
+    },
+    {
+      "type": "M",
+      "name": "M2",
+      "img": "M2"
+    },
+    {
+      "type": "M",
+      "name": "M3",
+      "img": "M3"
+    },
+    {
+      "type": "T",
+      "name": "T0",
+      "img": "T0"
+    },
+    {
+      "type": "T",
+      "name": "T1",
+      "img": "T1"
+    },
+    {
+      "type": "T",
+      "name": "T2",
+      "img": "T2"
+    },
+    {
+      "type": "T",
+      "name": "T3",
+      "img": "T3"
+    },
+    {
+      "type": "TERMICO",
+      "name": "TERMICO",
+      "img": "TERMICO"
+    },
+  ]
+  return render_template("medicoes2.html", data=[])
+
+def get_image_data():
+  link = f"https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/{pasta}%2F{'{}'}.png?alt=media"
+  data = [
+    {
+      "type": "M",
+      "name": "M0",
+      "img": link.format("M0")
+    },
+    {
+      "type": "M",
+      "name": "M1",
+      "img": link.format("M1")
+    },
+    {
+      "type": "M",
+      "name": "M2",
+      "img": link.format("M2")
+    },
+    {
+      "type": "M",
+      "name": "M3",
+      "img": link.format("M3")
+    },
+    {
+      "type": "T",
+      "name": "T0",
+      "img": link.format("T0")
+    },
+    {
+      "type": "T",
+      "name": "T1",
+      "img": link.format("T1")
+    },
+    {
+      "type": "T",
+      "name": "T2",
+      "img": link.format("T2")
+    },
+    {
+      "type": "T",
+      "name": "T3",
+      "img": link.format("T3")
+    },
+    {
+      "type": "TERMICO",
+      "name": "TERMICO",
+      "img": link.format("TERMICO")
+    }
+  ]
+  return data
+@app.route("/visualizar3/<pasta>")
+def visualizar_pasta3(pasta):
+  link_folder = f"https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/{pasta}%2FM0.png"
+
+  folder_exist = get(link_folder).status_code.real != 404
+  print("FOLDER EXIST: ", folder_exist)
+  if folder_exist:
+
+    return render_template("medicoes3.html", data=get_image_data())
+  data = [
+    {
+      "type": "M",
+      "name": "M0",
+      "img": "M0"
+    },
+    {
+      "type": "M",
+      "name": "M1",
+      "img": "M1"
+    },
+    {
+      "type": "M",
+      "name": "M2",
+      "img": "M2"
+    },
+    {
+      "type": "M",
+      "name": "M3",
+      "img": "M3"
+    },
+    {
+      "type": "T",
+      "name": "T0",
+      "img": "T0"
+    },
+    {
+      "type": "T",
+      "name": "T1",
+      "img": "T1"
+    },
+    {
+      "type": "T",
+      "name": "T2",
+      "img": "T2"
+    },
+    {
+      "type": "T",
+      "name": "T3",
+      "img": "T3"
+    },
+    {
+      "type": "TERMICO",
+      "name": "TERMICO",
+      "img": "TERMICO"
+    },
+  {
+    "type": "TEMPERATURA",
+    "name": "TEMPERATURA",
+    "img": "TEMPERATURA"
+  },
+  {
+    "type": "TENSAO",
+    "name": "TENSAO",
+    "img": "TENSAO"
+  },
+  {
+    "type": "VELOCIDADE",
+    "name": "VELOCIDADE",
+    "img": "VELOCIDADE"
+  },
+  {
+    "type": "EFICIENCIA",
+    "name": "EFICIENCIA",
+    "img": "EFICIENCIA"
+  }
+  ]
+  return render_template("medicoes3.html", data=[])
 
 
 @io.event
@@ -158,9 +438,8 @@ def start_simulation_loop():
 
 
 @io.event
-def att_data_image(data_img):
-  for data in data_img:
-    io.emit("plot_image", data)
+def request_update_image(data_img):
+  io.emit("plot_image", data_img)
 
 
 @io.event
@@ -169,6 +448,8 @@ def progress(prog_value):
 
 @io.event
 def progress_test():
+  # comment return to test
+  return
   progress_value = 0
   data = [
     {
@@ -215,18 +496,39 @@ def progress_test():
       "type": "TERMICO",
       "name": "TERMICO",
       "img": "TERMICO"
+    },
+    {
+      "type": "TEMPERATURA",
+      "name": "TEMPERATURA",
+      "img": "TEMPERATURA"
+    },
+    {
+      "type": "TENSAO",
+      "name": "TENSAO",
+      "img": "TENSAO"
+    },
+    {
+      "type": "VELOCIDADE",
+      "name": "VELOCIDADE",
+      "img": "VELOCIDADE"
+    },
+    {
+      "type": "EFICIENCIA",
+      "name": "EFICIENCIA",
+      "img": "EFICIENCIA"
     }
   ]
   for d in range(len(data)):
     while progress_value < 100:
       io.emit("progress_value", round(progress_value, 2))
       progress_value += 1
-      time.sleep(0.15)
+      time.sleep(0.01)
     progress_value = 0
     io.emit("update_image", data[0:d+1])
+  io.emit("update_image", data)
 
 
 if __name__ == "__main__":
-  io.run(app, allow_unsafe_werkzeug=True)
+  io.run(app, allow_unsafe_werkzeug=True, debug=True)
 
 # cors = CORS(app, resource={r"/*": {"origins": "*"}})
