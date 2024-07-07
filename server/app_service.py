@@ -13,7 +13,8 @@ link_bd_base = "https://simulacao-femm-default-rtdb.firebaseio.com/"
 
 link_bd = link_bd_base+"/medicoes/{}/.json"
 link_bd_todos_sensores = link_bd_base+"/medicoes/.json"
-link_bd_image = "gs://simulacao-femm.appspot.com"
+link_bd_image = "simulacao-femm.appspot.com"
+link_bd_image_gs = f"gs://{link_bd_image}"
 
 def pegar_data_formatada():
     data_atual = date.today()  # date é a lib
@@ -26,7 +27,7 @@ def pegar_hora_formatada():
 def escrever_dados_arquivo_csv(dados): #dados parametros aula lira
     for sensor in dados:
         cols = ['data', 'hora', 'medicao']  # titulo da coluna botando do mesmo jeito do bd
-        with open(f"server/outputs/{sensor}_output.csv", 'w') as f:  # to abrindo um arquivo csv
+        with open(f"./outputs/{sensor}_output.csv", 'w') as f:  # to abrindo um arquivo csv
             wr = csv.DictWriter(f, fieldnames=cols)  # organizador
             wr.writeheader()  # titulo
             wr.writerows(dados[sensor]) # dados de cada coluna
@@ -58,12 +59,12 @@ def enviar_pasta_dos_resultados_simulacao(pasta):
 def UploadBlob(folder):
 
     try:
-        cred = credentials.Certificate("C:/Users/elielson/PycharmProjects/SMAM/cred.json")
-        initialize_app(cred, {'storageBucket': 'sensorjhenni.appspot.com'})
+        cred = credentials.Certificate("./cred.json")
+        initialize_app(cred, {'storageBucket': f'{link_bd_image}'})
     except:
         pass
 
-    bucket = storage.bucket("sensorjhenni.appspot.com")
+    bucket = storage.bucket(f"{link_bd_image}")
 
     data_send_socket = []
     for file in os.listdir(folder):
