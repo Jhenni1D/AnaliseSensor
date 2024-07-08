@@ -67,7 +67,7 @@ def visualizar_pastas():
     pastas = []
     with open("folders.json", "r") as file:
         pastas = json.loads(file.read())
-    return render_template("pastas.html", pastas=pastas)
+    return jsonify(pastas)
 
 
 @app.route("/visualizar/<pasta>")
@@ -353,17 +353,33 @@ def visualizar_pasta3(pasta):
         return render_template("medicoes3.html", data=get_image_data(pasta))
     return render_template("medicoes3.html", data=[])
 
+@app.route("/ultima-pasta")
+def ultima_pasta():
+    data = {"pasta": None}
+    pasta = None
+    if "latest_folder" in os.listdir("./"):
+        with open("latest_folder", "r") as file:
+            pasta = file.read()
+    data["pasta"] = pasta
+    return jsonify(data)
+
 
 @io.event
 def criar_pasta(pasta):
     pastas = []
-    with open("folders.json", "r") as file:
-        pastas = json.loads(file.read())
-        if pasta not in pastas:
-            pastas.append(pasta)
-        print("\n\nPASTAS:", pastas)
+    try:
+        with open("folders.json", "r") as file:
+            pastas = json.loads(file.read())
+            if pasta not in pastas:
+                pastas.append(pasta)
+            print("\n\nPASTAS:", pastas)
+    except:
+        print("no file folders.json")
     with open("folders.json", "w") as file:
         file.write(json.dumps(pastas))
+    with open("latest_folder", "w") as file:
+        file.write(pasta)
+    print("ÚLTIMA PASTA:", pasta)
     io.emit("create_folder", pastas)
 
 
@@ -479,4 +495,4 @@ def ping():
 
 
 if __name__ == "__main__":
-    io.run(app, host="0.0.0.0", port=8080)
+    io.run(app, host="0.0.0.0", port=8080, allow_unsafe_werkzeug=True)
