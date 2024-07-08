@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "server-sensor"
+version = "0.1.0"
+description = ""
+authors = ["Elielson Barbosa <elielsonbr.com@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+flask = "^3.0.3"
+flask-socketio = "^5.3.6"
+requests = "^2.32.3"
+websocket-client = "^1.8.0"
+firebase-admin = "^6.5.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
