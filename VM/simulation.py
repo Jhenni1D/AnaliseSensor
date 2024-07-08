@@ -4,10 +4,10 @@ import random
 import sys
 import time
 
-from AnaliseSensor.VM.FEMM_Simulation import FEMMSimulationController
+from VM.FEMM_Simulation import FEMMSimulationController
 from app_service import pegar_ultimo_dado_do_sensor, enviar_pasta_dos_resultados_simulacao, pegar_data_formatada, \
     pegar_hora_formatada, second_to_hour_minute
-from AnaliseSensor.VM.log_handler import write_log
+from VM.log_handler import write_log
 
 
 class SimulationController:

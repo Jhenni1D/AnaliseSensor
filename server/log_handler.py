@@ -1,7 +1,5 @@
 folder_name = ""
 
-
-
 def write_log(msg, folder="", create=False):
     global folder_name
     if folder != "":

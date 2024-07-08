@@ -445,12 +445,12 @@ class FEMMSimulationController():
 
         femm.mo_close()
         femm.mi_close()
-        #femm.closefemm()
+        # femm.closefemm()
 
         ################################################
         # Simulação Térmica
         ################################################
-        #femm.openfemm()
+        # femm.openfemm()
         write_log("-Iniciou simulação térmica")
         femm.opendocument(f"./{self.femm_files}/Termico_Teste1.FEH")
         self.criando_materiais_TERMICA()
@@ -526,11 +526,11 @@ class FEMMSimulationController():
             print("Deu erro no FOR mesmo")
             print(e)
 
-        #Essa parte não tem no código novo self.p_estator.clear()
+        # Essa parte não tem no código novo self.p_estator.clear()
         self.theta3 = 0
         progresso += 4.54
         self.save_progress_simulation(progresso)
-        #Mudou os valores aqui embaixo - Ajustar valores
+        # Mudou os valores aqui embaixo - Ajustar valores
         write_log("-Calculo temperatura geral")
         for j in range(len(self.p_rotor)):
             self.theta3 = 12.86 * j
@@ -588,7 +588,7 @@ class FEMMSimulationController():
         progresso += 4.54
         self.save_progress_simulation(progresso)
         # Não tem no novo código ver com Jhenni femm.hi_addconductorprop("Perdas_" + str(self.index_simulacao - 1) + "_Estator", 0,
-                                 #self.pestator[self.index_simulacao - 1], 0)
+        # self.pestator[self.index_simulacao - 1], 0)
 
         write_log("-Setando condições de contorno")
         temp_sensor = 32
@@ -1136,22 +1136,51 @@ class FEMMSimulationController():
     #     self.p_estator.clear()
     """
 
+
 # Para testar simulações
 
-dados_teste= {
-        0:{"A": 2.5, "B": 2.5, "C": 2.5},
-        1:{"A": 3.7, "B": 3.7, "C": 3.75},
-        2:{"A": 4, "B": 4.1, "C": 4},
-        3:{"A": 4.4, "B": 4.3, "C": 4.4},
-    }
-femm_simulacao = FEMMSimulationController()
-femm_simulacao.set_femm_atributes(ca=dados_teste[0]["A"], cb=dados_teste[0]["B"], cc=dados_teste[0]["C"],
-                                     index=0,
-                                     first=True,
-                                     folder_name="TesteFEMM")
-
-femm_simulacao.iniciar_femm()
+# dados_teste= {
+#         0:{"A": 2.5, "B": 2.5, "C": 2.5},
+#         1:{"A": 3.7, "B": 3.7, "C": 3.75},
+#         2:{"A": 4, "B": 4.1, "C": 4},
+#         3:{"A": 4.4, "B": 4.3, "C": 4.4},
+#     }
+# femm_simulacao = FEMMSimulationController()
+# femm_simulacao.set_femm_atributes(ca=dados_teste[0]["A"], cb=dados_teste[0]["B"], cc=dados_teste[0]["C"],
+#                                      index=0,
+#                                      first=True,
+#                                      folder_name="TesteFEMM")
+#
+#
+# femm_simulacao.iniciar_femm()
 # for teste in dados_teste:
 #      femm_simulacao.set_femm_atributes(dados_teste[teste]["A"], dados_teste[teste]["B"], dados_teste[teste]["C"],teste,teste==0,teste)
 #      femm_simulacao.iniciar_femm()
 
+# TESTE DE SIMULAÇÃO COM PLANILHA DA JHENNI
+
+def teste_jhenni():
+    df_corrente = pd.read_excel('Planilha_Simulação.xlsx', sheet_name='RMS')
+    df = pd.DataFrame(df_corrente)
+
+    dados_teste = {}
+
+    # len serve pra dizer a quantidade do q ta sendo lido
+    for l in range(len(df_corrente)):
+        a = df_corrente._get_value(l, 'Fase_A')  # armazena o valor da corrente em p
+        b = df_corrente._get_value(l, 'Fase_B')  # armazena o valor da corrente em p
+        c = df_corrente._get_value(l, 'Fase_C')  # armazena o valor da corrente em p
+        b = -1 * b / 2
+        c = -1 * c / 2
+        dados_teste[l] = {"A": a, "B": b, "C": c}
+
+    femm_simulacao = FEMMSimulationController()
+
+    for key in dados_teste:
+        print("Vai iniciar a simulação pro item: ", key)
+        femm_simulacao.set_femm_atributes(ca=dados_teste[key]["A"], cb=dados_teste[key]["B"], cc=dados_teste[key]["C"],
+                                          index=key,
+                                          first=key == 0,
+                                          folder_name="TesteFEMM")
+
+        femm_simulacao.iniciar_femm()

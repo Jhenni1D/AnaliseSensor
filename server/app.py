@@ -1,9 +1,6 @@
-# import eventlet
-# eventlet.monkey_patch()
-
 from flask import Flask, request, send_file, render_template, jsonify
 import os
-from server.app_service import pegar_data_formatada, \
+from app_service import pegar_data_formatada, \
     pegar_hora_formatada, \
     escrever_dados_arquivo_csv, \
     registrar_dado_no_bd, \
@@ -31,8 +28,6 @@ def nova_simulacao():  # def = função
     return "Arquivos de simulação resetados!"
 
 
-# segunda rota
-# @io.on('receber', namespace='/dados')
 @app.route('/dados',
            methods=['POST'])  # dizer o metodo da rota, nesse caso é post
 def receber():  # o tipo da função
@@ -477,7 +472,11 @@ def progress_test():
     io.emit("update_image", data)
 
 
-if __name__ == "__main__":
-    io.run(app, allow_unsafe_werkzeug=True, debug=True)
+@io.event
+def ping():
+    io.emit("pong")
+    print("send pong")
 
-# cors = CORS(app, resource={r"/*": {"origins": "*"}})
+
+if __name__ == "__main__":
+    io.run(app, host="0.0.0.0", port=8080)

@@ -8,7 +8,6 @@ import socketio
 
 import simulation
 
-
 class LoopState:
 
     def __init__(self):
@@ -26,12 +25,18 @@ def connect():
     sio.emit("start_att_img")
     sio.emit("start_simulation_loop")
     print('connection established')
+    sio.emit("ping")
+    print("send ping")
 
+@sio.event
+def pong():
+    print("receive pong")
 
 @sio.event
 def insert_queue(data):
     simulation_controller.load_simulation()
-    if simulation_controller.is_can_enqueue(data["medicao"]):
+    is_can_enqueue = simulation_controller.is_can_enqueue(data["medicao"])
+    if is_can_enqueue:
         fila.put(data)
         simulation_controller.update_queue()
         print("Inseriu elemento na fila, elementos na fila:", fila.qsize(), " | dados:", data)
@@ -103,7 +108,7 @@ def disconnect():
     print('disconnected from server')
 
 
-sio.connect('https://JhenniSensor.eliko.repl.co')
+sio.connect("https://teste-flask-app.fly.dev/", wait_timeout=20)
 sio.wait()
 
 #codigo do femm
