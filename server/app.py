@@ -1,3 +1,5 @@
+import random
+
 from flask import Flask, request, send_file, render_template, jsonify
 import os
 from app_service import pegar_data_formatada, \
@@ -344,14 +346,62 @@ def get_image_data(pasta):
     return data
 
 
+class HourMinute:
+
+    def __init__(self):
+        self.hour = 0
+        self.minute = 0
+        self.second = 0
+
+    def uptate_hour_minute_test(self):
+        if self.second > 59:
+            self.second = 0
+            self.minute += 1
+        if self.minute > 59:
+            self.minute = 0
+            self.hour += 1
+
+    def increment_second(self):
+        self.second += 10
+        self.uptate_hour_minute_test()
+
+    def get_second(self) -> str:
+        self.increment_second()
+        return str(self.second)
+
+    def get_minute(self) -> str:
+        return str(self.minute)
+
+
 @app.route("/visualizar3/<pasta>")
 def visualizar_pasta3(pasta):
     link_folder = f"https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/{pasta}%2FM0.png"
     folder_exist = get(link_folder).status_code.real != 404
     print("FOLDER EXIST: ", folder_exist)
+    hrs = HourMinute()
+    rpm_values = [random.randint(1300, 2000) for x in range(100)]
+    corrente_values = [random.randint(1, 5) for x in range(100)]
+    tensao_values = [random.randint(50, 150) for x in range(100)]
+    temperatura_values = [random.randint(30, 100) for x in range(100)]
+    eficiencia_values = [random.random() for x in range(100)]
+    time_series = [f'2024-07-09 09:{hrs.get_minute().zfill(2)}:{hrs.get_second().zfill(2)}' for x in range(100)]
+    print(rpm_values)
+    print(time_series)
+
+    format_values = lambda list_values: [{"x": time_series[i], "y": list_values[i], "xAlign": "center"} for i in range(len(list_values))]
+    graph_data = {"rpm": {"values": format_values(rpm_values), "pure_values": rpm_values[1:10], "time_series": time_series[1:10]},
+                  "corrente": {"values": format_values(corrente_values)},
+                  "tensao": {"values": format_values(tensao_values)},
+                  "temperatura": {"values": format_values(temperatura_values)},
+                  "eficiencia": {"values": format_values(eficiencia_values)},
+                  "min_value": time_series[0]
+                  }
+
     if folder_exist:
-        return render_template("medicoes3.html", data=get_image_data(pasta))
-    return render_template("medicoes3.html", data=[])
+        return render_template("medicoes3.html", data=get_image_data(pasta), graph_data=graph_data)
+
+    return render_template("medicoes3.html", data=[], graph_data=graph_data)
+
 
 @app.route("/ultima-pasta")
 def ultima_pasta():
