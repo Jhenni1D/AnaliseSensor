@@ -35,11 +35,10 @@
       </h2>
       <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
         <div class="accordion-body">
-            <div class="row row-cols-4 row-cols-md-4 g-4" id="first_cards" style="margin: 15px">
+            <div class="row row-cols-2 row-cols-md-2 g-2" id="first_cards" style="margin: 15px">
           <div class="col">
         <div class="card">
-          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
-            alt="Loading" id="termico" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <canvas id="corrente" width="100%" height="50%"></canvas>
           <div class="card-body">
             <h5 class="card-title">Simulação Térmico</h5>
             <p class="card-text placeholder-glow">
@@ -49,8 +48,7 @@
       </div>
       <div class="col">
         <div class="card">
-          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
-            alt="Loading" id="tensao" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <canvas id="tensao" width="100%" height="50%"></canvas>
           <div class="card-body">
             <h5 class="card-title">Simulação Tensão</h5>
             <p class="card-text placeholder-glow">
@@ -60,8 +58,7 @@
       </div>
       <div class="col">
         <div class="card">
-          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
-            alt="Loading" id="temperatura" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <canvas id="temperatura" width="100%" height="50%"></canvas>
           <div class="card-body">
             <h5 class="card-title">Simulação Temperatura</h5>
             <p class="card-text placeholder-glow">
@@ -71,8 +68,8 @@
       </div>
       <div class="col">
         <div class="card">
-          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
-            alt="Loading" id="velocidade" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <!-- TODO: BOTAR O CANVA AQUI -->
+          <canvas id="rpm" width="100%" height="50%"></canvas>
           <div class="card-body">
             <h5 class="card-title">Simulação Velocidade</h5>
             <p class="card-text placeholder-glow">
@@ -82,8 +79,7 @@
       </div>
       <div class="col">
         <div class="card">
-          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
-            alt="Loading" id="eficiencia" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <canvas id="eficiencia" width="100%" height="50%"></canvas>
           <div class="card-body">
             <h5 class="card-title">Simulação Eficiência</h5>
             <p class="card-text placeholder-glow">
@@ -227,12 +223,12 @@
     </div>
   </div>
 
-
-
   <script>
     var dado = JSON.parse("{{data}}".replaceAll("&#39;", '"'))
+    var graph_data = JSON.parse("{{graph_data}}".replaceAll("&#39;", '"'))
     console.log(dado)
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
     integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.min.js"></script>
