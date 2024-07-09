@@ -24,7 +24,7 @@ $(document).ready(function () {
     "TENSAO": document.querySelector("#tensao"),
     "TEMPERATURA": document.querySelector("#temperatura"),
     "EFICIENCIA": document.querySelector("#eficiencia"),
-    "VELOCIDADE": document.querySelector("#velocidade"),
+    //"VELOCIDADE": document.querySelector("#velocidade"),
   }
 
   let modal_img = document.querySelector("#modal_img")
@@ -35,6 +35,7 @@ $(document).ready(function () {
 
   UpdateImages();
   RegisterActions();
+  PlotGraphData();
 
   function UpdateImages()
   {
@@ -50,10 +51,10 @@ $(document).ready(function () {
              t_images[d["name"]].classList.remove('placeholder')
            }
 
-           if (d["name"] in graficos_images) {
-             graficos_images[d["name"]].src = d["img"];
-             graficos_images[d["name"]].classList.remove('placeholder')
-           }
+//           if (d["name"] in graficos_images) {
+//             graficos_images[d["name"]].src = d["img"];
+//             graficos_images[d["name"]].classList.remove('placeholder')
+//           }
         }
       }
   }
@@ -69,16 +70,58 @@ $(document).ready(function () {
         t_images[img].addEventListener('click', ShowModalImage);
       }
 
-      for (img in graficos_images)
-      {
-        graficos_images[img].addEventListener('click', ShowModalImage);
-      }
+//      for (img in graficos_images)
+//      {
+//        graficos_images[img].addEventListener('click', ShowModalImage);
+//      }
   }
 
   function ShowModalImage(event)
   {
     modal_img.src = event.srcElement.src;
     modal_title.innerHTML = event.srcElement.id.toUpperCase();
+  }
+
+  function PlotGraphData()
+  {
+    console.log(graph_data)
+    for(graph in graph_data)
+    {
+        console.log(graph_data[graph])
+        if(graph_data[graph].hasOwnProperty("values"))
+        {
+            let ctx = document.getElementById(graph);
+            let data = {}
+            data =
+            {
+                datasets:
+                [
+                    {
+                        label: `${graph.toLocaleUpperCase()} / Tempo`,
+                        data: graph_data[graph]['values']
+                    }
+                ]
+            }
+            let chart = new Chart(ctx,
+            {
+                type: 'line',
+                data: data,
+                options:
+                {
+                    scales: {
+//                         x:
+//                         {
+//                            ticks: {
+//                              autoSkip: false,
+//                              maxRotation: 360,
+//                              minRotation: 10
+//                            }
+//                         }
+                    }
+                }
+            });
+        }
+    }
   }
 
 
