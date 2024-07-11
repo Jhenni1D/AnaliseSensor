@@ -85,6 +85,8 @@ $(document).ready(function () {
   function PlotGraphData()
   {
     console.log(graph_data)
+    let colors = ['blue', 'red', 'green', 'purple', 'orange']
+    let index_color = 0
     for(graph in graph_data)
     {
         console.log(graph_data[graph])
@@ -97,6 +99,7 @@ $(document).ready(function () {
                 datasets:
                 [
                     {
+                        borderColor: colors[index_color++],
                         label: `${graph.toLocaleUpperCase()} / Tempo`,
                         data: graph_data[graph]['values']
                     }
