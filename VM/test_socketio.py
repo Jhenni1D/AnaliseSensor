@@ -108,7 +108,7 @@ def disconnect():
     print('disconnected from server')
 
 
-sio.connect("https://teste-flask-app.fly.dev/", wait_timeout=20)
+sio.connect("https://server-sensor.fly.dev/", wait_timeout=20)
 sio.wait()
 
 #codigo do femm
