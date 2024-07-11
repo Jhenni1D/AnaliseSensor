@@ -12,7 +12,7 @@
     </div>
   </nav>
 
-  <h1 class="display-6 d-flex justify-content-center" style="height: 80px;">Gráficos das medições</h1>
+  <h1 class="display-6 d-flex justify-content-center" style="height: 80px;">Gráficos e Simulações</h1>
   <hr>
 
 
@@ -40,7 +40,7 @@
         <div class="card">
           <canvas id="corrente" width="100%" height="50%"></canvas>
           <div class="card-body">
-            <h5 class="card-title">Simulação Térmico</h5>
+            <h5 class="card-title">Corrente</h5>
             <p class="card-text placeholder-glow">
             </p>
           </div>
@@ -50,7 +50,7 @@
         <div class="card">
           <canvas id="tensao" width="100%" height="50%"></canvas>
           <div class="card-body">
-            <h5 class="card-title">Simulação Tensão</h5>
+            <h5 class="card-title">Tensão</h5>
             <p class="card-text placeholder-glow">
             </p>
           </div>
@@ -60,7 +60,7 @@
         <div class="card">
           <canvas id="temperatura" width="100%" height="50%"></canvas>
           <div class="card-body">
-            <h5 class="card-title">Simulação Temperatura</h5>
+            <h5 class="card-title">Temperatura</h5>
             <p class="card-text placeholder-glow">
             </p>
           </div>
@@ -71,7 +71,7 @@
           <!-- TODO: BOTAR O CANVA AQUI -->
           <canvas id="rpm" width="100%" height="50%"></canvas>
           <div class="card-body">
-            <h5 class="card-title">Simulação Velocidade</h5>
+            <h5 class="card-title">RPM</h5>
             <p class="card-text placeholder-glow">
             </p>
           </div>
@@ -81,7 +81,63 @@
         <div class="card">
           <canvas id="eficiencia" width="100%" height="50%"></canvas>
           <div class="card-body">
-            <h5 class="card-title">Simulação Eficiência</h5>
+            <h5 class="card-title">Eficiência</h5>
+            <p class="card-text placeholder-glow">
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
+          Mostrar simulações M
+        </button>
+      </h2>
+      <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
+        <div class="accordion-body">
+        <div class="row row-cols-4 row-cols-md-4 g-4" id="third_cards" style="margin: 0px 15px 15px 15px;">
+      <div class="col">
+        <div class="card">
+          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
+            alt="Loading" id="m0" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <div class="card-body">
+            <h5 class="card-title">Simulação M0</h5>
+            <p class="card-text placeholder-glow">
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
+            alt="Loading" id="m1" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <div class="card-body">
+            <h5 class="card-title">Simulação M1</h5>
+            <p class="card-text placeholder-glow">
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
+            alt="Loading" id="m2" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <div class="card-body">
+            <h5 class="card-title">Simulação M2</h5>
+            <p class="card-text placeholder-glow">
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card">
+          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top" alt="Loading" id="m3" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          <div class="card-body">
+            <h5 class="card-title">Simulação M3</h5>
             <p class="card-text placeholder-glow">
             </p>
           </div>
@@ -94,7 +150,7 @@
     <div class="accordion-item">
       <h2 class="accordion-header">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
-          Mostrar medições T
+          Mostrar simulações T
         </button>
       </h2>
       <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
@@ -151,62 +207,7 @@
         </div>
       </div>
     </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
-          Mostrar medições M
-        </button>
-      </h2>
-      <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
-        <div class="accordion-body">
-        <div class="row row-cols-4 row-cols-md-4 g-4" id="third_cards" style="margin: 0px 15px 15px 15px;">
-      <div class="col">
-        <div class="card">
-          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
-            alt="Loading" id="m0" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          <div class="card-body">
-            <h5 class="card-title">Simulação M0</h5>
-            <p class="card-text placeholder-glow">
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
-            alt="Loading" id="m1" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          <div class="card-body">
-            <h5 class="card-title">Simulação M1</h5>
-            <p class="card-text placeholder-glow">
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top"
-            alt="Loading" id="m2" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          <div class="card-body">
-            <h5 class="card-title">Simulação M2</h5>
-            <p class="card-text placeholder-glow">
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card">
-          <img src="https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif" class="placeholder card-img-top" alt="Loading" id="m3" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          <div class="card-body">
-            <h5 class="card-title">Simulação M3</h5>
-            <p class="card-text placeholder-glow">
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-        </div>
-      </div>
-    </div>
+
   </div>
 
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
