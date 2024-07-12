@@ -63,11 +63,16 @@ class FEMMSimulationController():
 
     def set_femm_atributes(self, ca, cb, cc, index, first, folder_name):
         self.correnteA = ca
-        self.correnteB = -cb
-        self.correnteC = -cc
+        self.correnteB = -1 * cb / 2
+        self.correnteC = -1 * cc / 2
         self.index_simulacao = index
         self.primeira_simulacao = first
         self.folder_name = folder_name
+        dir_files = os.listdir("./")
+        if folder_name not in dir_files:
+            os.mkdir(f"./{folder_name}")
+        if "femm_generate_files" not in dir_files:
+            os.mkdir("./femm_generate_files")
 
     def reset(self):
         self.femm_files = "femm_files"
@@ -353,7 +358,7 @@ class FEMMSimulationController():
         write_log("-Modificando o parâmetro ho_blockintegralde corrente do circuito")
         femm.mi_modifycircprop('A', 1, self.correnteA)  # verificar se no final n ta pegando o mesmo valor
         femm.mi_modifycircprop('B', 1, self.correnteB)
-        femm.mi_modifycircprop('C', 1, self.correnteB)
+        femm.mi_modifycircprop('C', 1, self.correnteC)
 
         # Solucionando o problema
         progresso += 4.54
@@ -1170,8 +1175,7 @@ def teste_jhenni():
         a = df_corrente._get_value(l, 'Fase_A')  # armazena o valor da corrente em p
         b = df_corrente._get_value(l, 'Fase_B')  # armazena o valor da corrente em p
         c = df_corrente._get_value(l, 'Fase_C')  # armazena o valor da corrente em p
-        b = -1 * b / 2
-        c = -1 * c / 2
+
         dados_teste[l] = {"A": a, "B": b, "C": c}
 
     femm_simulacao = FEMMSimulationController()
