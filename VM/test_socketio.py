@@ -38,7 +38,7 @@ def insert_queue(data):
     is_can_enqueue = simulation_controller.is_can_enqueue(data["medicao"])
     if is_can_enqueue:
         fila.put(data)
-        simulation_controller.update_queue()
+        simulation_controller.update_queue(data["folder_name"])
         print("Inseriu elemento na fila, elementos na fila:", fila.qsize(), " | dados:", data)
 
 
@@ -81,9 +81,10 @@ def send_img_loop():
 
         if folder_file_name in dir_list:
             try:
-                with open(folder_file_name) as file:
-                    sio.emit('criar_pasta', file.read())
-                os.remove(folder_file_name)
+                pass
+                # with open(folder_file_name) as file:
+                #     sio.emit('criar_pasta', file.read())
+                # os.remove(folder_file_name)
             except:
                 print("Quebrou ao tentar abrir arquivo de pasta")
 
