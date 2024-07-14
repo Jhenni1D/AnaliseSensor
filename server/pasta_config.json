@@ -1,0 +1,25 @@
+{
+  "13-07-2024_17-47-10-1154":
+  {
+    "Sensores": {"SensorA": [{"data": "13/07/2024", "hora":  "13:8:55", "medicao": 2.5}]},
+    "completed": false
+  }
+}
+
+#SensorData = {"data": "dd/mm/yyyy", "hora":  "hh:mm:ss", "medicao": value}]
+
+#{
+    "nova_pasta_name":
+        {
+            "Sensores":
+            {
+                "SensorA": [],
+                "SensorB": [],
+                "SensorC": [],
+                "SensorRPM": [],
+                "SensorTemp": [],
+                "SensorTensao": []
+            },
+            "completed": False
+        }
+}
