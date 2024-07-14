@@ -2,12 +2,7 @@ import random
 
 from flask import Flask, request, send_file, render_template, jsonify
 import os
-from app_service import pegar_data_formatada, \
-    pegar_hora_formatada, \
-    escrever_dados_arquivo_csv, \
-    registrar_dado_no_bd, \
-    pegar_todos_dados_bd, \
-    pegar_ultimo_dado_do_sensor
+from app_service import *
 
 from flask_socketio import SocketIO
 import json
@@ -37,9 +32,27 @@ def receber():  # o tipo da função
     dado_armazenar = {"medicao": dado["medicao"]}  # dicionario ou objeto
     dado_armazenar["data"] = pegar_data_formatada()
     dado_armazenar["hora"] = pegar_hora_formatada()
+
     dado["datahora"] = dado_armazenar["data"] + "_" + dado_armazenar["hora"]
-    print(f"\nDado armazenado: {dado_armazenar} - Sensor: {dado['sensor']}")
-    registrar_dado_no_bd(dado_armazenar, dado["sensor"])
+
+    folder_incompleted = get_folder_incompleted()
+    print(folder_incompleted)
+    if len(folder_incompleted) == 0:
+        new_folder_name, new_folder = pegar_nova_pasta_formatada()
+        new_folder[new_folder_name]["Sensores"][dado['sensor']].append(dado_armazenar)
+        print(f"nova pasta a ser registrada: {new_folder}")
+        register_new_folder(new_folder)
+        dado["folder_name"] = new_folder_name
+    else:
+        folder_name, folder_data = folder_incompleted[0]
+
+        if dado['sensor'] not in folder_data[folder_name]["Sensores"]:
+            folder_data[folder_name]["Sensores"][dado['sensor']] = []
+
+        folder_data[folder_name]["Sensores"][dado['sensor']].append(dado_armazenar)
+        register_new_folder(folder_data)
+        dado["folder_name"] = folder_name
+
     io.emit("insert_queue", dado)
     return "deu tudo certo"
 
@@ -70,219 +83,6 @@ def visualizar_pastas():
     with open("folders.json", "r") as file:
         pastas = json.loads(file.read())
     return jsonify(pastas)
-
-
-@app.route("/visualizar/<pasta>")
-def visualizar_pasta(pasta):
-    link_folder = f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{pasta}%2FM0.png"
-
-    folder_exist = get(link_folder).status_code.real != 404
-
-    if folder_exist:
-        link = f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{pasta}%2F{'{}'}.png?alt=media&token=eec1cda6-c13b-43af-a475-84d1b4518c33"
-        data = [
-            {
-                "type": "M",
-                "name": "M0",
-                "img": link.format("M0")
-            },
-            {
-                "type": "M",
-                "name": "M1",
-                "img": link.format("M1")
-            },
-            {
-                "type": "M",
-                "name": "M2",
-                "img": link.format("M2")
-            },
-            {
-                "type": "M",
-                "name": "M3",
-                "img": link.format("M3")
-            },
-            {
-                "type": "T",
-                "name": "T0",
-                "img": link.format("T0")
-            },
-            {
-                "type": "T",
-                "name": "T1",
-                "img": link.format("T1")
-            },
-            {
-                "type": "T",
-                "name": "T2",
-                "img": link.format("T2")
-            },
-            {
-                "type": "T",
-                "name": "T3",
-                "img": link.format("T3")
-            },
-            {
-                "type": "TERMICO",
-                "name": "TERMICO",
-                "img": link.format("TERMICO")
-            },
-        ]
-        return render_template("medicoes.html", data=data)
-    data = [
-        {
-            "type": "M",
-            "name": "M0",
-            "img": "M0"
-        },
-        {
-            "type": "M",
-            "name": "M1",
-            "img": "M1"
-        },
-        {
-            "type": "M",
-            "name": "M2",
-            "img": "M2"
-        },
-        {
-            "type": "M",
-            "name": "M3",
-            "img": "M3"
-        },
-        {
-            "type": "T",
-            "name": "T0",
-            "img": "T0"
-        },
-        {
-            "type": "T",
-            "name": "T1",
-            "img": "T1"
-        },
-        {
-            "type": "T",
-            "name": "T2",
-            "img": "T2"
-        },
-        {
-            "type": "T",
-            "name": "T3",
-            "img": "T3"
-        },
-        {
-            "type": "TERMICO",
-            "name": "TERMICO",
-            "img": "TERMICO"
-        },
-    ]
-    return render_template("medicoes.html", data=[])
-
-
-@app.route("/visualizar2/<pasta>")
-def visualizar_pasta2(pasta):
-    link_folder = f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{pasta}%2FM0.png"
-
-    folder_exist = get(link_folder).status_code.real != 404
-
-    if folder_exist:
-        link = f"https://firebasestorage.googleapis.com/v0/b/itutor-32257.appspot.com/o/{pasta}%2F{'{}'}.png?alt=media&token=eec1cda6-c13b-43af-a475-84d1b4518c33"
-        data = [
-            {
-                "type": "M",
-                "name": "M0",
-                "img": link.format("M0")
-            },
-            {
-                "type": "M",
-                "name": "M1",
-                "img": link.format("M1")
-            },
-            {
-                "type": "M",
-                "name": "M2",
-                "img": link.format("M2")
-            },
-            {
-                "type": "M",
-                "name": "M3",
-                "img": link.format("M3")
-            },
-            {
-                "type": "T",
-                "name": "T0",
-                "img": link.format("T0")
-            },
-            {
-                "type": "T",
-                "name": "T1",
-                "img": link.format("T1")
-            },
-            {
-                "type": "T",
-                "name": "T2",
-                "img": link.format("T2")
-            },
-            {
-                "type": "T",
-                "name": "T3",
-                "img": link.format("T3")
-            },
-            {
-                "type": "TERMICO",
-                "name": "TERMICO",
-                "img": link.format("TERMICO")
-            },
-        ]
-        return render_template("medicoes2.html", data=data)
-    data = [
-        {
-            "type": "M",
-            "name": "M0",
-            "img": "M0"
-        },
-        {
-            "type": "M",
-            "name": "M1",
-            "img": "M1"
-        },
-        {
-            "type": "M",
-            "name": "M2",
-            "img": "M2"
-        },
-        {
-            "type": "M",
-            "name": "M3",
-            "img": "M3"
-        },
-        {
-            "type": "T",
-            "name": "T0",
-            "img": "T0"
-        },
-        {
-            "type": "T",
-            "name": "T1",
-            "img": "T1"
-        },
-        {
-            "type": "T",
-            "name": "T2",
-            "img": "T2"
-        },
-        {
-            "type": "T",
-            "name": "T3",
-            "img": "T3"
-        },
-        {
-            "type": "TERMICO",
-            "name": "TERMICO",
-            "img": "TERMICO"
-        },
-    ]
-    return render_template("medicoes2.html", data=[])
-
 
 def check_and_get_img(link, folder_img, all_folders):
     img_link = link if folder_img in all_folders else "https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif"
@@ -373,8 +173,8 @@ class HourMinute:
         return str(self.minute)
 
 
-@app.route("/visualizar3/<pasta>")
-def visualizar_pasta3(pasta):
+@app.route("/visualizar/<pasta>")
+def visualizar_pasta(pasta):
     link_folder = f"https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/{pasta}%2FM0.png"
     folder_exist = get(link_folder).status_code.real != 404
     print("FOLDER EXIST: ", folder_exist)
