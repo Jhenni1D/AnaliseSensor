@@ -5,10 +5,11 @@ import json
 import os
 import shutil
 from datetime import date
-from requests import get, post
+from requests import get, post, patch
 from log_handler import write_log
 from firebase_admin import credentials, initialize_app, storage
 link_bd = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/{}/.json"
+link_bd_folders = link_bd.format("Pastas")
 link_bd_todos_sensores = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/.json"
 
 link_bd_image = "simulacao-femm.appspot.com"
@@ -35,9 +36,14 @@ def registrar_dado_no_bd(dados, sensor):
     post(link_bd.format(sensor), json=dados)
 
 def pegar_dados_do_sensor(sensor):
-    dados_json = json.loads(get(link_bd.format(sensor)).text) #objeto json que pode ser manuseada
-    dados_json = [dados_json[x] for x in dados_json] #formatando dados
-    return dados_json
+    folders = get(link_bd_folders).json()
+    folder_peding = [folders[folder] for folder in folders if folders[folder]["completed"] is False]
+    if len(folder_peding) == 0:
+        print("Folder peding not exist")
+        return
+
+    folder_peding = folder_peding[0]
+    return folder_peding["Sensores"][sensor]
 
 def pegar_todos_dados_bd():
     dados_json = json.loads(get(link_bd_todos_sensores).text)  # objeto json que pode ser manuseada
@@ -50,6 +56,16 @@ def pegar_todos_dados_bd():
 def pegar_ultimo_dado_do_sensor(sensor):
     dados = pegar_dados_do_sensor(sensor)
     return dados[-1] #estou pegando o ultimo valor enviado
+
+def definir_simulacao_completed():
+    folders = get(link_bd_folders).json()
+    folder_pending = [folders[folder] for folder in folders if folders[folder]["completed"] is False]
+    if len(folder_pending) == 0:
+        print("definir_simulacao_completed - Folder peding not exist")
+        return
+    folder_pending = folder_pending[0]
+    folder_pending["completed"] = True
+    patch(link_bd_folders, json=folder_pending)
 
 def enviar_pasta_dos_resultados_simulacao(pasta):
     UploadBlob(pasta)
