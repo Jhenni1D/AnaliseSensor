@@ -53,7 +53,8 @@ def receber():  # o tipo da função
         register_new_folder(folder_data)
         dado["folder_name"] = folder_name
 
-    io.emit("insert_queue", dado)
+    if "sensora" == dado["sensor"].lower():
+        io.emit("insert_queue", dado)
     return "deu tudo certo"
 
 
@@ -251,6 +252,8 @@ def request_update_image(data_img):
 
 @io.event
 def progress(prog_value):
+    if prog_value == '':
+        return
     prog = round(float(prog_value), 2)
     prog = max(0.0, min(prog, 100.0))
     io.emit("progress_value", prog)
