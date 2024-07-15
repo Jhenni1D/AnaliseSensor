@@ -76,6 +76,7 @@ def escrever_dados_arquivo_csv(dados): #dados parametros aula lira
 
 def get_folder_incompleted():
     folders = get(link_bd_folders).json()
+    print(f"get_folder_incompleted: folders = {folders}")
     folder_incompleted = [(folder, {folder: folders[folder]}) for folder in folders if "completed" in folders[folder] and folders[folder]["completed"] is False]
     return folder_incompleted
 
