@@ -1,6 +1,10 @@
 folder_name = ""
 
 
+def set_folder_log(folder):
+    global folder_name
+    folder_name = folder
+
 
 def write_log(msg, folder="", create=False):
     global folder_name
