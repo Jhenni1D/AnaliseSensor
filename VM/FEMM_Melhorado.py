@@ -28,6 +28,7 @@ cond_enr_estator = []
 t_rotor = []
 temperatura_enr_rotor = []
 cond_enr_rotor = []
+torques = []
 
 
 df_corrente = pandas.read_excel('Planilha_Simulação.xlsx', sheet_name='RMS')
@@ -230,13 +231,17 @@ for id in first_id:
 
 
 print(i)
+
+print("Correntes A: ", CORRENTE_A)
+print("Correntes B: ", CORRENTE_B)
+print("Correntes C: ", CORRENTE_C)
 while controle:
     I.append(i)
 
     femm.openfemm()
 
     if i == 1:  # se I == 1 é a primeira simulação
-        femm.opendocument('Motor_Teste1.fem')
+        femm.opendocument('./femm_files/Motor_Teste1.fem')
         femm.mi_saveas('temp.fem')
         criando_materiais()
         criando_materiais_Rotor()
