@@ -1,12 +1,10 @@
+import json
 import os
-import time
-
-import femm, math, cmath
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import json
-from log_handler import write_log
+import femm
+import math
+from log_handler import write_log, set_folder_log
 
 
 class FEMMSimulationController():
@@ -47,7 +45,7 @@ class FEMMSimulationController():
     def load_data(self):
         file_name = f"simulation_{self.folder_name}.json"
         if file_name in os.listdir("./"):
-            with open(file_name, "r") as file:
+            with open("./"+file_name, "r") as file:
                 data = json.loads(file.read())
                 data["index_simulacao"] = self.index_simulacao
                 data["correnteA"] = self.correnteA
@@ -59,7 +57,7 @@ class FEMMSimulationController():
             write_log("-Arquivo com dados de simulação anterior carregado.\n")
 
     def save_data(self):
-        with open(f"simulation_{self.folder_name}.json", "w") as file:
+        with open(f"./simulation_{self.folder_name}.json", "w") as file:
             file.write(json.dumps(self.__dict__))
         write_log(f"-Salvou dados da simulação {self.index_simulacao}\n")
 
@@ -110,7 +108,7 @@ class FEMMSimulationController():
 
     def save_progress_simulation(self, value, first=False):
         try:
-            with open("progress_simulation.txt", "w") as file:
+            with open("./progress_simulation.txt", "w") as file:
                 file.write(str(value))
         except Exception as e:
             print(e)
@@ -283,7 +281,7 @@ class FEMMSimulationController():
     def iniciar_femm(self):
         progresso = 4.54
         self.save_progress_simulation(progresso)
-
+        set_folder_log(self.folder_name)
         self.load_data()
 
         femm.openfemm()
@@ -762,10 +760,11 @@ class FEMMSimulationController():
         df6 = np.asarray(self.torques)
         np.savetxt(f"./{self.femm_generate_files}/torque{self.index_simulacao}.csv", df6, delimiter=",")
 
+        self.save_data()
+
         self.p_rotor.clear()
         self.p_estator.clear()
 
-        self.save_data()
         progresso += 4.54
         self.save_progress_simulation(progresso)
 
@@ -793,7 +792,7 @@ class FEMMSimulationController():
 # TESTE DE SIMULAÇÃO COM PLANILHA DA JHENNI
 
 def teste_jhenni():
-    df_corrente = pd.read_excel('Planilha_Simulação.xlsx', sheet_name='RMS')
+    df_corrente = pd.read_excel('./Planilha_Simulação.xlsx', sheet_name='RMS')
     df = pd.DataFrame(df_corrente)
 
     dados_teste = {}
@@ -807,12 +806,13 @@ def teste_jhenni():
         dados_teste[l] = {"A": float(a), "B": float(b), "C": float(c)}
 
     femm_simulacao = FEMMSimulationController()
+    femm_simulacao.reset()
     for key in dados_teste:
         print("Vai iniciar a simulação pro item: ", key)
         femm_simulacao.set_femm_atributes(ca=dados_teste[key]["A"], cb=dados_teste[key]["B"], cc=dados_teste[key]["C"],
                                           temperatura=36,
                                           index=key,
-                                          first=key == 0,
+                                          first=True,
                                           folder_name="TesteFEMM")
 
         femm_simulacao.iniciar_femm()
