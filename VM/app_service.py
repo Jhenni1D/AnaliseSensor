@@ -26,7 +26,7 @@ def pegar_hora_formatada():
 def escrever_dados_arquivo_csv(dados): #dados parametros aula lira
     for sensor in dados:
         cols = ['data', 'hora', 'medicao']  # titulo da coluna botando do mesmo jeito do bd
-        with open(f"server/outputs/{sensor}_output.csv", 'w') as f:  # to abrindo um arquivo csv
+        with open(f"./{sensor}_output.csv", 'w') as f:  # to abrindo um arquivo csv
             wr = csv.DictWriter(f, fieldnames=cols)  # organizador
             wr.writeheader()  # titulo
             wr.writerows(dados[sensor]) # dados de cada coluna
@@ -59,12 +59,12 @@ def pegar_ultimo_dado_do_sensor(sensor):
 
 def definir_simulacao_completed():
     folders = get(link_bd_folders).json()
-    folder_pending = [folders[folder] for folder in folders if folders[folder]["completed"] is False]
+    folder_pending = [(folder, {folder: folders[folder]}) for folder in folders if folders[folder]["completed"] is False]
     if len(folder_pending) == 0:
         print("definir_simulacao_completed - Folder peding not exist")
         return
-    folder_pending = folder_pending[0]
-    folder_pending["completed"] = True
+    folder_name, folder_pending = folder_pending[0]
+    folder_pending[folder_name]["completed"] = True
     patch(link_bd_folders, json=folder_pending)
 
 def enviar_pasta_dos_resultados_simulacao(pasta):
