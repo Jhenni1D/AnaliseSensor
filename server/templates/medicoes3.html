@@ -226,8 +226,9 @@
 
   <script>
     var dado = JSON.parse("{{data}}".replaceAll("&#39;", '"'))
-    var graph_data = JSON.parse("{{graph_data}}".replaceAll("&#39;", '"'))
-    console.log(dado)
+    var folder_name = "{{folder_name}}";
+    var graph_data = [];
+    console.log(folder_name);
   </script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
