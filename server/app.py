@@ -12,6 +12,11 @@ import time
 app = Flask(__name__)  # nome
 io = SocketIO(app)
 
+sensor_names = {
+    "SensorC1": "SensorA",
+    "SensorC2": "SensorB",
+    "SensorC3": "SensorC"
+}
 
 # primeira rota
 @app.route('/')
@@ -29,6 +34,11 @@ def nova_simulacao():  # def = função
            methods=['POST'])  # dizer o metodo da rota, nesse caso é post
 def receber():  # o tipo da função
     dado = request.json  # requisitando um arquivo json
+
+    if dado["sensor"] in ["SensorC1", "SensorC2", "SensorC3"]:
+        actual_name = dado["sensor"]
+        dado["sensor"] = sensor_names[actual_name]
+
     dado_armazenar = {"medicao": dado["medicao"]}  # dicionario ou objeto
     dado_armazenar["data"] = pegar_data_formatada()
     dado_armazenar["hora"] = pegar_hora_formatada()
@@ -36,13 +46,13 @@ def receber():  # o tipo da função
     dado["datahora"] = dado_armazenar["data"] + "_" + dado_armazenar["hora"]
 
     folder_incompleted = get_folder_incompleted()
-    print(folder_incompleted)
     if len(folder_incompleted) == 0:
         new_folder_name, new_folder = pegar_nova_pasta_formatada()
         new_folder[new_folder_name]["Sensores"][dado['sensor']].append(dado_armazenar)
         print(f"nova pasta a ser registrada: {new_folder}")
         register_new_folder(new_folder)
         dado["folder_name"] = new_folder_name
+        print(f"criou pasta - Armazenou o dado: {dado_armazenar}")
     else:
         folder_name, folder_data = folder_incompleted[0]
 
@@ -50,10 +60,13 @@ def receber():  # o tipo da função
             folder_data[folder_name]["Sensores"][dado['sensor']] = []
 
         folder_data[folder_name]["Sensores"][dado['sensor']].append(dado_armazenar)
+        print(f"Armazenou o dado: {dado_armazenar}")
         register_new_folder(folder_data)
         dado["folder_name"] = folder_name
 
+
     if "sensora" == dado["sensor"].lower():
+        print(f"dado enviado para a VM: {dado}")
         io.emit("insert_queue", dado)
     return "deu tudo certo"
 
