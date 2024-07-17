@@ -20,7 +20,16 @@ $(document).ready(function () {
   }
 
   let grafico_corrent = document.querySelector("#corrente");
-
+    let corrent_chart = new Chart(document.querySelector("#corrente"),
+    {
+        type: 'line',
+        data: [],
+        options:
+        {
+            scales: {
+            }
+        }
+    });
   let graficos_images = {
     "SensorTensao": document.querySelector("#tensao"),
     "SensorTemp": document.querySelector("#temperatura"),
@@ -85,7 +94,11 @@ $(document).ready(function () {
 
   function PlotGraphData()
   {
-    console.log(graph_data)
+    if(graph_data == undefined)
+    {
+        return;
+    }
+
     let colors = ['blue', 'red', 'green', 'purple', 'orange']
     let corrent_colors = ['blue', 'red', 'green']
     let index_color = 0;
@@ -106,60 +119,55 @@ $(document).ready(function () {
 //            },
         ]
     }
-
-    for(graph in graph_data)
+    try
     {
-        console.log(graph_data[graph])
-        if(graph_data[graph].hasOwnProperty("values") && graficos_images.hasOwnProperty(graph))
+        for(graph in graph_data)
         {
-            let ctx = graficos_images[graph];
-            let data = {}
-            data =
+            if(graph_data[graph].hasOwnProperty("values") && graficos_images.hasOwnProperty(graph))
             {
-                datasets:
-                [
-                    {
-                        borderColor: colors[index_color++],
-                        label: `${graph.toLocaleUpperCase()} / Tempo`,
-                        data: graph_data[graph]['values']
-                    }
-                ]
-            }
-            let chart = new Chart(ctx,
-            {
-                type: 'line',
-                data: data,
-                options:
+                let ctx = graficos_images[graph];
+                let data = {}
+                data =
                 {
-                    scales: {
+                    datasets:
+                    [
+                        {
+                            borderColor: colors[index_color++],
+                            label: `${graph.toLocaleUpperCase()} / Tempo`,
+                            data: graph_data[graph]['values']
+                        }
+                    ]
+                }
+                let chart = new Chart(ctx,
+                {
+                    type: 'line',
+                    data: data,
+                    options:
+                    {
+                        scales: {
+                        }
                     }
-                }
-            });
-        }
-        if(IsCorrentSensor(graph))
-        {
-            let data_set_item =
-            {
-                borderColor: corrent_colors[index_corrent_color++],
-                label: `${graph.toLocaleUpperCase()} / Tempo`,
-                data: graph_data[graph]['values']
-            };
-            corrent_graph_data.datasets.push(data_set_item);
-        }
-    }
-    if(graph_data !== undefined)
-    {
-        let corrent_chart = new Chart(document.querySelector("#corrente"),
-        {
-            type: 'line',
-            data: corrent_graph_data,
-            options:
-            {
-                scales: {
-                }
+                });
             }
-        });
+            if(IsCorrentSensor(graph))
+            {
+                let data_set_item =
+                {
+                    borderColor: corrent_colors[index_corrent_color++],
+                    label: `${graph.toLocaleUpperCase()} / Tempo`,
+                    data: graph_data[graph]['values']
+                };
+                corrent_graph_data.datasets.push(data_set_item);
+            }
+        }
     }
+    catch
+    {
+        console.log("Erro ao criar os gráficos gerais");
+    }
+
+    corrent_chart.data = corrent_graph_data;
+    corrent_chart.update('resize');
   }
 
   function IsCorrentSensor(sensor)
@@ -196,17 +204,16 @@ $(document).ready(function () {
 
     function loadDoc()
     {
-      const xhttp = new XMLHttpRequest();
+      let xhttp = new XMLHttpRequest();
       xhttp.onload = function()
       {
         var sensors_data = JSON.parse(this.responseText);
         graph_data = FormatSensorsData(sensors_data);
-        PlotGraphData();
-        loadDoc();
+        setTimeout(PlotGraphData, 1000);
+        setTimeout(loadDoc, 2000);
       }
-
-        xhttp.open("GET", "https://simulacao-femm-default-rtdb.firebaseio.com/medicoes/Pastas/16-07-2024_22-05-39-3528/Sensores/.json", true);
-        xhttp.send();
+      xhttp.open("GET", `https://simulacao-femm-default-rtdb.firebaseio.com/medicoes/Pastas/${folder_name}/Sensores/.json`, true);
+      xhttp.send();
     }
 
     loadDoc();
