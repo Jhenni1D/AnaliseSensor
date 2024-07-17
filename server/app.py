@@ -165,8 +165,8 @@ def visualizar_pasta(pasta):
     folder_exist = get(link_folder).status_code.real != 404
 
     if folder_exist:
-        return render_template("medicoes3.html", data=get_image_data(pasta))
-    return render_template("medicoes3.html", data=[])
+        return render_template("medicoes3.html", data=get_image_data(pasta), folder_name=pasta)
+    return render_template("medicoes3.html", data=[], folder_name=pasta)
 
 
 @app.route("/ultima-pasta")
