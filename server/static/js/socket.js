@@ -37,6 +37,13 @@ $(document).ready(function () {
     "eficiencia": document.querySelector("#eficiencia")
   }
 
+  let charts_graphs = {
+    "SensorTensao": CreateChart(graficos_images["SensorTensao"]),
+    "SensorTemp": CreateChart(graficos_images["SensorTemp"]),
+    "SensorRPM": CreateChart(graficos_images["SensorRPM"]),
+    "eficiencia": CreateChart(graficos_images["eficiencia"])
+  }
+
   let modal_img = document.querySelector("#modal_img")
   let modal_title = document.querySelector("#title_modal")
 
@@ -46,6 +53,20 @@ $(document).ready(function () {
   UpdateImages();
   RegisterActions();
   PlotGraphData();
+
+  function CreateChart(canvas_element)
+  {
+    return new Chart(canvas_element,
+                {
+                    type: 'line',
+                    data: [],
+                    options:
+                    {
+                        scales: {
+                        }
+                    }
+                });
+  }
 
   function UpdateImages()
   {
@@ -110,7 +131,7 @@ $(document).ready(function () {
 //            {
 //                borderColor: "blue",
 //                label: "SensorA / Tempo",
-//                data: [{"x": "16/7/2024 23:18:39", y: 0.5}, {"x": "16/7/2024 23:49:39", y: 1.5}, {"x": "16/7/2024 23:50:01", y: 2.0}]
+//                data: [{"x": "16/7/2024 23:18:39", y: 3.8}, {"x": "16/7/2024 23:49:39", y: 2.5}]
 //            },
 //            {
 //                borderColor: "blue",
@@ -126,8 +147,7 @@ $(document).ready(function () {
             if(graph_data[graph].hasOwnProperty("values") && graficos_images.hasOwnProperty(graph))
             {
                 let ctx = graficos_images[graph];
-                let data = {}
-                data =
+                let data =
                 {
                     datasets:
                     [
@@ -138,16 +158,9 @@ $(document).ready(function () {
                         }
                     ]
                 }
-                let chart = new Chart(ctx,
-                {
-                    type: 'line',
-                    data: data,
-                    options:
-                    {
-                        scales: {
-                        }
-                    }
-                });
+
+                charts_graphs[graph].data = data;
+                charts_graphs[graph].update('resize');
             }
             if(IsCorrentSensor(graph))
             {
