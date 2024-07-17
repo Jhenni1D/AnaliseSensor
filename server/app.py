@@ -1,6 +1,6 @@
 import random
 
-from flask import Flask, request, send_file, render_template, jsonify
+from flask import Flask, request, send_file, render_template, jsonify, redirect, url_for
 import os
 from app_service import *
 
@@ -39,9 +39,8 @@ def receber():  # o tipo da função
         actual_name = dado["sensor"]
         dado["sensor"] = sensor_names[actual_name]
 
-    dado_armazenar = {"medicao": dado["medicao"]}  # dicionario ou objeto
-    dado_armazenar["data"] = pegar_data_formatada()
-    dado_armazenar["hora"] = pegar_hora_formatada()
+    dado_armazenar = {"medicao": dado["medicao"], "data": pegar_data_formatada(),
+                      "hora": pegar_hora_formatada()}  # dicionario ou objeto
 
     dado["datahora"] = dado_armazenar["data"] + "_" + dado_armazenar["hora"]
 
@@ -160,92 +159,32 @@ def get_image_data(pasta):
     return data
 
 
-class HourMinute:
-
-    def __init__(self):
-        self.hour = 0
-        self.minute = 0
-        self.second = 0
-
-    def uptate_hour_minute_test(self):
-        if self.second > 59:
-            self.second = 0
-            self.minute += 1
-        if self.minute > 59:
-            self.minute = 0
-            self.hour += 1
-
-    def increment_second(self):
-        self.second += 10
-        self.uptate_hour_minute_test()
-
-    def get_second(self) -> str:
-        self.increment_second()
-        return str(self.second)
-
-    def get_minute(self) -> str:
-        return str(self.minute)
-
-
 @app.route("/visualizar/<pasta>")
 def visualizar_pasta(pasta):
     link_folder = f"https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/{pasta}%2FM0.png"
     folder_exist = get(link_folder).status_code.real != 404
-    print("FOLDER EXIST: ", folder_exist)
-    hrs = HourMinute()
-    rpm_values = [random.randint(1300, 2000) for x in range(100)]
-    corrente_values = [random.randint(1, 5) for x in range(100)]
-    tensao_values = [random.randint(50, 150) for x in range(100)]
-    temperatura_values = [random.randint(30, 100) for x in range(100)]
-    eficiencia_values = [random.random() for x in range(100)]
-    time_series = [f'2024-07-09 09:{hrs.get_minute().zfill(2)}:{hrs.get_second().zfill(2)}' for x in range(100)]
-    print(rpm_values)
-    print(time_series)
-
-    format_values = lambda list_values: [{"x": time_series[i], "y": list_values[i], "xAlign": "center"} for i in range(len(list_values))]
-    graph_data = {"rpm": {"values": format_values(rpm_values), "pure_values": rpm_values[1:10], "time_series": time_series[1:10]},
-                  "corrente": {"values": format_values(corrente_values)},
-                  "tensao": {"values": format_values(tensao_values)},
-                  "temperatura": {"values": format_values(temperatura_values)},
-                  "eficiencia": {"values": format_values(eficiencia_values)},
-                  "min_value": time_series[0]
-                  }
 
     if folder_exist:
-        return render_template("medicoes3.html", data=get_image_data(pasta), graph_data=graph_data)
-
-    return render_template("medicoes3.html", data=[], graph_data=graph_data)
+        return render_template("medicoes3.html", data=get_image_data(pasta))
+    return render_template("medicoes3.html", data=[])
 
 
 @app.route("/ultima-pasta")
 def ultima_pasta():
     data = {"pasta": None}
-    pasta = None
-    if "latest_folder" in os.listdir("./"):
-        with open("latest_folder", "r") as file:
-            pasta = file.read()
-    data["pasta"] = pasta
+    folder_incompleted = get_folder_incompleted()
+    if len(folder_incompleted) != 0:
+        data["pasta"] = folder_incompleted[0][0]
     return jsonify(data)
 
 
-@io.event
-def criar_pasta(pasta):
-    pastas = []
-    try:
-        with open("folders.json", "r") as file:
-            pastas = json.loads(file.read())
-            if pasta not in pastas:
-                pastas.append(pasta)
-            print("\n\nPASTAS:", pastas)
-    except:
-        print("no file folders.json")
-    with open("folders.json", "w") as file:
-        file.write(json.dumps(pastas))
-    with open("latest_folder", "w") as file:
-        file.write(pasta)
-    print("ÚLTIMA PASTA:", pasta)
-    io.emit("create_folder", pastas)
-
+@app.route("/dashboard/ultima-pasta")
+def dashboard_ultima_pasta():
+    folder_incompleted = get_folder_incompleted()
+    if len(folder_incompleted) == 0:
+        return redirect(url_for("/"))
+    print(folder_incompleted[0][0])
+    return redirect(location=f"/visualizar/{folder_incompleted[0][0]}")
 
 @io.event
 def start_att_img():
