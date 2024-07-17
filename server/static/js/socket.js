@@ -19,12 +19,13 @@ $(document).ready(function () {
     "T3": document.querySelector("#t3")
   }
 
+  let grafico_corrent = document.querySelector("#corrente");
+
   let graficos_images = {
-    "TERMICO": document.querySelector("#termico"),
-    "TENSAO": document.querySelector("#tensao"),
-    "TEMPERATURA": document.querySelector("#temperatura"),
-    "EFICIENCIA": document.querySelector("#eficiencia"),
-    //"VELOCIDADE": document.querySelector("#velocidade"),
+    "SensorTensao": document.querySelector("#tensao"),
+    "SensorTemp": document.querySelector("#temperatura"),
+    "SensorRPM": document.querySelector("#rpm"),
+    "eficiencia": document.querySelector("#eficiencia")
   }
 
   let modal_img = document.querySelector("#modal_img")
@@ -86,13 +87,32 @@ $(document).ready(function () {
   {
     console.log(graph_data)
     let colors = ['blue', 'red', 'green', 'purple', 'orange']
-    let index_color = 0
+    let corrent_colors = ['blue', 'red', 'green']
+    let index_color = 0;
+    let index_corrent_color = 0;
+    let corrent_graph_data =
+    {
+        datasets:
+        [
+//            {
+//                borderColor: "blue",
+//                label: "SensorA / Tempo",
+//                data: [{"x": "16/7/2024 23:18:39", y: 0.5}, {"x": "16/7/2024 23:49:39", y: 1.5}, {"x": "16/7/2024 23:50:01", y: 2.0}]
+//            },
+//            {
+//                borderColor: "blue",
+//                label: "SensorB / Tempo",
+//                data: [{"x": "D", y: 1.5}, {"x": "E", y: 2.2}, {"x": "F", y: 2.8}]
+//            },
+        ]
+    }
+
     for(graph in graph_data)
     {
         console.log(graph_data[graph])
-        if(graph_data[graph].hasOwnProperty("values"))
+        if(graph_data[graph].hasOwnProperty("values") && graficos_images.hasOwnProperty(graph))
         {
-            let ctx = document.getElementById(graph);
+            let ctx = graficos_images[graph];
             let data = {}
             data =
             {
@@ -112,21 +132,86 @@ $(document).ready(function () {
                 options:
                 {
                     scales: {
-//                         x:
-//                         {
-//                            ticks: {
-//                              autoSkip: false,
-//                              maxRotation: 360,
-//                              minRotation: 10
-//                            }
-//                         }
                     }
                 }
             });
         }
+        if(IsCorrentSensor(graph))
+        {
+            let data_set_item =
+            {
+                borderColor: corrent_colors[index_corrent_color++],
+                label: `${graph.toLocaleUpperCase()} / Tempo`,
+                data: graph_data[graph]['values']
+            };
+            corrent_graph_data.datasets.push(data_set_item);
+        }
+    }
+    if(graph_data !== undefined)
+    {
+        let corrent_chart = new Chart(document.querySelector("#corrente"),
+        {
+            type: 'line',
+            data: corrent_graph_data,
+            options:
+            {
+                scales: {
+                }
+            }
+        });
     }
   }
 
+  function IsCorrentSensor(sensor)
+  {
+    return sensor == "SensorA" || sensor == "SensorB" || sensor == "SensorC";
+  }
+   // ATUALIZAÇÃO DOS GRÁFICOS
+    function FormatSensorsData(sensors_data)
+    {
+        sensors_data_formatted = {}
+        for(sensor in sensors_data)
+        {
+            sensors_data_formatted[sensor] = {"values": []}
+            for(sensor_info of sensors_data[sensor])
+            {
+                graph_info = {"x": sensor_info["data"]+" "+sensor_info["hora"], "y": parseFloat(sensor_info["medicao"])}
+                sensors_data_formatted[sensor]["values"].push(graph_info)
+            }
+        }
+
+        return sensors_data_formatted;
+    }
+
+    function FormatCorrentSensorData(corrent_sensor_data)
+    {
+        let only_values = []
+        for (data of corrent_sensor_data)
+        {
+            only_values.push(data["y"])
+        }
+
+        return only_values;
+    }
+
+    function loadDoc()
+    {
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function()
+      {
+        var sensors_data = JSON.parse(this.responseText);
+        graph_data = FormatSensorsData(sensors_data);
+        PlotGraphData();
+        loadDoc();
+      }
+
+        xhttp.open("GET", "https://simulacao-femm-default-rtdb.firebaseio.com/medicoes/Pastas/16-07-2024_22-05-39-3528/Sensores/.json", true);
+        xhttp.send();
+    }
+
+    loadDoc();
+
+    // SOCKETIO LOGIC
 
   let socket = io();
 
