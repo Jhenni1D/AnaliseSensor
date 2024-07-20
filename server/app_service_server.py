@@ -3,7 +3,7 @@ import datetime
 import time
 import json
 from datetime import date
-from requests import get, post, patch
+from requests import get, patch
 
 link_bd_base = "https://simulacao-femm-default-rtdb.firebaseio.com/"
 
@@ -14,19 +14,19 @@ link_bd_image = "simulacao-femm.appspot.com"
 link_bd_image_gs = f"gs://{link_bd_image}"
 
 
-def pegar_data_formatada():
+def get_date_formatted():
     data_atual = date.today()  # date é a lib
     return "{}/{}/{}".format(str(data_atual.day).zfill(2), str(data_atual.month).zfill(2),
                              str(data_atual.year).zfill(2))  # formatando a data contatenar dados
 
 
-def pegar_hora_formatada():
+def get_hour_formatted():
     now = datetime.datetime.now()  # agora pegar a hora
     return str(now.hour).zfill(2) + ":" + str(now.minute).zfill(2) + ":" + str(now.second).zfill(
         2)  # concatenar o foamato da hora
 
 
-def pegar_nome_pasta():
+def get_folder_name():
     data_atual = date.today()
     data_atual = "{}-{}-{}".format(str(data_atual.day).zfill(2), str(data_atual.month).zfill(2), data_atual.year)
 
@@ -42,8 +42,8 @@ def pegar_nome_pasta():
     return nome_pasta
 
 
-def pegar_nova_pasta_formatada():
-    nova_pasta_name = pegar_nome_pasta()
+def get_new_folder_info_template():
+    nova_pasta_name = get_folder_name()
     nova_pasta = {
         nova_pasta_name:
             {
@@ -58,7 +58,7 @@ def register_new_folder(folder_data):
     patch(link_bd_folders, json=folder_data)
 
 
-def escrever_dados_arquivo_csv(dados):  # dados parametros aula lira
+def write_csv_data(dados):  # dados parametros aula lira
     # TODO: refazer a criação do CSV
     pass
     # for sensor in dados:
@@ -78,14 +78,14 @@ def get_folder_incompleted():
 
 
 # TODO: ajustar método
-def pegar_dados_do_sensor(sensor):
+def get_sensor_data(sensor):
     dados_json = json.loads(get(link_bd.format(sensor)).text)  # objeto json que pode ser manuseada
     dados_json = [dados_json[x] for x in dados_json]  # formatando dados
     return dados_json
 
 
 # TODO: ajustar método
-def pegar_todos_dados_bd():
+def get_all_sensors():
     dados_json = json.loads(get(link_bd_todos_sensores).text)  # objeto json que pode ser manuseada
     dados_formatados = {}
     for sensor in dados_json:
@@ -95,8 +95,8 @@ def pegar_todos_dados_bd():
 
 
 # TODO: ajustar método
-def pegar_ultimo_dado_do_sensor(sensor):
-    dados = pegar_dados_do_sensor(sensor)
+def get_last_sensor_data(sensor):
+    dados = get_sensor_data(sensor)
     return dados[-1]  # estou pegando o ultimo valor enviado
 
 
