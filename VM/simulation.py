@@ -111,7 +111,6 @@ class SimulationController:
             # SensorA deve ser enviado por último.
             return
 
-        write_log(f"!!Nome da pasta atual: {self.simulations['folder_name']}")
         try:
             if self.simulations["actual_simulation"] == 0 and self.is_folder_exist() is False:
                 os.mkdir(self.simulations["folder_name"])
