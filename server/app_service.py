@@ -1,4 +1,4 @@
-#Funções serviços dos aplicativos
+# Funções serviços dos aplicativos
 import csv
 import datetime
 import time
@@ -12,19 +12,23 @@ from firebase_admin import credentials, initialize_app, storage
 
 link_bd_base = "https://simulacao-femm-default-rtdb.firebaseio.com/"
 
-link_bd = link_bd_base+"/medicoes/{}/.json"
+link_bd = link_bd_base + "/medicoes/{}/.json"
 link_bd_folders = link_bd.format("Pastas")
-link_bd_todos_sensores = link_bd_base+"/medicoes/.json"
+link_bd_todos_sensores = link_bd_base + "/medicoes/.json"
 link_bd_image = "simulacao-femm.appspot.com"
 link_bd_image_gs = f"gs://{link_bd_image}"
 
+
 def pegar_data_formatada():
     data_atual = date.today()  # date é a lib
-    return "{}/{}/{}".format(data_atual.day, data_atual.month, data_atual.year)  # formatando a data contatenar dados
+    return "{}/{}/{}".format(str(data_atual.day).zfill(2), str(data_atual.month).zfill(2), str(data_atual.year).zfill(2))  # formatando a data contatenar dados
+
 
 def pegar_hora_formatada():
     now = datetime.datetime.now()  # agora pegar a hora
-    return str(now.hour).zfill(2) + ":" + str(now.minute).zfill(2) + ":" + str(now.second).zfill(2)  # concatenar o foamato da hora
+    return str(now.hour).zfill(2) + ":" + str(now.minute).zfill(2) + ":" + str(now.second).zfill(
+        2)  # concatenar o foamato da hora
+
 
 def pegar_nome_pasta():
     data_atual = date.today()
@@ -33,12 +37,14 @@ def pegar_nome_pasta():
     time_now = datetime.datetime.now()  # agora pegar a hora
     milliseconds = str(round(time.time() * 1000, 4))[-4:].replace(".", "")
 
-    time_now = str(time_now.hour).zfill(2) + "-" + str(time_now.minute).zfill(2) + "-" + str(time_now.second).zfill(2) + "-" + str(
+    time_now = str(time_now.hour).zfill(2) + "-" + str(time_now.minute).zfill(2) + "-" + str(time_now.second).zfill(
+        2) + "-" + str(
         milliseconds)  # concatenar o foamato da hora
 
     nome_pasta = f'{data_atual}_{time_now}'
 
     return nome_pasta
+
 
 def pegar_nova_pasta_formatada():
     nova_pasta_name = pegar_nome_pasta()
@@ -46,49 +52,51 @@ def pegar_nova_pasta_formatada():
         nova_pasta_name:
             {
                 "Sensores":
-                {
-                    "SensorA": [],
-                    "SensorB": [],
-                    "SensorC": [],
-                    "SensorRPM": [],
-                    "SensorTemp": [],
-                    "SensorTensao": []
-                },
+                    {
+                        "SensorA": [],
+                        "SensorB": [],
+                        "SensorC": [],
+                        "SensorRPM": [],
+                        "SensorTemp": [],
+                        "SensorTensao": []
+                    },
                 "completed": False
             }
     }
 
     return nova_pasta_name, nova_pasta
 
+
 def register_new_folder(folder_data):
     patch(link_bd_folders, json=folder_data)
 
 
-def escrever_dados_arquivo_csv(dados): #dados parametros aula lira
+def escrever_dados_arquivo_csv(dados):  # dados parametros aula lira
     for sensor in dados:
         cols = ['data', 'hora', 'medicao']  # titulo da coluna botando do mesmo jeito do bd
         with open(f"./outputs/{sensor}_output.csv", 'w') as f:  # to abrindo um arquivo csv
             wr = csv.DictWriter(f, fieldnames=cols)  # organizador
             wr.writeheader()  # titulo
-            wr.writerows(dados[sensor]) # dados de cada coluna
+            wr.writerows(dados[sensor])  # dados de cada coluna
     shutil.make_archive('output', 'zip', './', 'server/outputs')
 
 
 def get_folder_incompleted():
     folders = get(link_bd_folders).json()
-    print(f"get_folder_incompleted: folders = {folders}")
-    folder_incompleted = [(folder, {folder: folders[folder]}) for folder in folders if "completed" in folders[folder] and folders[folder]["completed"] is False]
+    folder_incompleted = [(folder, {folder: folders[folder]}) for folder in folders if
+                          "completed" in folders[folder] and folders[folder]["completed"] is False]
     return folder_incompleted
-
 
 
 def registrar_dado_no_bd(dados, sensor):
     post(link_bd.format(sensor), json=dados)
 
+
 def pegar_dados_do_sensor(sensor):
-    dados_json = json.loads(get(link_bd.format(sensor)).text) #objeto json que pode ser manuseada
-    dados_json = [dados_json[x] for x in dados_json] #formatando dados
+    dados_json = json.loads(get(link_bd.format(sensor)).text)  # objeto json que pode ser manuseada
+    dados_json = [dados_json[x] for x in dados_json]  # formatando dados
     return dados_json
+
 
 def pegar_todos_dados_bd():
     dados_json = json.loads(get(link_bd_todos_sensores).text)  # objeto json que pode ser manuseada
@@ -98,15 +106,17 @@ def pegar_todos_dados_bd():
     print(dados_formatados)
     return dados_formatados
 
+
 def pegar_ultimo_dado_do_sensor(sensor):
     dados = pegar_dados_do_sensor(sensor)
-    return dados[-1] #estou pegando o ultimo valor enviado
+    return dados[-1]  # estou pegando o ultimo valor enviado
+
 
 def enviar_pasta_dos_resultados_simulacao(pasta):
     UploadBlob(pasta)
 
-def UploadBlob(folder):
 
+def UploadBlob(folder):
     try:
         cred = credentials.Certificate("./cred.json")
         initialize_app(cred, {'storageBucket': f'{link_bd_image}'})
@@ -127,6 +137,7 @@ def UploadBlob(folder):
     with open("img_send.json", "w") as file:
         file.write(json.dumps(data_send_socket))
 
+
 def second_to_hour_minute(diferenca):
     if diferenca >= 3600:
         hora = int(diferenca / 60 / 60)
@@ -141,7 +152,10 @@ def second_to_hour_minute(diferenca):
 
 
 def get_date_and_sensors_values_for_graph():
-    folder_name, folder_data = get_folder_incompleted()[0]
+    folders_data = get_folder_incompleted()
+    if len(folders_data) == 0:
+        return {}
+    folder_name, folder_data = folders_data[0]
     sensors_names = [fn for fn in folder_data[folder_name]["Sensores"] if fn in ['SensorA', 'SensorB', 'SensorC']]
     list_unpacked_unique_values = lambda list_filter: list(
         {a for b in [{y for y in x} for x in list_filter] for a in b})
