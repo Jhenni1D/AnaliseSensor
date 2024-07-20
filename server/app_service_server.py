@@ -69,11 +69,11 @@ def write_csv_data(dados):  # dados parametros aula lira
     # shutil.make_archive('output', 'zip', './', 'server/outputs')
 
 
-def get_folder_incompleted():
+def get_folder_uncompleted():
     folders = get(link_bd_folders).json()
-    folder_incompleted = [(folder, {folder: folders[folder]}) for folder in folders if
+    folder_uncompleted = [(folder, {folder: folders[folder]}) for folder in folders if
                           "completed" in folders[folder] and folders[folder]["completed"] is False]
-    return folder_incompleted
+    return folder_uncompleted
 
 
 # TODO: ajustar método
@@ -100,7 +100,7 @@ def get_last_sensor_data(sensor):
 
 
 def get_date_and_sensors_values_for_graph():
-    folders_data = get_folder_incompleted()
+    folders_data = get_folder_uncompleted()
     if len(folders_data) == 0:
         return {}
     folder_name, folder_data = folders_data[0]
@@ -135,3 +135,65 @@ def get_date_and_sensors_values_for_graph():
     graph_data = {sensor_name: sensor_data(sensor_name) for sensor_name in sensors_names}
     graph_data["dates"] = all_dates
     return graph_data
+
+
+def check_and_get_img(link, folder_img, all_folders):
+    img_link = link if folder_img in all_folders else "https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif"
+    return img_link
+
+
+def get_image_data(pasta):
+    link_all_folders_imgs = "https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/"
+    all_folders = get(link_all_folders_imgs).json()['items']
+    all_folders = [data_img['name'] for data_img in all_folders]
+    link = f"https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/{pasta}%2F{'{}'}.png?alt=media"
+    data = [
+        {
+            "type": "M",
+            "name": "M0",
+            "img": ""
+        },
+        {
+            "type": "M",
+            "name": "M1",
+            "img": ""
+        },
+        {
+            "type": "M",
+            "name": "M2",
+            "img": ""
+        },
+        {
+            "type": "M",
+            "name": "M3",
+            "img": ""
+        },
+        {
+            "type": "T",
+            "name": "T0",
+            "img": ""
+        },
+        {
+            "type": "T",
+            "name": "T1",
+            "img": ""
+        },
+        {
+            "type": "T",
+            "name": "T2",
+            "img": ""
+        },
+        {
+            "type": "T",
+            "name": "T3",
+            "img": ""
+        },
+        {
+            "type": "TERMICO",
+            "name": "TERMICO",
+            "img": ""
+        }
+    ]
+    for d in data:
+        d["img"] = check_and_get_img(link.format(d["name"]), f'{pasta}/{d["name"]}.png', all_folders)
+    return data
