@@ -218,4 +218,4 @@ def corrent_data_updater():
 
 
 if __name__ == "__main__":
-    io.run(app, host="0.0.0.0", port=8080, allow_unsafe_werkzeug=True, debug=True)
+    io.run(app, host="0.0.0.0", port=8080, allow_unsafe_werkzeug=True)
