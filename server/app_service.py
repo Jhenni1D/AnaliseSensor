@@ -138,3 +138,40 @@ def second_to_hour_minute(diferenca):
         segundos = int(diferenca % 60)
         return f"{int(minutos):0>2}m{segundos:0>2}s"
     return f"{diferenca}s"
+
+
+def get_date_and_sensors_values_for_graph():
+    folder_name, folder_data = get_folder_incompleted()[0]
+    sensors_names = [fn for fn in folder_data[folder_name]["Sensores"] if fn in ['SensorA', 'SensorB', 'SensorC']]
+    list_unpacked_unique_values = lambda list_filter: list(
+        {a for b in [{y for y in x} for x in list_filter] for a in b})
+    list_unpacked = lambda list_filter: [a for b in [[y for y in x] for x in list_filter] for a in b]
+    list_unpacked_hashed = lambda list_filter: {list(x.keys())[0]: x[list(x.keys())[0]] for x in list_filter}
+
+    sensors = folder_data[folder_name]['Sensores']
+
+    def del_sensor_not_need(sensor_name):
+        if sensor_name in sensors:
+            del sensors[sensor_name]
+
+    del_sensor_not_need("SensorRPM")
+    del_sensor_not_need("SensorTemp")
+    del_sensor_not_need("SensorTensao")
+    all_values = [
+        [{f"{sensor_info['data']} {sensor_info['hora']}": {"sensor": sensor, "value": sensor_info['medicao']}} for
+         sensor_info in sensors[sensor]] for sensor in sensors]
+    all_values = list_unpacked(all_values)
+    all_values_hashed = list_unpacked_hashed(all_values)
+    all_dates = [[f"{sensor_info['data']} {sensor_info['hora']}" for sensor_info in sensors[sensor]] for sensor in
+                 sensors]
+    all_dates = list_unpacked_unique_values(all_dates)
+    all_dates.sort()
+
+    sensor_data = lambda sensor_name: [all_values_hashed[date]['value'] for date in all_dates if
+                                       sensor_name in all_values_hashed[date]['sensor']]
+
+    graph_data = {sensor_name: sensor_data(sensor_name) for sensor_name in sensors_names}
+    graph_data["dates"] = all_dates
+    return graph_data
+
+#get_date_and_sensors_values_for_graph()

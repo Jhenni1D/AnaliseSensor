@@ -186,6 +186,10 @@ def dashboard_ultima_pasta():
     print(folder_incompleted[0][0])
     return redirect(location=f"/visualizar/{folder_incompleted[0][0]}")
 
+@app.route("/get_corrent_values")
+def get_corrent_values():
+    return jsonify(get_date_and_sensors_values_for_graph())
+
 @io.event
 def start_att_img():
     io.emit("send_img_loop")
@@ -297,6 +301,12 @@ def progress_test():
 def ping():
     io.emit("pong")
     print("send pong")
+
+@io.event
+def corrent_data_updater():
+    while True:
+        io.emit("corrent_data_updater", get_date_and_sensors_values_for_graph())
+        time.sleep(1)
 
 
 if __name__ == "__main__":
