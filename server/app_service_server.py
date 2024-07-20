@@ -9,15 +9,14 @@ link_bd_base = "https://simulacao-femm-default-rtdb.firebaseio.com/"
 
 link_bd = link_bd_base + "/medicoes/{}/.json"
 link_bd_folders = link_bd.format("Pastas")
-link_bd_todos_sensores = link_bd_base + "/medicoes/.json"
 link_bd_image = "simulacao-femm.appspot.com"
 link_bd_image_gs = f"gs://{link_bd_image}"
 
 
 def get_date_formatted():
-    data_atual = date.today()  # date é a lib
-    return "{}/{}/{}".format(str(data_atual.day).zfill(2), str(data_atual.month).zfill(2),
-                             str(data_atual.year).zfill(2))  # formatando a data contatenar dados
+    today = date.today()  # date é a lib
+    return "{}/{}/{}".format(str(today.day).zfill(2), str(today.month).zfill(2),
+                             str(today.year).zfill(2))  # formatando a data contatenar dados
 
 
 def get_hour_formatted():
@@ -27,8 +26,8 @@ def get_hour_formatted():
 
 
 def get_folder_name():
-    data_atual = date.today()
-    data_atual = "{}-{}-{}".format(str(data_atual.day).zfill(2), str(data_atual.month).zfill(2), data_atual.year)
+    today = date.today()
+    today = "{}-{}-{}".format(str(today.day).zfill(2), str(today.month).zfill(2), today.year)
 
     time_now = datetime.datetime.now()  # agora pegar a hora
     milliseconds = str(round(time.time() * 1000, 4))[-4:].replace(".", "")
@@ -37,21 +36,21 @@ def get_folder_name():
         2) + "-" + str(
         milliseconds)  # concatenar o foamato da hora
 
-    nome_pasta = f'{data_atual}_{time_now}'
+    folder_name = f'{today}_{time_now}'
 
-    return nome_pasta
+    return folder_name
 
 
 def get_new_folder_info_template():
-    nova_pasta_name = get_folder_name()
-    nova_pasta = {
-        nova_pasta_name:
+    new_folder_name = get_folder_name()
+    new_folder = {
+        new_folder_name:
             {
                 "Sensores": [],
                 "completed": False
             }
     }
-    return nova_pasta_name, nova_pasta
+    return new_folder_name, new_folder
 
 
 def register_new_folder(folder_data):
@@ -79,25 +78,25 @@ def get_folder_incompleted():
 
 # TODO: ajustar método
 def get_sensor_data(sensor):
-    dados_json = json.loads(get(link_bd.format(sensor)).text)  # objeto json que pode ser manuseada
-    dados_json = [dados_json[x] for x in dados_json]  # formatando dados
-    return dados_json
+    json_data = get(link_bd.format(sensor)).json()  # objeto json que pode ser manuseada
+    json_data = [json_data[x] for x in json_data]  # formatando dados
+    return json_data
 
 
 # TODO: ajustar método
 def get_all_sensors():
-    dados_json = json.loads(get(link_bd_todos_sensores).text)  # objeto json que pode ser manuseada
-    dados_formatados = {}
-    for sensor in dados_json:
-        dados_formatados[sensor] = [dados_json[sensor][x] for x in dados_json[sensor]]
-    print(dados_formatados)
-    return dados_formatados
+    json_data = get(link_bd_folders).json()  # objeto json que pode ser manuseada
+    formatted_data = {}
+    for sensor in json_data:
+        formatted_data[sensor] = [json_data[sensor][x] for x in json_data[sensor]]
+    print(formatted_data)
+    return formatted_data
 
 
 # TODO: ajustar método
 def get_last_sensor_data(sensor):
-    dados = get_sensor_data(sensor)
-    return dados[-1]  # estou pegando o ultimo valor enviado
+    data = get_sensor_data(sensor)
+    return data[-1]  # estou pegando o ultimo valor enviado
 
 
 def get_date_and_sensors_values_for_graph():
