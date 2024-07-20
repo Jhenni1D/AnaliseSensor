@@ -1,14 +1,9 @@
 # Funções serviços dos aplicativos
-import csv
 import datetime
 import time
 import json
-import os
-import shutil
 from datetime import date
 from requests import get, post, patch
-from log_handler import write_log
-from firebase_admin import credentials, initialize_app, storage
 
 link_bd_base = "https://simulacao-femm-default-rtdb.firebaseio.com/"
 
@@ -21,7 +16,8 @@ link_bd_image_gs = f"gs://{link_bd_image}"
 
 def pegar_data_formatada():
     data_atual = date.today()  # date é a lib
-    return "{}/{}/{}".format(str(data_atual.day).zfill(2), str(data_atual.month).zfill(2), str(data_atual.year).zfill(2))  # formatando a data contatenar dados
+    return "{}/{}/{}".format(str(data_atual.day).zfill(2), str(data_atual.month).zfill(2),
+                             str(data_atual.year).zfill(2))  # formatando a data contatenar dados
 
 
 def pegar_hora_formatada():
@@ -51,19 +47,10 @@ def pegar_nova_pasta_formatada():
     nova_pasta = {
         nova_pasta_name:
             {
-                "Sensores":
-                    {
-                        "SensorA": [],
-                        "SensorB": [],
-                        "SensorC": [],
-                        "SensorRPM": [],
-                        "SensorTemp": [],
-                        "SensorTensao": []
-                    },
+                "Sensores": [],
                 "completed": False
             }
     }
-
     return nova_pasta_name, nova_pasta
 
 
@@ -72,13 +59,15 @@ def register_new_folder(folder_data):
 
 
 def escrever_dados_arquivo_csv(dados):  # dados parametros aula lira
-    for sensor in dados:
-        cols = ['data', 'hora', 'medicao']  # titulo da coluna botando do mesmo jeito do bd
-        with open(f"./outputs/{sensor}_output.csv", 'w') as f:  # to abrindo um arquivo csv
-            wr = csv.DictWriter(f, fieldnames=cols)  # organizador
-            wr.writeheader()  # titulo
-            wr.writerows(dados[sensor])  # dados de cada coluna
-    shutil.make_archive('output', 'zip', './', 'server/outputs')
+    # TODO: refazer a criação do CSV
+    pass
+    # for sensor in dados:
+    #     cols = ['data', 'hora', 'medicao']  # titulo da coluna botando do mesmo jeito do bd
+    #     with open(f"./outputs/{sensor}_output.csv", 'w') as f:  # to abrindo um arquivo csv
+    #         wr = csv.DictWriter(f, fieldnames=cols)  # organizador
+    #         wr.writeheader()  # titulo
+    #         wr.writerows(dados[sensor])  # dados de cada coluna
+    # shutil.make_archive('output', 'zip', './', 'server/outputs')
 
 
 def get_folder_incompleted():
@@ -88,16 +77,14 @@ def get_folder_incompleted():
     return folder_incompleted
 
 
-def registrar_dado_no_bd(dados, sensor):
-    post(link_bd.format(sensor), json=dados)
-
-
+# TODO: ajustar método
 def pegar_dados_do_sensor(sensor):
     dados_json = json.loads(get(link_bd.format(sensor)).text)  # objeto json que pode ser manuseada
     dados_json = [dados_json[x] for x in dados_json]  # formatando dados
     return dados_json
 
 
+# TODO: ajustar método
 def pegar_todos_dados_bd():
     dados_json = json.loads(get(link_bd_todos_sensores).text)  # objeto json que pode ser manuseada
     dados_formatados = {}
@@ -107,48 +94,10 @@ def pegar_todos_dados_bd():
     return dados_formatados
 
 
+# TODO: ajustar método
 def pegar_ultimo_dado_do_sensor(sensor):
     dados = pegar_dados_do_sensor(sensor)
     return dados[-1]  # estou pegando o ultimo valor enviado
-
-
-def enviar_pasta_dos_resultados_simulacao(pasta):
-    UploadBlob(pasta)
-
-
-def UploadBlob(folder):
-    try:
-        cred = credentials.Certificate("./cred_firebase_server.json")
-        initialize_app(cred, {'storageBucket': f'{link_bd_image}'})
-    except:
-        pass
-
-    bucket = storage.bucket(f"{link_bd_image}")
-
-    data_send_socket = []
-    for file in os.listdir(folder):
-        file_name = f'{folder}/{file}'
-        blob = bucket.blob(file_name)
-        blob.upload_from_filename(file_name)
-        blob.make_public()
-        write_log(f"-Upload file: {file_name} | link: {blob.public_url}\n")
-        type = "TERMICO" if "TERMICO" in file else "T" if "T" in file else "M"
-        data_send_socket.append({"type": type, "name": file, "img": blob.public_url})
-    with open("img_send.json", "w") as file:
-        file.write(json.dumps(data_send_socket))
-
-
-def second_to_hour_minute(diferenca):
-    if diferenca >= 3600:
-        hora = int(diferenca / 60 / 60)
-        minutos = int(diferenca / 60) % 60
-        segundos = diferenca % 60
-        return f"{hora:0>2}h{minutos:0>2}m{segundos:0>2}s"
-    if diferenca >= 60:
-        minutos = int(diferenca / 60)
-        segundos = int(diferenca % 60)
-        return f"{int(minutos):0>2}m{segundos:0>2}s"
-    return f"{diferenca}s"
 
 
 def get_date_and_sensors_values_for_graph():
@@ -181,11 +130,9 @@ def get_date_and_sensors_values_for_graph():
     all_dates = list_unpacked_unique_values(all_dates)
     all_dates.sort()
 
-    sensor_data = lambda sensor_name: [all_values_hashed[date]['value'] for date in all_dates if
-                                       sensor_name in all_values_hashed[date]['sensor']]
+    sensor_data = lambda sensor_name: [all_values_hashed[d]['value'] for d in all_dates if
+                                       sensor_name in all_values_hashed[d]['sensor']]
 
     graph_data = {sensor_name: sensor_data(sensor_name) for sensor_name in sensors_names}
     graph_data["dates"] = all_dates
     return graph_data
-
-#get_date_and_sensors_values_for_graph()
