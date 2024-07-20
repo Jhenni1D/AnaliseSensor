@@ -40,21 +40,8 @@ try:
     @sio.event
     def insert_queue(data):
         simulation_controller.load_simulation()
-        is_can_enqueue = simulation_controller.is_can_enqueue(data["medicao"])
-        # TODO: SensorC1/ ...C2 / ...C3 são a mesma coisa que ABC.
-
-        # TODO: valor da temperatura vai entrar na medição
+        is_can_enqueue = simulation_controller.is_can_enqueue(data["SensorA"])
         if is_can_enqueue:
-            data["medicaoA"] = data["medicao"]
-            del data["medicao"]
-            try:
-                data["medicaoB"] = float(pegar_ultimo_dado_do_sensor("SensorB")["medicao"])
-                data["medicaoC"] = float(pegar_ultimo_dado_do_sensor("SensorC")["medicao"])
-                data["medicaoTemp"] = float(pegar_ultimo_dado_do_sensor("SensorTemp")["medicao"])
-            except Exception as e:
-                print("Erro ao buscar valores dos sensores B, C e da Temperatura! Verifique se os valores existem no firebase!")
-                print(e)
-                return
             fila.put(data)
             simulation_controller.update_queue(data["folder_name"])
             print("Inseriu elemento na fila, elementos na fila:", fila.qsize(), " | dados:", data)
@@ -71,11 +58,16 @@ try:
             while not fila.empty():
                 data = fila.get()
                 print('Irá iniciar simulação com os dados:', data)
-                with subprocess.Popen(f'./simulation.exe \"[{data["medicaoA"]}, {data["medicaoB"]}, {data["medicaoC"]}, {data["medicaoTemp"]}, \'{data["sensor"]}\']\"', stdin=subprocess.PIPE, stdout=subprocess.PIPE) as proc:
-                    print(proc.stdout.read())
-                # p = subprocess.run([sys.executable, "./simulation.exe", json.dumps([data["medicao"], data["sensor"]])],
-                #                    capture_output=True, text=True)
-                # print("LOG EXECUCAO SUBPROCESS:", p.stdout)
+                args = f"./simulation.exe \"{json.dumps(data).replace('"', "'")}\""
+                args_test = f"./.vm-venv/Scripts/python ./simulation.py \"{json.dumps(data).replace('"', "'")}\""
+                args = args_test
+                with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as proc:
+                    try:
+                        stdout_simulation = proc.stdout.read().decode()
+                    except Exception as e:
+                        print("Exception in stout of simulation.exe")
+                        stdout_simulation = proc.stdout.read().decode("latin-1")
+                    print(f"LOG DO PROCESSo: \n---\n{stdout_simulation}\n---\n")
         simulation_state.simulation_running = False
 
     @sio.event

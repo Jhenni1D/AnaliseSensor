@@ -12,11 +12,6 @@ import time
 app = Flask(__name__)  # nome
 io = SocketIO(app)
 
-sensor_names = {
-    "SensorC1": "SensorA",
-    "SensorC2": "SensorB",
-    "SensorC3": "SensorC"
-}
 
 # primeira rota
 @app.route('/')
@@ -30,43 +25,31 @@ def nova_simulacao():  # def = função
     return "Arquivos de simulação resetados!"
 
 
-@app.route('/dados',
-           methods=['POST'])  # dizer o metodo da rota, nesse caso é post
-def receber():  # o tipo da função
-    dado = request.json  # requisitando um arquivo json
-
-    if dado["sensor"] in ["SensorC1", "SensorC2", "SensorC3"]:
-        actual_name = dado["sensor"]
-        dado["sensor"] = sensor_names[actual_name]
-
-    dado_armazenar = {"medicao": dado["medicao"], "data": pegar_data_formatada(),
-                      "hora": pegar_hora_formatada()}  # dicionario ou objeto
-
-    dado["datahora"] = dado_armazenar["data"] + "_" + dado_armazenar["hora"]
+@app.route('/dados', methods=['POST'])
+def receber():
+    dado = request.json
+    date = pegar_data_formatada()
+    hour = pegar_hora_formatada()
+    dado_armazenar = dado | {"data": date,
+                             "hora": hour, "data_hora": f"{date} {hour}"}
 
     folder_incompleted = get_folder_incompleted()
     if len(folder_incompleted) == 0:
         new_folder_name, new_folder = pegar_nova_pasta_formatada()
-        new_folder[new_folder_name]["Sensores"][dado['sensor']].append(dado_armazenar)
+        new_folder[new_folder_name]["Sensores"] = [dado_armazenar]
         print(f"nova pasta a ser registrada: {new_folder}")
         register_new_folder(new_folder)
         dado["folder_name"] = new_folder_name
         print(f"criou pasta - Armazenou o dado: {dado_armazenar}")
     else:
         folder_name, folder_data = folder_incompleted[0]
-
-        if dado['sensor'] not in folder_data[folder_name]["Sensores"]:
-            folder_data[folder_name]["Sensores"][dado['sensor']] = []
-
-        folder_data[folder_name]["Sensores"][dado['sensor']].append(dado_armazenar)
+        folder_data[folder_name]["Sensores"].append(dado_armazenar)
         print(f"Armazenou o dado: {dado_armazenar}")
         register_new_folder(folder_data)
         dado["folder_name"] = folder_name
 
-
-    if "sensora" == dado["sensor"].lower():
-        print(f"dado enviado para a VM: {dado}")
-        io.emit("insert_queue", dado)
+    print(f"dado enviado para a VM: {dado}")
+    io.emit("insert_queue", dado)
     return "deu tudo certo"
 
 
@@ -96,6 +79,7 @@ def visualizar_pastas():
     with open("folders.json", "r") as file:
         pastas = json.loads(file.read())
     return jsonify(pastas)
+
 
 def check_and_get_img(link, folder_img, all_folders):
     img_link = link if folder_img in all_folders else "https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif"
@@ -186,9 +170,11 @@ def dashboard_ultima_pasta():
     print(folder_incompleted[0][0])
     return redirect(location=f"/visualizar/{folder_incompleted[0][0]}")
 
+
 @app.route("/get_corrent_values")
 def get_corrent_values():
     return jsonify(get_date_and_sensors_values_for_graph())
+
 
 @io.event
 def start_att_img():
@@ -301,6 +287,7 @@ def progress_test():
 def ping():
     io.emit("pong")
     print("send pong")
+
 
 @io.event
 def corrent_data_updater():
