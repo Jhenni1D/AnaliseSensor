@@ -3,7 +3,7 @@ import sys
 import time
 
 from FEMM_Simulation import FEMMSimulationController
-from app_service import *
+from app_service_VM import *
 from log_handler import write_log
 
 

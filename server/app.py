@@ -2,7 +2,7 @@ import random
 
 from flask import Flask, request, send_file, render_template, jsonify, redirect, url_for
 import os
-from app_service import *
+from app_service_server import *
 
 from flask_socketio import SocketIO
 import json

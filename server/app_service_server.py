@@ -118,7 +118,7 @@ def enviar_pasta_dos_resultados_simulacao(pasta):
 
 def UploadBlob(folder):
     try:
-        cred = credentials.Certificate("./cred.json")
+        cred = credentials.Certificate("./cred_firebase_server.json")
         initialize_app(cred, {'storageBucket': f'{link_bd_image}'})
     except:
         pass

@@ -7,7 +7,6 @@ import queue
 import socketio
 
 import simulation
-from app_service import pegar_ultimo_dado_do_sensor
 
 
 class LoopState:
