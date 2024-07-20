@@ -20,6 +20,7 @@ $(document).ready(function () {
   }
 
   let grafico_corrent = document.querySelector("#corrente");
+
     let corrent_chart = new Chart(document.querySelector("#corrente"),
     {
         type: 'line',
@@ -30,6 +31,7 @@ $(document).ready(function () {
             }
         }
     });
+
   let graficos_images = {
     "SensorTensao": document.querySelector("#tensao"),
     "SensorTemp": document.querySelector("#temperatura"),
@@ -81,14 +83,10 @@ $(document).ready(function () {
              t_images[d["name"]].src = d["img"];
              t_images[d["name"]].classList.remove('placeholder')
            }
-
-//           if (d["name"] in graficos_images) {
-//             graficos_images[d["name"]].src = d["img"];
-//             graficos_images[d["name"]].classList.remove('placeholder')
-//           }
         }
       }
   }
+
   function RegisterActions()
   {
       for (img in m_images)
@@ -100,11 +98,6 @@ $(document).ready(function () {
       {
         t_images[img].addEventListener('click', ShowModalImage);
       }
-
-//      for (img in graficos_images)
-//      {
-//        graficos_images[img].addEventListener('click', ShowModalImage);
-//      }
   }
 
   function ShowModalImage(event)
@@ -121,23 +114,11 @@ $(document).ready(function () {
     }
 
     let colors = ['blue', 'red', 'green', 'purple', 'orange']
-    let corrent_colors = ['blue', 'red', 'green']
     let index_color = 0;
-    let index_corrent_color = 0;
     let corrent_graph_data =
     {
         datasets:
         [
-//            {
-//                borderColor: "blue",
-//                label: "SensorA / Tempo",
-//                data: [{"x": "16/7/2024 23:18:39", y: 3.8}, {"x": "16/7/2024 23:49:39", y: 2.5}]
-//            },
-//            {
-//                borderColor: "blue",
-//                label: "SensorB / Tempo",
-//                data: [{"x": "D", y: 1.5}, {"x": "E", y: 2.2}, {"x": "F", y: 2.8}]
-//            },
         ]
     }
     try
@@ -162,25 +143,52 @@ $(document).ready(function () {
                 charts_graphs[graph].data = data;
                 charts_graphs[graph].update('resize');
             }
-            if(IsCorrentSensor(graph))
-            {
-                let data_set_item =
-                {
-                    borderColor: corrent_colors[index_corrent_color++],
-                    label: `${graph.toLocaleUpperCase()} / Tempo`,
-                    data: graph_data[graph]['values']
-                };
-                corrent_graph_data.datasets.push(data_set_item);
-            }
         }
     }
     catch
     {
         console.log("Erro ao criar os gráficos gerais");
     }
+  }
 
-    corrent_chart.data = corrent_graph_data;
-    corrent_chart.update('resize');
+  function PlotCorrentGraph()
+  {
+
+    if(corrent_graph_data_server == null)
+    {
+        return;
+    }
+
+    let corrent_colors = ['blue', 'red', 'green']
+    let index_color = 0;
+    let index_corrent_color = 0;
+    let corrent_graph_data =
+    {
+        datasets:
+        [
+            {
+                    borderColor: corrent_colors[index_corrent_color++],
+                    label: "SensorA / Tempo",
+                    data: corrent_graph_data_server["SensorA"]
+            },
+            {
+                    borderColor: corrent_colors[index_corrent_color++],
+                    label: "SensorB / Tempo",
+                    data: corrent_graph_data_server["SensorB"]
+            },
+            {
+                    borderColor: corrent_colors[index_corrent_color++],
+                    label: "SensorC / Tempo",
+                    data: corrent_graph_data_server["SensorC"]
+            }
+        ],
+        labels: corrent_graph_data_server["dates"]
+    }
+    if(corrent_chart.data.length === 0)
+    {
+        corrent_chart.data = corrent_graph_data;
+    }
+    corrent_chart.update();
   }
 
   function IsCorrentSensor(sensor)
@@ -193,6 +201,10 @@ $(document).ready(function () {
         sensors_data_formatted = {}
         for(sensor in sensors_data)
         {
+            if(sensor == "SensorA" || sensor == "SensorB" || sensor == "SensorC")
+            {
+                continue;
+            }
             sensors_data_formatted[sensor] = {"values": []}
             for(sensor_info of sensors_data[sensor])
             {
@@ -215,21 +227,41 @@ $(document).ready(function () {
         return only_values;
     }
 
-    function loadDoc()
+    function updateGraphs(handlerResult, link)
     {
       let xhttp = new XMLHttpRequest();
-      xhttp.onload = function()
+      xhttp.onload = handlerResult;
+      xhttp.open("GET", link, true);
+      xhttp.send();
+    }
+
+    function updateSingularGraphs()
+    {
+      handlerResult = function()
       {
         var sensors_data = JSON.parse(this.responseText);
         graph_data = FormatSensorsData(sensors_data);
         setTimeout(PlotGraphData, 1000);
-        setTimeout(loadDoc, 2000);
+        setTimeout(updateSingularGraphs, 2000);
       }
-      xhttp.open("GET", `https://simulacao-femm-default-rtdb.firebaseio.com/medicoes/Pastas/${folder_name}/Sensores/.json`, true);
-      xhttp.send();
+
+      updateGraphs(handlerResult, `https://simulacao-femm-default-rtdb.firebaseio.com/medicoes/Pastas/${folder_name}/Sensores/.json`);
     }
 
-    loadDoc();
+    function updateCorrentGraphs()
+    {
+        handlerResult = function()
+      {
+        corrent_graph_data_server = JSON.parse(this.responseText);
+        setTimeout(PlotCorrentGraph, 1000);
+        setTimeout(updateCorrentGraphs, 2000);
+      }
+
+      updateGraphs(handlerResult, `http://localhost:8080/get_corrent_values`);
+    }
+
+    updateSingularGraphs();
+    //updateCorrentGraphs();
 
     // SOCKETIO LOGIC
 
@@ -238,6 +270,7 @@ $(document).ready(function () {
   socket.on('connect', function () {
     console.log('Connected!');
     socket.emit('progress_test');
+    socket.emit('corrent_data_updater')
   });
 
 
@@ -247,11 +280,31 @@ $(document).ready(function () {
   });
 
 
-
   socket.on('progress_value', function (prog_value) {
     progresso.style["width"] = `${prog_value}%`;
     progresso.innerHTML = `${prog_value}%`;
   });
+
+
+  socket.on('corrent_data_updater', function(data){
+
+    if(corrent_graph_data_server === null)
+    {
+        corrent_graph_data_server = data;
+        PlotCorrentGraph();
+        return;
+    }
+    let need_update = corrent_graph_data_server['dates'].slice(-1)[0] !== data['dates'].slice(-1)[0]
+    if(need_update)
+    {
+        for(key in data)
+        {
+            corrent_graph_data_server[key].push(data[key].slice(-1)[0]);
+        }
+        PlotCorrentGraph();
+    }
+  });
+
 
   socket.on('disconnect', function () {
     console.log('Disconnected!');
