@@ -2,3 +2,5 @@
 /venv/
 /__pycache__/
 /project.migrations/
+/VM/.vm-venv/
+/VM/femm_generate_files/
