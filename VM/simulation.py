@@ -65,13 +65,15 @@ class SimulationController:
 
     def hash_generate(self):
         letras = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "m", "n", "o", "p", "q", "z", "A", "B"
-                  "C", "D", "E", "F", "G", "H", "I", "J", "M"]
+                                                                                                       "C", "D", "E",
+                  "F", "G", "H", "I", "J", "M"]
         return "".join(random.choices(letras, k=10))
 
     def reset_config_if_index_out_of_range(self):
         if str(self.simulations["actual_simulation"]) not in self.simulations:
-            write_log(f"# RESET AUTOMATICO\n-Index {self.simulations['actual_simulation']} ultrapassa limite. Resetando dados e iniciando "
-                      f"nova simulação do 0.\n\n")
+            write_log(
+                f"# RESET AUTOMATICO\n-Index {self.simulations['actual_simulation']} ultrapassa limite. Resetando dados e iniciando "
+                f"nova simulação do 0.\n\n")
             self.reset()
             with open("./simulation.json", "w") as file:
                 file.write(json.dumps(self.simulations, indent=1))
@@ -83,18 +85,27 @@ class SimulationController:
         with open("./simulation.json", "w") as file:
             file.write(json.dumps(self.simulations, indent=1))
 
+    def invalid_queue_reset(self):
+        print(f"will reset: index queue: {self.simulations["index_queue"]} | in queue: {self.simulations[str(self.simulations["index_queue"])]["in_queue"]}")
+        if 0 > (self.simulations["index_queue"]-1) > 4:
+            print(f"invalid index_queue: {(self.simulations["index_queue"]-1)}")
+            return
+        self.simulations["index_queue"] -= 1
+        self.simulations[str(self.simulations["index_queue"])]["in_queue"] = False
+        with open("./simulation.json", "w") as file:
+            file.write(json.dumps(self.simulations, indent=1))
+
     def is_folder_exist(self):
         return self.simulations["folder_name"] in os.listdir("./")
 
-    def start_simulation(self, range_sensorA, range_sensorB, range_sensorC, temp, sensor):
+    def start_simulation(self, range_sensorA, range_sensorB, range_sensorC, temp):
         start = time.time()
         try:
             self.load_simulation()
         except Exception as e:
             print("Exception in load_simulation or reset_config: ", e.args)
 
-
-        if (self.is_can_start_simulation(range_sensorA) is False and sensor.lower() != "sensora"):  # sai da simulaçao e define sensor
+        if (self.is_can_start_simulation(range_sensorA) is False):
             # Isso aqui serve pra ele iniciar a simulação apenas com o sensorA.
             # Devido a isso, todos os outros dados devem ser setados anteriormente.
             # SensorA deve ser enviado por último.
@@ -104,7 +115,8 @@ class SimulationController:
         try:
             if self.simulations["actual_simulation"] == 0 and self.is_folder_exist() is False:
                 os.mkdir(self.simulations["folder_name"])
-                write_log(f"-Criou pasta com o nome: {self.simulations['folder_name']}\n", folder=self.simulations["folder_name"], create=True)
+                write_log(f"-Criou pasta com o nome: {self.simulations['folder_name']}\n",
+                          folder=self.simulations["folder_name"], create=True)
 
                 with open("./folder_name.txt", "w") as file:
                     file.write(self.simulations["folder_name"])
@@ -116,7 +128,9 @@ class SimulationController:
         sensorB = -1
         sensorC = -1
         try:
-            write_log(f"# INICIO DA SIMULAÇÃO {self.simulations['actual_simulation']}: {pegar_data_formatada()}_{pegar_hora_formatada()}\n", folder=self.simulations["folder_name"])
+            write_log(
+                f"# INICIO DA SIMULAÇÃO {self.simulations['actual_simulation']}: {pegar_data_formatada()}_{pegar_hora_formatada()}\n",
+                folder=self.simulations["folder_name"])
             write_log(
                 f"# MEDICAO_A: {range_sensorA} | B: {sensorB} | C: {sensorC}")
             self.femm.set_femm_atributes(ca=range_sensorA, cb=range_sensorB, cc=range_sensorC, temperatura=temp,
@@ -127,34 +141,40 @@ class SimulationController:
             msg = f"Exception in get SensorB/C and set femm attributes: {e.args}"
             print(msg)
             write_log(f"\n# MEDICAO_A: {range_sensorA} | B: {sensorB} | C: {sensorC}\n{msg}")
-
-
+        finished_simulation_correctaly = False
         try:
             self.femm.iniciar_femm()
+            finished_simulation_correctaly = True
         except Exception as e:
             msg = f"Exception when try init femm: {e.args}"
             print(msg)
             write_log(f"\n{msg}")
 
         try:
-            write_log(f"-Finalizou simulação\n")
-            self.load_simulation()
-            self.simulations[str(self.simulations["actual_simulation"])]["done"] = True
-            self.simulations["actual_simulation"] += 1
-            enviar_pasta_dos_resultados_simulacao(self.simulations["folder_name"])
-            write_log(f"-Finalizou de enviar imagens para o Firebase\n")
-            print("Finalizou:", self.simulations["folder_name"])
-            with open("./simulation.json", "w") as file:
-                file.write(json.dumps(self.simulations, indent=1))
-            write_log(f"-Atualizou o arquivo simulation.json\n")
-            write_log(f"-arquivo simulation.json: {json.dumps(self.simulations)}\n")
-            finish = time.time()
-            write_log(f"# FIM DA SIMULACAO: {pegar_data_formatada()}_{pegar_hora_formatada()} - TEMPO DE EXECUÇÃO: {second_to_hour_minute(finish - start)}\n")
-
-            if self.simulations["actual_simulation"] == 5:
-                definir_simulacao_completed()
-                self.reset()
-                write_log(f"\n# FINALIZOU AS SIMULAÇÕES PARA A PASTA: {self.simulations['folder_name']}")
+            if finished_simulation_correctaly:
+                write_log(f"-Finalizou simulação\n")
+                self.load_simulation()
+                self.simulations[str(self.simulations["actual_simulation"])]["done"] = True
+                self.simulations["actual_simulation"] += 1
+                enviar_pasta_dos_resultados_simulacao(self.simulations["folder_name"])
+                write_log(f"-Finalizou de enviar imagens para o Firebase\n")
+                print("Finalizou:", self.simulations["folder_name"])
+                with open("./simulation.json", "w") as file:
+                    file.write(json.dumps(self.simulations, indent=1))
+                write_log(f"-Atualizou o arquivo simulation.json\n")
+                write_log(f"CUUU-arquivo simulation.json: {json.dumps(self.simulations)}\n")
+                finish = time.time()
+                write_log(
+                    f"# FIM DA SIMULACAO: {pegar_data_formatada()}_{pegar_hora_formatada()} - TEMPO DE EXECUÇÃO: {second_to_hour_minute(finish - start)}\n")
+                print("simulation finished")
+                if self.simulations["actual_simulation"] == 5:
+                    definir_simulacao_completed()
+                    self.reset()
+                    write_log(f"\n# FINALIZOU AS SIMULAÇÕES PARA A PASTA: {self.simulations['folder_name']}")
+            else:
+                print("FEMM simulation not completed!")
+                self.load_simulation()
+                self.invalid_queue_reset()
 
         except Exception as e:
             msg = f"Exception in finalize: {e.args}"
@@ -165,18 +185,12 @@ class SimulationController:
 def main(args):
     s = SimulationController()
     try:
-        print(args[1])
-        print(type(args[1]))
         data = json.loads(args[1].replace("\'", '\"'))
-        rangeA, rangeB, rangeC, temp, sensor = float(data[0]), float(data[1]), float(data[2]), float(data[3]), data[4]
-        print(f"Irá iniciar a simulação com os dados: A: {rangeA} | B: {rangeB} | C: {rangeC} | temp: {temp} | sensor: {sensor}")
-        s.start_simulation(rangeA, rangeB, rangeC, temp, sensor)
+        print(f"Irá iniciar a simulação com os dados: {data}")
+        s.start_simulation(data["SensorA"], data["SensorB"], data["SensorC"], data["SensorTemp"])
     except Exception as e:
         print("Excpetion in main:", e.args, "\n\n", args)
 
 
-
 if __name__ == "__main__":
-    teste = [2121, json.dumps(['2.5', '2.5', '2.5', 'SensorA'])]
-    print(sys.argv)
-    main(sys.argv)#sys.argv | teste = json.dumps(['4.65', 'SensorA'])
+    main(sys.argv)
