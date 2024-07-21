@@ -1,6 +1,6 @@
-from app_service_server import get_date_and_sensors_values_for_graph
 from flask_socketio import SocketIO
-import time
+
+from server.app_service_server import *
 
 
 def create_io(app):
@@ -117,6 +117,5 @@ def create_io(app):
     def corrent_data_updater(folder):
         io.emit("corrent_data_updater", get_date_and_sensors_values_for_graph_by_folder(folder))
         time.sleep(1)
-
 
     return io
