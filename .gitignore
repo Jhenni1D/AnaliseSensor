@@ -48,3 +48,4 @@ VM/build/simulation/localpycs/pyimod02_importers.pyc
 VM/build/simulation/localpycs/pyimod03_ctypes.pyc
 VM/build/simulation/localpycs/pyimod04_pywin32.pyc
 VM/build/simulation/localpycs/struct.pyc
+/server/*_Data.xls
