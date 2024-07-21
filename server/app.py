@@ -79,5 +79,21 @@ def to_uncompleted_simulation_dashboard():
     return redirect(location=f"/uncompleted-simulation/dashboard/{folder_uncompleted[0][0]}")
 
 
+@app.route('/download/<filename>', methods=['GET'])
+def download(filename):
+    get_excel_of_folder(filename)
+    filename = filename + ".xls" if ".xls" not in filename else filename
+    return send_file(get_bytes_file(filename), mimetype='application/xls', as_attachment=True,
+                     download_name=filename)
+
+
+@app.route('/download-all/', methods=['GET'])
+def download_all_data():
+    get_excel_all_folders()
+    all_data_file_name = "All_Sensors_Data.xls"
+    return send_file(get_bytes_file(all_data_file_name), mimetype='application/xls', as_attachment=True,
+                     download_name=all_data_file_name)
+
+
 if __name__ == "__main__":
     io.run(app, host="0.0.0.0", port=8080, allow_unsafe_werkzeug=True)

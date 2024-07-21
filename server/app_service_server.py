@@ -173,6 +173,16 @@ def check_and_get_img(link, folder_img, all_folders):
     return img_link
 
 
+def get_bytes_file(filename):
+    file_path = f"./{filename}"
+    return_data = io.BytesIO()
+    with open(file_path, 'rb') as fo:
+        return_data.write(fo.read())
+    return_data.seek(0)
+    os.remove(file_path)
+    return return_data
+
+
 def get_image_data(pasta):
     link_all_folders_imgs = "https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/"
     all_folders = get(link_all_folders_imgs).json()['items']
