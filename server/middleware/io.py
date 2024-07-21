@@ -1,4 +1,4 @@
-from server.app_service_server import get_date_and_sensors_values_for_graph
+from app_service_server import get_date_and_sensors_values_for_graph
 from flask_socketio import SocketIO
 import time
 

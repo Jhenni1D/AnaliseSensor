@@ -1,4 +1,4 @@
-from server.app_service_server import get_all_sensors, get_last_sensor_data, get_folder_uncompleted
+from app_service_server import get_all_sensors, get_last_sensor_data, get_folder_uncompleted
 from flask import Blueprint, jsonify
 
 
