@@ -1,12 +1,11 @@
 import json
 import os
 import subprocess
-import sys
 import time
 import queue
 import socketio
 
-import simulation
+import simulation_controller_executor
 
 
 class LoopState:
@@ -19,7 +18,7 @@ sio = socketio.Client()
 fila = queue.Queue()
 file_simulation = os.path.abspath("simulation.exe").replace("\\", "/")
 print(file_simulation)
-simulation_controller = simulation.SimulationController()
+simulation_controller = simulation_controller_executor.SimulationController()
 simulation_state = LoopState()
 
 try:
@@ -101,7 +100,7 @@ try:
 
     @sio.event
     def reset_simulation():
-        simu = simulation.SimulationController()
+        simu = simulation_controller_executor.SimulationController()
         simu.reset()
         print('Arquivos de simulação Resetados!')
 
