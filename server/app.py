@@ -1,9 +1,8 @@
 from flask import Flask, request, send_file, render_template, redirect, url_for
+
+from app_service_server import *
 from blueprints.json_api import create_bp
 from middleware.io import create_io
-from app_service_server import *
-from requests import get
-import os
 
 app = Flask(__name__)  # nome
 io = create_io(app)

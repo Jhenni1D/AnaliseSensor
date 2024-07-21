@@ -1,5 +1,7 @@
 # Funções serviços dos aplicativos
 import datetime
+import io
+import os
 import time
 from datetime import date
 
