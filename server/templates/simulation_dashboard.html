@@ -37,8 +37,16 @@
       </h2>
       <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
         <div class="accordion-body">
+
           <p style="text-align: center;">Axis <b>Dates</b> Range Limit</p>
           <div id="slider" style="margin-left: 40px; margin-right: 40px;"></div>
+
+          <form action="/download/{{folder_name}}" class="row g-4" style="margin: 15 15 15 15;">
+            <div class="col-auto">
+              <button class="btn btn-info" id="submit_button" style="color: white;" type="submit"><b>Download Sensors
+                Data</b></button>
+            </div>
+          </form>
 
           <div class="row row-cols-2 row-cols-md-2 g-2" id="first_cards" style="margin: 15px">
             <div class="col">

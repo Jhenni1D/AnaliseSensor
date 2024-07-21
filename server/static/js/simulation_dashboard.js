@@ -206,7 +206,7 @@ $(document).ready(function () {
   socket.on('connect', function () {
     console.log('Connected!');
     socket.emit('progress_test');
-    socket.emit('corrent_data_updater')
+    socket.emit('corrent_data_updater', folder_name)
   });
 
 
@@ -230,6 +230,7 @@ $(document).ready(function () {
       PlotGraphData();
       maxSliderValue = data['data_hora'].length - 1;
       UpdateSlider();
+      socket.emit("corrent_data_updater", folder_name);
       return;
     }
 
@@ -244,6 +245,8 @@ $(document).ready(function () {
       maxSliderValue = graph_data_cache['data_hora'].length - 1;
       UpdateSlider();
     }
+
+    socket.emit("corrent_data_updater", folder_name);
   });
 
 

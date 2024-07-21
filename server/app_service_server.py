@@ -124,11 +124,18 @@ def get_formatted_sensors_data(folders_data):
     return data_graph
 
 
-def get_date_and_sensors_values_for_graph():
+def get_date_and_sensors_values_for_graph_uncompleted():
     folders_data = get_folder_uncompleted()
     if len(folders_data) == 0:
         return {}
     return get_formatted_sensors_data(folders_data[0])
+
+
+def get_date_and_sensors_values_for_graph_by_folder(folder):
+    folder_data = get_folder_filter(lambda fn, fd: fn == folder)
+    if len(folder_data) == 0:
+        return {}
+    return get_formatted_sensors_data(folder_data[0])
 
 
 def get_excel_all_folders(start_limit=0, end_limit=0):

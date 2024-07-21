@@ -27,7 +27,6 @@ var config = {
 				if (graph_data_cache === null) {
 					return value;
 				}
-				console.log(parseInt(value))
 				return graph_data_cache['data_hora'][parseInt(value)];
 			}
 		}
