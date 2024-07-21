@@ -69,15 +69,6 @@ class SimulationController:
                   "F", "G", "H", "I", "J", "M"]
         return "".join(random.choices(letras, k=10))
 
-    def reset_config_if_index_out_of_range(self):
-        if str(self.simulations["actual_simulation"]) not in self.simulations:
-            write_log(
-                f"# RESET AUTOMATICO\n-Index {self.simulations['actual_simulation']} ultrapassa limite. Resetando dados e iniciando "
-                f"nova simulação do 0.\n\n")
-            self.reset()
-            with open("./simulation.json", "w") as file:
-                file.write(json.dumps(self.simulations, indent=1))
-
     def update_queue(self, folder_name):
         self.simulations["folder_name"] = folder_name
         self.simulations[str(self.simulations["index_queue"])]["in_queue"] = True
@@ -86,9 +77,10 @@ class SimulationController:
             file.write(json.dumps(self.simulations, indent=1))
 
     def invalid_queue_reset(self):
-        print(f"will reset: index queue: {self.simulations["index_queue"]} | in queue: {self.simulations[str(self.simulations["index_queue"])]["in_queue"]}")
-        if 0 > (self.simulations["index_queue"]-1) > 4:
-            print(f"invalid index_queue: {(self.simulations["index_queue"]-1)}")
+        print(
+            f"will reset: index queue: {self.simulations["index_queue"]} | in queue: {self.simulations[str(self.simulations["index_queue"])]["in_queue"]}")
+        if 0 > (self.simulations["index_queue"] - 1) > 4:
+            print(f"invalid index_queue: {(self.simulations["index_queue"] - 1)}")
             return
         self.simulations["index_queue"] -= 1
         self.simulations[str(self.simulations["index_queue"])]["in_queue"] = False
@@ -105,7 +97,7 @@ class SimulationController:
         except Exception as e:
             print("Exception in load_simulation or reset_config: ", e.args)
 
-        if (self.is_can_start_simulation(range_sensorA) is False):
+        if self.is_can_start_simulation(range_sensorA) is False:
             # Isso aqui serve pra ele iniciar a simulação apenas com o sensorA.
             # Devido a isso, todos os outros dados devem ser setados anteriormente.
             # SensorA deve ser enviado por último.
