@@ -34,6 +34,18 @@ $(document).ready(function () {
     corrent_chart.options.scales.x.min = parseInt(value[0]);
     corrent_chart.options.scales.x.max = parseInt(value[1]);
     corrent_chart.update();
+    for (graph in graph_data) {
+      if (graph.includes("Sensor") === false || graph.includes("SensorA") || graph.includes("SensorB") || graph.includes("SensorC")) {
+        continue;
+      }
+
+      if (charts_graphs[graph].data.length !== 0) {
+        charts_graphs[graph].options.scales.x.min = currentMinSliderValue;
+        charts_graphs[graph].options.scales.x.max = currentMaxSliderValue;
+        charts_graphs[graph].update();
+        continue;
+      }
+    }
   });
 
   let elements_graph = {
@@ -65,6 +77,10 @@ $(document).ready(function () {
         options:
         {
           scales: {
+            x: {
+              min: minSliderValue,
+              max: maxSliderValue
+            }
           }
         }
       });
@@ -110,12 +126,13 @@ $(document).ready(function () {
     let index_color = 0;
     try {
       for (graph in graph_data) {
-
         if (graph.includes("Sensor") === false || graph.includes("SensorA") || graph.includes("SensorB") || graph.includes("SensorC")) {
           continue;
         }
 
         if (charts_graphs[graph].data.length !== 0) {
+          charts_graphs[graph].options.scales.x.min = currentMinSliderValue;
+          charts_graphs[graph].options.scales.x.max = (currentMaxSliderValue == (maxSliderValue - 1)) ? maxSliderValue : currentMaxSliderValue;;
           charts_graphs[graph].update();
           continue;
         }
@@ -132,10 +149,7 @@ $(document).ready(function () {
             ],
           labels: graph_data["data_hora"]
         }
-
-        if (charts_graphs[graph].data.length === 0) {
-          charts_graphs[graph].data = data;
-        }
+        charts_graphs[graph].data = data;
         charts_graphs[graph].update();
       }
     }
@@ -153,7 +167,7 @@ $(document).ready(function () {
 
     if (corrent_chart.data.length !== 0) {
       corrent_chart.options.scales.x.min = currentMinSliderValue;
-      corrent_chart.options.scales.x.max = currentMaxSliderValue;
+      corrent_chart.options.scales.x.max = (currentMaxSliderValue == (maxSliderValue - 1)) ? maxSliderValue : currentMaxSliderValue;;
       corrent_chart.update();
       return;
     }
@@ -220,7 +234,6 @@ $(document).ready(function () {
     }
 
     let need_update = graph_data['data_hora'].slice(-1)[0] !== data['data_hora'].slice(-1)[0]
-    //console.log(graph_data['data_hora']);
 
     if (need_update) {
       for (key in data) {

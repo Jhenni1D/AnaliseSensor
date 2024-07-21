@@ -43,6 +43,7 @@ slider.noUiSlider.on('update', function (value) {
 
 function UpdateSlider() {
 	config.range['max'] = maxSliderValue;
-	config.start[1] = currentMaxSliderValue;
+	config.start[0] = currentMinSliderValue;
+	config.start[1] = (currentMaxSliderValue == (maxSliderValue - 1)) ? maxSliderValue : currentMaxSliderValue;
 	slider.noUiSlider.updateOptions(config);
 }
