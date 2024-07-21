@@ -120,7 +120,7 @@ class SimulationController:
         sensorC = -1
         try:
             write_log(
-                f"# INICIO DA SIMULAÇÃO {self.simulations['actual_simulation']}: {pegar_data_formatada()}_{pegar_hora_formatada()}\n",
+                f"# INICIO DA SIMULAÇÃO {self.simulations['actual_simulation']}: {get_formatted_date()}_{get_formatted_hour()}\n",
                 folder=self.simulations["folder_name"])
             write_log(
                 f"# MEDICAO_A: {range_sensorA} | B: {sensorB} | C: {sensorC}")
@@ -147,7 +147,7 @@ class SimulationController:
                 self.load_simulation()
                 self.simulations[str(self.simulations["actual_simulation"])]["done"] = True
                 self.simulations["actual_simulation"] += 1
-                enviar_pasta_dos_resultados_simulacao(self.simulations["folder_name"])
+                send_simulation_images_to_firebase(self.simulations["folder_name"])
                 write_log(f"-Finalizou de enviar imagens para o Firebase\n")
                 print("Finalizou:", self.simulations["folder_name"])
                 with open("./simulation.json", "w") as file:
@@ -156,10 +156,10 @@ class SimulationController:
                 write_log(f"arquivo simulation.json: {json.dumps(self.simulations)}\n")
                 finish = time.time()
                 write_log(
-                    f"# FIM DA SIMULACAO: {pegar_data_formatada()}_{pegar_hora_formatada()} - TEMPO DE EXECUÇÃO: {second_to_hour_minute(finish - start)}\n")
+                    f"# FIM DA SIMULACAO: {get_formatted_date()}_{get_formatted_hour()} - TEMPO DE EXECUÇÃO: {second_to_hour_minute(finish - start)}\n")
                 print("simulation finished")
                 if self.simulations["actual_simulation"] == 5:
-                    definir_simulacao_completed()
+                    set_completed_simulation()
                     self.reset()
                     write_log(f"\n# FINALIZOU AS SIMULAÇÕES PARA A PASTA: {self.simulations['folder_name']}")
             else:

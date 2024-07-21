@@ -9,23 +9,21 @@ import os
 
 link_bd = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/{}/.json"
 link_bd_folders = link_bd.format("Pastas")
-link_bd_todos_sensores = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/.json"
-
 link_bd_image = "simulacao-femm.appspot.com"
 link_bd_image_gs = f"gs://{link_bd_image}"
 
 
-def pegar_data_formatada():
-    data_atual = date.today()  # date é a lib
-    return "{}/{}/{}".format(data_atual.day, data_atual.month, data_atual.year)  # formatando a data contatenar dados
+def get_formatted_date():
+    toay = date.today()  # date é a lib
+    return "{}/{}/{}".format(str(toay.day).zfill(2), str(toay.month).zfill(2), toay.year)  # formatando a data contatenar dados
 
 
-def pegar_hora_formatada():
+def get_formatted_hour():
     now = datetime.datetime.now()  # agora pegar a hora
-    return str(now.hour) + ":" + str(now.minute) + ":" + str(now.second)  # concatenar o foamato da hora
+    return str(now.hour).zfill(2) + ":" + str(now.minute).zfill(2) + ":" + str(now.second).zfill(2)  # concatenar o foamato da hora
 
 
-def definir_simulacao_completed():
+def set_completed_simulation():
     folders = get(link_bd_folders).json()
     folder_pending = [(folder, {folder: folders[folder]}) for folder in folders if
                       folders[folder]["completed"] is False]
@@ -37,11 +35,11 @@ def definir_simulacao_completed():
     patch(link_bd_folders, json=folder_pending)
 
 
-def enviar_pasta_dos_resultados_simulacao(pasta):
-    UploadBlob(pasta)
+def send_simulation_images_to_firebase(folder):
+    upload_blob(folder)
 
 
-def UploadBlob(folder):
+def upload_blob(folder):
     try:
         cred = credentials.Certificate("./cred_firebase_server.json")
         initialize_app(cred, {'storageBucket': f'{link_bd_image}/'})
@@ -64,14 +62,14 @@ def UploadBlob(folder):
         file.write(json.dumps(data_send_socket))
 
 
-def second_to_hour_minute(diferenca):
-    if diferenca >= 3600:
-        hora = int(diferenca / 60 / 60)
-        minutos = int(diferenca / 60) % 60
-        segundos = diferenca % 60
-        return f"{hora:0>2}h{minutos:0>2}m{segundos:0>2}s"
-    if diferenca >= 60:
-        minutos = int(diferenca / 60)
-        segundos = int(diferenca % 60)
-        return f"{int(minutos):0>2}m{segundos:0>2}s"
-    return f"{diferenca}s"
+def second_to_hour_minute(second):
+    if second >= 3600:
+        hour = int(second / 60 / 60)
+        minute = int(second / 60) % 60
+        new_second = second % 60
+        return f"{hour:0>2}h{minute:0>2}m{new_second:0>2}s"
+    if second >= 60:
+        minute = int(second / 60)
+        new_second = int(second % 60)
+        return f"{int(minute):0>2}m{new_second:0>2}s"
+    return f"{second}s"
