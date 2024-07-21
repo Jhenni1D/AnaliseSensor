@@ -1,4 +1,4 @@
-#Funções serviços dos aplicativos
+# Funções serviços dos aplicativos
 import csv
 import datetime
 import json
@@ -8,6 +8,7 @@ from datetime import date
 from requests import get, post, patch
 from log_handler import write_log
 from firebase_admin import credentials, initialize_app, storage
+
 link_bd = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/{}/.json"
 link_bd_folders = link_bd.format("Pastas")
 link_bd_todos_sensores = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/.json"
@@ -15,25 +16,30 @@ link_bd_todos_sensores = "https://simulacao-femm-default-rtdb.firebaseio.com//me
 link_bd_image = "simulacao-femm.appspot.com"
 link_bd_image_gs = f"gs://{link_bd_image}"
 
+
 def pegar_data_formatada():
     data_atual = date.today()  # date é a lib
-    return "{}/{}/{}".format(data_atual.day, data_atual.month,data_atual.year)  # formatando a data contatenar dados
+    return "{}/{}/{}".format(data_atual.day, data_atual.month, data_atual.year)  # formatando a data contatenar dados
+
 
 def pegar_hora_formatada():
     now = datetime.datetime.now()  # agora pegar a hora
     return str(now.hour) + ":" + str(now.minute) + ":" + str(now.second)  # concatenar o foamato da hora
 
-def escrever_dados_arquivo_csv(dados): #dados parametros aula lira
+
+def escrever_dados_arquivo_csv(dados):  # dados parametros aula lira
     for sensor in dados:
         cols = ['data', 'hora', 'medicao']  # titulo da coluna botando do mesmo jeito do bd
         with open(f"./{sensor}_output.csv", 'w') as f:  # to abrindo um arquivo csv
             wr = csv.DictWriter(f, fieldnames=cols)  # organizador
             wr.writeheader()  # titulo
-            wr.writerows(dados[sensor]) # dados de cada coluna
+            wr.writerows(dados[sensor])  # dados de cada coluna
     shutil.make_archive('output', 'zip', './', 'server/outputs')
+
 
 def registrar_dado_no_bd(dados, sensor):
     post(link_bd.format(sensor), json=dados)
+
 
 def pegar_dados_do_sensor(sensor):
     folders = get(link_bd_folders).json()
@@ -45,6 +51,7 @@ def pegar_dados_do_sensor(sensor):
     folder_peding = folder_peding[0]
     return folder_peding["Sensores"][sensor]
 
+
 def pegar_todos_dados_bd():
     dados_json = json.loads(get(link_bd_todos_sensores).text)  # objeto json que pode ser manuseada
     dados_formatados = {}
@@ -53,13 +60,16 @@ def pegar_todos_dados_bd():
     print(dados_formatados)
     return dados_formatados
 
+
 def pegar_ultimo_dado_do_sensor(sensor):
     dados = pegar_dados_do_sensor(sensor)
-    return dados[-1] #estou pegando o ultimo valor enviado
+    return dados[-1]  # estou pegando o ultimo valor enviado
+
 
 def definir_simulacao_completed():
     folders = get(link_bd_folders).json()
-    folder_pending = [(folder, {folder: folders[folder]}) for folder in folders if folders[folder]["completed"] is False]
+    folder_pending = [(folder, {folder: folders[folder]}) for folder in folders if
+                      folders[folder]["completed"] is False]
     if len(folder_pending) == 0:
         print("definir_simulacao_completed - Folder peding not exist")
         return
@@ -67,11 +77,12 @@ def definir_simulacao_completed():
     folder_pending[folder_name]["completed"] = True
     patch(link_bd_folders, json=folder_pending)
 
+
 def enviar_pasta_dos_resultados_simulacao(pasta):
     UploadBlob(pasta)
 
-def UploadBlob(folder):
 
+def UploadBlob(folder):
     try:
         cred = credentials.Certificate("./cred_firebase_server.json")
         initialize_app(cred, {'storageBucket': f'{link_bd_image}/'})
@@ -92,6 +103,7 @@ def UploadBlob(folder):
         data_send_socket.append({"type": type, "name": file.split(".")[0], "img": blob.public_url})
     with open("img_send.json", "w") as file:
         file.write(json.dumps(data_send_socket))
+
 
 def second_to_hour_minute(diferenca):
     if diferenca >= 3600:
