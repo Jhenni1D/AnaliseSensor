@@ -17,7 +17,6 @@ class LoopState:
 
 sio = socketio.Client()
 queue = queue.Queue()
-simulation_exe = os.path.abspath("simulation.exe").replace("\\", "/")
 simulation_controller = simulation_controller_executor.SimulationController()
 simulation_state = LoopState()
 
