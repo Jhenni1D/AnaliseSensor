@@ -14,15 +14,14 @@ class LoopState:
         self.simulation_running = False
         self.files_running = False
 
+
 sio = socketio.Client()
-fila = queue.Queue()
-file_simulation = os.path.abspath("simulation.exe").replace("\\", "/")
-print(file_simulation)
+queue = queue.Queue()
+simulation_exe = os.path.abspath("simulation.exe").replace("\\", "/")
 simulation_controller = simulation_controller_executor.SimulationController()
 simulation_state = LoopState()
 
 try:
-
     @sio.event
     def connect():
         sio.emit("start_att_img")
@@ -31,19 +30,20 @@ try:
         sio.emit("ping")
         print("send ping")
 
+
     @sio.event
     def pong():
         print("receive pong")
+
 
     @sio.event
     def insert_queue(data):
         simulation_controller.load_simulation()
         is_can_enqueue = simulation_controller.is_can_enqueue(data["SensorA"])
         if is_can_enqueue:
-            fila.put(data)
+            queue.put(data)
             simulation_controller.update_queue(data["folder_name"])
-            print("Inseriu elemento na fila, elementos na fila:", fila.qsize(), " | dados:", data)
-
+            print("Inseriu elemento na fila, elementos na fila:", queue.qsize(), " | dados:", data)
 
 
     @sio.event
@@ -53,12 +53,12 @@ try:
             return
         while True:
             simulation_state.simulation_running = True
-            while not fila.empty():
-                data = fila.get()
+            while not queue.empty():
+                data = queue.get()
                 print('Irá iniciar simulação com os dados:', data)
                 args = f"./simulation.exe \"{json.dumps(data).replace('"', "'")}\""
                 args_test = f"./.vm-venv/Scripts/python ./simulation.py \"{json.dumps(data).replace('"', "'")}\""
-                args = args_test
+                #args = args_test
                 with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as proc:
                     try:
                         stdout_simulation = proc.stdout.read().decode()
@@ -66,7 +66,7 @@ try:
                         print("Exception in stout of simulation.exe")
                         stdout_simulation = proc.stdout.read().decode("latin-1")
                     print(f"LOG DO PROCESSo: \n---\n{stdout_simulation}\n---\n")
-        simulation_state.simulation_running = False
+
 
     @sio.event
     def send_img_loop():
@@ -85,24 +85,30 @@ try:
                     with open(img_file_name) as file:
                         sio.emit('request_update_image', json.loads(file.read()))
                     os.remove(img_file_name)
-                except:
-                    print("Quebrou ao tentar abrir arquivo das imagens")
+                except Exception as ex:
+                    print(f"Quebrou ao tentar abrir arquivo das imagens:\n{ex}")
 
             if progress_file_name in dir_list:
                 try:
                     with open(progress_file_name) as file:
                         sio.emit('progress', file.read())
-                except:
-                    print("Quebrou ao tentar abrir arquivo progress")
-        print("Finalizou Loop")
-        simulation_state.files_running = False
+                except Exception as ex:
+                    print(f"Quebrou ao tentar abrir arquivo progress:\n{ex}")
 
+            log_file = f"simulation_{simulation_controller.simulations["folder_name"]}.txt"
+            if log_file in dir_list:
+                try:
+                    with open(f"./{log_file}") as file:
+                        sio.emit('log_file', file.read())
+                except Exception as ex:
+                    print(f"Quebrou ao tentar abrir o arquivo de log:\n {ex}")
 
     @sio.event
     def reset_simulation():
         simu = simulation_controller_executor.SimulationController()
         simu.reset()
         print('Arquivos de simulação Resetados!')
+
 
     @sio.event
     def disconnect():
