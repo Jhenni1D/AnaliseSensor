@@ -1,9 +1,10 @@
 # Funções serviços dos aplicativos
 import datetime
 import time
-import json
 from datetime import date
+
 from requests import get, patch
+from xlwt import Workbook
 
 link_bd_base = "https://simulacao-femm-default-rtdb.firebaseio.com/"
 
@@ -69,10 +70,18 @@ def write_csv_data(dados):  # dados parametros aula lira
     # shutil.make_archive('output', 'zip', './', 'server/outputs')
 
 
-def get_folder_uncompleted():
+def get_folder_filter(filter_folder):
     folders = get(link_bd_folders).json()
-    folder_uncompleted = [(folder, {folder: folders[folder]}) for folder in folders if
-                          "completed" in folders[folder] and folders[folder]["completed"] is False]
+    folder_filtred = [(folder, {folder: folders[folder]}) for folder in folders if
+                      filter_folder(folder, folders[folder])]
+    return folder_filtred
+
+
+def get_folder_uncompleted():
+    def filter_folder(folder_name, folder_data):
+        return "completed" in folder_data and folder_data["completed"] is False
+
+    folder_uncompleted = get_folder_filter(filter_folder)
     return folder_uncompleted
 
 
@@ -89,7 +98,6 @@ def get_all_sensors():
     formatted_data = {}
     for sensor in json_data:
         formatted_data[sensor] = [json_data[sensor][x] for x in json_data[sensor]]
-    print(formatted_data)
     return formatted_data
 
 
@@ -99,11 +107,8 @@ def get_last_sensor_data(sensor):
     return data[-1]  # estou pegando o ultimo valor enviado
 
 
-def get_date_and_sensors_values_for_graph():
-    folders_data = get_folder_uncompleted()
-    if len(folders_data) == 0:
-        return {}
-    folder_name, folder_data = folders_data[0]
+def get_formatted_sensors_data(folders_data):
+    folder_name, folder_data = folders_data
     sorted_sensors = sorted(folder_data[folder_name]['Sensores'], key=lambda d: d['data_hora'])
     data_graph = {}
     keys = list(sorted_sensors[0].keys())
@@ -115,6 +120,52 @@ def get_date_and_sensors_values_for_graph():
     del data_graph['data']
     del data_graph['hora']
     return data_graph
+
+
+def get_date_and_sensors_values_for_graph():
+    folders_data = get_folder_uncompleted()
+    if len(folders_data) == 0:
+        return {}
+    return get_formatted_sensors_data(folders_data[0])
+
+
+def get_excel_all_folders(start_limit=0, end_limit=0):
+    all_folders_data = get_folder_filter(lambda fn, fd: True)
+    all_folders_formatted = []
+    all_folders_data_info = {}
+    for folders_data in all_folders_data:
+        all_folders_formatted.append(get_formatted_sensors_data(folders_data))
+    for data in all_folders_formatted:
+        for key in data:
+            if key not in all_folders_data_info:
+                all_folders_data_info[key] = []
+            all_folders_data_info[key] += data[key]
+    get_excel_of_data("All_Sensors", all_folders_data_info)
+
+
+def get_excel_of_folder(folder, start_limit=0, end_limit=0):
+    folder_data = get_folder_filter(lambda folder_name, folder_d: folder_name == folder)
+    if len(folder_data) == 0:
+        return
+
+    folder_data = get_formatted_sensors_data(folder_data[0])
+    get_excel_of_data(folder, folder_data)
+
+
+def get_excel_of_data(file_name, data):
+    wb = Workbook()
+    sheet1 = wb.add_sheet(f'Sensor Data', cell_overwrite_ok=True)
+    # sheet1.write(coluna, linha, 'Value')
+    sheet1.write(0, 0, "Data")
+    datetime_sensor = data['data_hora']
+    del data['data_hora']
+    for i in range(1, len(datetime_sensor) + 1):
+        sheet1.write(i, 0, datetime_sensor[i - 1])
+        for sensor in data:
+            if i == 1:
+                sheet1.write(0, list(data.keys()).index(sensor) + 1, sensor)
+            sheet1.write(i, list(data.keys()).index(sensor) + 1, data[sensor][i - 1])
+    wb.save(f'{file_name}_Data.xls')
 
 
 def check_and_get_img(link, folder_img, all_folders):
