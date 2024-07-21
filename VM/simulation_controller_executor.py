@@ -153,7 +153,7 @@ class SimulationController:
                 with open("./simulation.json", "w") as file:
                     file.write(json.dumps(self.simulations, indent=1))
                 write_log(f"-Atualizou o arquivo simulation.json\n")
-                write_log(f"CUUU-arquivo simulation.json: {json.dumps(self.simulations)}\n")
+                write_log(f"arquivo simulation.json: {json.dumps(self.simulations)}\n")
                 finish = time.time()
                 write_log(
                     f"# FIM DA SIMULACAO: {pegar_data_formatada()}_{pegar_hora_formatada()} - TEMPO DE EXECUÇÃO: {second_to_hour_minute(finish - start)}\n")
