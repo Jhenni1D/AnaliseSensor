@@ -66,8 +66,8 @@ def uncompleted_simulation_dashboard(folder):
     folder_exist = get(link_folder).status_code.real != 404
 
     if folder_exist:
-        return render_template("medicoes3.html", data=get_image_data(folder), folder_name=folder)
-    return render_template("medicoes3.html", data=[], folder_name=folder)
+        return render_template("simulation_dashboard.html", data=get_image_data(folder), folder_name=folder)
+    return render_template("simulation_dashboard.html", data=[], folder_name=folder)
 
 
 @app.route("/to/uncompleted-simulation/dashboard")
