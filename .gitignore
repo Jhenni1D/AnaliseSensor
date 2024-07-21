@@ -41,3 +41,10 @@
 /server/static/image_test/VELOCIDADE.png
 /VM/build/simulation/warn-simulation.txt
 /VM/build/simulation/xref-simulation.html
+VM/__pycache__/FEMM_Simulation.cpython-312.pyc
+VM/__pycache__/log_handler.cpython-312.pyc
+VM/build/simulation/localpycs/pyimod01_archive.pyc
+VM/build/simulation/localpycs/pyimod02_importers.pyc
+VM/build/simulation/localpycs/pyimod03_ctypes.pyc
+VM/build/simulation/localpycs/pyimod04_pywin32.pyc
+VM/build/simulation/localpycs/struct.pyc
