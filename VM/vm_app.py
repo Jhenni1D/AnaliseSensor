@@ -55,9 +55,9 @@ try:
             while not queue.empty():
                 data = queue.get()
                 print('Irá iniciar simulação com os dados:', data)
-                args = f"./simulation.exe \"{json.dumps(data).replace('"', "'")}\""
-                args_test = f"./.vm-venv/Scripts/python ./simulation.py \"{json.dumps(data).replace('"', "'")}\""
-                #args = args_test
+                args = f"./simulation_controller_executor.exe \"{json.dumps(data).replace('"', "'")}\""
+                # args_test = f"./.vm-venv/Scripts/python ./simulation_controller_executor.py \"{json.dumps(data).replace('"', "'")}\""
+                args = args_test
                 with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as proc:
                     try:
                         stdout_simulation = proc.stdout.read().decode()
@@ -94,11 +94,11 @@ try:
                 except Exception as ex:
                     print(f"Quebrou ao tentar abrir arquivo progress:\n{ex}")
 
-            log_file = f"simulation_{simulation_controller.simulations["folder_name"]}.txt"
+            log_file = f"log-simulacao_{simulation_controller.simulations["folder_name"]}.txt"
             if log_file in dir_list:
                 try:
-                    with open(f"./{log_file}") as file:
-                        sio.emit('log_file', file.read())
+                    with open(f"./{log_file}", encoding="utf-8") as file:
+                        sio.emit('log_simulation', file.read())
                 except Exception as ex:
                     print(f"Quebrou ao tentar abrir o arquivo de log:\n {ex}")
 

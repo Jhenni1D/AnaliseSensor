@@ -118,4 +118,8 @@ def create_io(app):
         io.emit("corrent_data_updater", get_date_and_sensors_values_for_graph_by_folder(folder))
         time.sleep(1)
 
+    @io.event
+    def log_simulation(log_text):
+        io.emit("log_simulation", log_text)
+
     return io

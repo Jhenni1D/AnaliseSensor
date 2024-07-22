@@ -275,6 +275,9 @@ $(document).ready(function () {
     socket.emit("corrent_data_updater", folder_name);
   });
 
+  socket.on('log_simulation', log_text => {
+    document.getElementById("log-text").innerHTML = log_text;
+  });
 
   socket.on('disconnect', function () {
     console.log('Disconnected!');
