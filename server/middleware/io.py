@@ -1,6 +1,5 @@
 from flask_socketio import SocketIO
-
-from server.app_service_server import *
+from app_service_server import *
 
 
 def create_io(app):

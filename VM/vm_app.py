@@ -1,8 +1,8 @@
 import json
 import os
+import queue
 import subprocess
 import time
-import queue
 import socketio
 
 import simulation_controller_executor
@@ -101,6 +101,7 @@ try:
                         sio.emit('log_simulation', file.read())
                 except Exception as ex:
                     print(f"Quebrou ao tentar abrir o arquivo de log:\n {ex}")
+
 
     @sio.event
     def reset_simulation():
