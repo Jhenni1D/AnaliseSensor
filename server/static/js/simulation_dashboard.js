@@ -277,6 +277,12 @@ $(document).ready(function () {
 
   socket.on('log_simulation', log_text => {
     document.getElementById("log-text").innerHTML = log_text;
+    if (log_text.toLowerCase().includes("exception") || log_text.toLowerCase().includes("error")) {
+      progress_simulation_element.classList.add("bg-danger");
+    }
+    else {
+      progress_simulation_element.classList.remove("bg-danger");
+    }
   });
 
   socket.on('disconnect', function () {

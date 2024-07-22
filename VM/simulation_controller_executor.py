@@ -41,6 +41,9 @@ class SimulationController:
         for file in os.listdir("./"):
             if "simulation" in file and ".json" in file:
                 os.remove(f"./{file}")
+            if f"log-simulacao_" in file:
+                os.remove(f"./{file}")
+
         with open("./simulation.json", "w") as file:
             file.write(json.dumps(self.simulations, indent=1))
 

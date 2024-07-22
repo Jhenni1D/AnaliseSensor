@@ -57,7 +57,7 @@ try:
                 print('Irá iniciar simulação com os dados:', data)
                 args = f"./simulation_controller_executor.exe \"{json.dumps(data).replace('"', "'")}\""
                 # args_test = f"./.vm-venv/Scripts/python ./simulation_controller_executor.py \"{json.dumps(data).replace('"', "'")}\""
-                args = args_test
+                # args = args_test
                 with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as proc:
                     try:
                         stdout_simulation = proc.stdout.read().decode()
