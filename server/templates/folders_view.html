@@ -27,12 +27,9 @@
                         <button type="submit" class="btn btn-primary mb-3">Download in Excel</button>
                     </div>
                 </form>
-
             </div>
             <div class="row border border-info rounded" style="margin: 0% 5% 5% 5%; height: 100%;">
-
                 <nav class="col p-2 nav-pills" style="margin-top: 3%">
-
                     {% for folder in all_folders %}
                     {% set index_item = all_folders.index(folder) %}
                     <div id=" list-{{folder[0]}}" class="list-group">
@@ -41,7 +38,6 @@
                     </div>
                     {% endfor %}
                 </nav>
-
                 <div class="col p-2">
                     {% for folder in all_folders %}
                     {% set index_item = all_folders.index(folder) %}
@@ -50,16 +46,12 @@
                         <div data-bs-spy="scroll" data-bs-target="#list-{{folder[0]}}"
                             data-bs-offset="{{all_folders.index(folder)}}" class="scrollspy-{{folder[0]}}"
                             tabindex="{{all_folders.index(folder)}}">
-
                             <h4 id="list-item-{{all_folders.index(folder)}}">{{folder[0]}}</h4>
-
                             <form class="row align-items-center" action="/download/{{folder_name}}">
-
                                 <div class="col">
                                     <div class="accordion" id="accordion-{{folder[0]}}-sensors">
                                         <div class="accordion-item">
                                             <h2 class="accordion-header">
-
                                                 <button class="accordion-button collapsed" type="button"
                                                     data-bs-toggle="collapse"
                                                     data-bs-target="#collapse-{{folder[0]}}-sensors"
@@ -67,13 +59,12 @@
                                                     aria-controls="collapse-{{folder[0]}}-sensors">
                                                     Sensors
                                                 </button>
-
                                             </h2>
                                             <div id="collapse-{{folder[0]}}-sensors"
                                                 class="accordion-collapse collapse overflow-auto"
                                                 data-bs-parent="#accordion-{{folder[0]}}-sensors">
                                                 <div class="accordion-body" style="height: 600px;">
-                                                    <div>
+                                                    <div id="collapse-child-level-1">
                                                         {% set sensors = folder[1][folder[0]]["Sensores"] %}
                                                         {% for sensor_info in sensors %}
                                                         <div class="accordion"
@@ -136,8 +127,8 @@
                             </form>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
         </div>
     </div>
@@ -149,5 +140,4 @@
     </script>
     <script src="{{ url_for('static', filename='js/folders_view.js') }}"></script>
 </body>
-
 </html>
