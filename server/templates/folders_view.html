@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="bg-light bg-gradient" lang="en">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -8,17 +8,28 @@
           integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" rel="stylesheet">
 </head>
 
-<body class="bg-light bg-gradient">
+<body>
 <nav class="navbar navbar-light bg-light">
     <div class="container-fluid">
         <span class="navbar-brand mb-0 h1">SMAM</span>
     </div>
 </nav>
 <hr>
-<div class="bg-info">
-    <div class="container text-center bg-light bg-gradient">
 
-        <div class="row border border-info rounded" style="margin: 5% 5% 5% 5%; height: 100%;">
+<div>
+    <div class="container text-center bg-light bg-gradient">
+        <div class="border rounded" style="margin: 5% 5% 0% 5%;">
+            <p>
+                Download All Sensors Data
+            </p>
+            <form action="/download-all">
+                <div class="col">
+                    <button class="btn btn-primary mb-3" type="submit">Download in Excel</button>
+                </div>
+            </form>
+
+        </div>
+        <div class="row border border-info rounded" style="margin: 0% 5% 5% 5%; height: 100%;">
 
             <nav class="col p-2 nav-pills" style="margin-top: 3%">
 
@@ -42,7 +53,7 @@
 
                         <h4 id="list-item-{{all_folders.index(folder)}}">{{folder[0]}}</h4>
 
-                        <form class="row align-items-center">
+                        <form action="/download/{{folder_name}}" class="row align-items-center">
 
                             <div class="col">
                                 <div class="accordion" id="accordion-{{folder[0]}}-sensors">
@@ -50,17 +61,18 @@
                                         <h2 class="accordion-header">
 
                                             <button aria-controls="collapse-{{folder[0]}}-sensors" aria-expanded="false"
+                                                    data-bs-toggle="collapse"
                                                     class="accordion-button collapsed"
                                                     data-bs-target="#collapse-{{folder[0]}}-sensors"
-                                                    data-bs-toggle="collapse"
                                                     type="button">
                                                 Sensors
                                             </button>
 
                                         </h2>
-                                        <div class="accordion-collapse collapse" data-bs-parent="#accordion-{{folder[0]}}-sensors"
+                                        <div class="accordion-collapse collapse overflow-auto"
+                                             data-bs-parent="#accordion-{{folder[0]}}-sensors"
                                              id="collapse-{{folder[0]}}-sensors">
-                                            <div class="accordion-body">
+                                            <div class="accordion-body" style="height: 600px;">
                                                 <div>
                                                     {% set sensors = folder[1][folder[0]]["Sensores"] %}
                                                     {% for sensor_info in sensors %}
@@ -80,7 +92,7 @@
                                                             <div class="accordion-collapse collapse"
                                                                  data-bs-parent="#accordion-{{folder[0]}}-item-{{sensors.index(sensor_info)+1}}"
                                                                  id="collapse-{{folder[0]}}-item-{{sensors.index(sensor_info)+1}}">
-                                                                <div class="accordion-body">
+                                                                <div class="accordion-body" data-bs-spy="scroll">
                                                                     {% for info in sensor_info %}
                                                                     <div class="input-group mb-3">
                                                                             <span class="input-group-text"
@@ -117,14 +129,15 @@
                                 </div>
                                 <div class="col">
                                     <a class="btn btn-info" href="/simulation/dashboard/{{folder_name}}"
-                                       target="_blank">Go to dashboard</a>
+                                       target="_blank">Go
+                                        to dashboard</a>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
-                {% endfor %}
             </div>
+            {% endfor %}
         </div>
     </div>
 </div>
