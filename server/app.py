@@ -13,7 +13,10 @@ create_bp(app)
 
 @app.route('/')
 def home():
-    return render_template("home.html")
+    home_info = {}
+    with open("./home.json", "r", encoding="utf-8") as file:
+        home_info = json.loads(file.read())
+    return render_template("home.html", home_info=home_info)
 
 
 @app.route('/folders_view')
