@@ -24,7 +24,18 @@ $(document).ready(function () {
         scales: {
           x: {
             min: minSliderValue,
-            max: maxSliderValue
+            max: maxSliderValue,
+            title: {
+              display: true,
+              text: 'DATETIME' // Your y-axis title
+            }
+          },
+          y:
+          {
+            title: {
+              display: true,
+              text: 'CURRENT' // Your y-axis title
+            }
           }
         }
       }
@@ -60,6 +71,13 @@ $(document).ready(function () {
     "SensorTemp": CreateChart(elements_graph["SensorTemp"]),
     "SensorRPM": CreateChart(elements_graph["SensorRPM"]),
     "eficiencia": CreateChart(elements_graph["eficiencia"])
+  }
+
+  let graph_title = {
+    "SensorTensao": "Tension",
+    "SensorTemp": "Temperature",
+    "SensorRPM": "RPM",
+    "eficiencia": "Efficiency"
   }
 
   let modal_img = document.querySelector("#modal_img")
@@ -143,7 +161,7 @@ $(document).ready(function () {
             [
               {
                 borderColor: colors[index_color++],
-                label: `${graph.toLocaleUpperCase()} / Tempo`,
+                label: `${graph_title[graph].toLocaleUpperCase()} / DATETIME`,
                 data: graph_data[graph]
               }
             ],
@@ -151,6 +169,14 @@ $(document).ready(function () {
         }
         charts_graphs[graph].data = data;
         charts_graphs[graph].update();
+        charts_graphs[graph].options.scales.y.title = {
+          display: true,
+          text: graph_title[graph].toLocaleUpperCase()
+        }
+        charts_graphs[graph].options.scales.x.title = {
+          display: true,
+          text: "DATETIME"
+        }
       }
     }
     catch (err) {
@@ -180,17 +206,17 @@ $(document).ready(function () {
         [
           {
             borderColor: corrent_colors[index_corrent_color++],
-            label: "SensorA / Tempo",
+            label: "CURRENT A / DATETIME",
             data: graph_data["SensorA"]
           },
           {
             borderColor: corrent_colors[index_corrent_color++],
-            label: "SensorB / Tempo",
+            label: "CURRENT B / DATETIME",
             data: graph_data["SensorB"]
           },
           {
             borderColor: corrent_colors[index_corrent_color++],
-            label: "SensorC / Tempo",
+            label: "CURRENT C / DATETIME",
             data: graph_data["SensorC"]
           }
         ],
