@@ -1,4 +1,4 @@
-from app_service_server import get_all_sensors, get_last_sensor_data, get_folder_uncompleted
+from app_service_server import get_all_folders, get_folder_uncompleted
 from flask import Blueprint, jsonify
 
 
@@ -7,13 +7,13 @@ bp = Blueprint("api", __name__)
 
 @bp.route("/show-data/.json")
 def show_data():
-    return jsonify(get_all_sensors())
+    return jsonify(get_all_folders())
 
 
 # TODO: ajustar rota e seu método
-@bp.route("/last-sensor-data/<sensor>/.json")
-def last_sensor_data(sensor):
-    return jsonify(get_last_sensor_data(sensor))
+@bp.route("/last-simulation-data/.json")
+def last_sensor_data():
+    return jsonify(get_all_folders()[-1])
 
 
 @bp.route("/uncompleted-simulation/.json")

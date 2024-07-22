@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, request, send_file, render_template, redirect, url_for
 
 from app_service_server import *
@@ -9,14 +11,19 @@ io = create_io(app)
 create_bp(app)
 
 
-# primeira rota
 @app.route('/')
-def home():  # def = função
+def home():
     return render_template("home.html")
 
 
+@app.route('/folders_view')
+def folders_view():
+    return render_template("folders_view.html", all_folders=get_all_folders(),
+                           all_folders_dumped=json.dumps(get_all_folders()))
+
+
 @app.route('/reset-simulation-data')
-def nova_simulacao():  # def = função
+def reset_simulation_data():
     io.emit("reset_simulation")
     return "Simulation data deleteds!"
 
@@ -49,15 +56,14 @@ def store_and_init_new_simulation():
     return "deu tudo certo"
 
 
-# terceira rota de baixar os dados em formato de excel
-@app.route("/download-simulation-data")
-def download_simulation_data():
-    write_csv_data(get_all_sensors())
-    path = os.getcwd() + "/output.zip"  # caminho do codigo atual
-    return send_file(
-        path, as_attachment=True
-    )  # send_file do flask pegue o arquivo do direotiro pra poder baixar
+@app.route("/simulation/dashboard/<folder>")
+def simulation_dashboard(folder):
+    link_folder = f"https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/{folder}%2FM0.png"
+    folder_exist = get(link_folder).status_code.real != 404
 
+    if folder_exist:
+        return render_template("simulation_dashboard.html", data=get_image_data(folder), folder_name=folder)
+    return render_template("simulation_dashboard.html", data=[], folder_name=folder)
 
 @app.route("/uncompleted-simulation/dashboard/<folder>")
 def uncompleted_simulation_dashboard(folder):

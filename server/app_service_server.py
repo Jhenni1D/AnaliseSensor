@@ -60,23 +60,16 @@ def register_new_folder(folder_data):
     patch(link_bd_folders, json=folder_data)
 
 
-def write_csv_data(dados):  # dados parametros aula lira
-    # TODO: refazer a criação do CSV
-    pass
-    # for sensor in dados:
-    #     cols = ['data', 'hora', 'medicao']  # titulo da coluna botando do mesmo jeito do bd
-    #     with open(f"./outputs/{sensor}_output.csv", 'w') as f:  # to abrindo um arquivo csv
-    #         wr = csv.DictWriter(f, fieldnames=cols)  # organizador
-    #         wr.writeheader()  # titulo
-    #         wr.writerows(dados[sensor])  # dados de cada coluna
-    # shutil.make_archive('output', 'zip', './', 'server/outputs')
-
-
 def get_folder_filter(filter_folder):
     folders = get(link_bd_folders).json()
-    folder_filtred = [(folder, {folder: folders[folder]}) for folder in folders if
+    folder_filtred = [[folder, {folder: folders[folder]}] for folder in folders if
                       filter_folder(folder, folders[folder])]
     return folder_filtred
+
+
+def get_all_folders():
+    all_folders = get_folder_filter(lambda fn, fd: True)
+    return all_folders
 
 
 def get_folder_uncompleted():
@@ -85,28 +78,6 @@ def get_folder_uncompleted():
 
     folder_uncompleted = get_folder_filter(filter_folder)
     return folder_uncompleted
-
-
-# TODO: ajustar método
-def get_sensor_data(sensor):
-    json_data = get(link_bd.format(sensor)).json()  # objeto json que pode ser manuseada
-    json_data = [json_data[x] for x in json_data]  # formatando dados
-    return json_data
-
-
-# TODO: ajustar método
-def get_all_sensors():
-    json_data = get(link_bd_folders).json()  # objeto json que pode ser manuseada
-    formatted_data = {}
-    for sensor in json_data:
-        formatted_data[sensor] = [json_data[sensor][x] for x in json_data[sensor]]
-    return formatted_data
-
-
-# TODO: ajustar método
-def get_last_sensor_data(sensor):
-    data = get_sensor_data(sensor)
-    return data[-1]  # estou pegando o ultimo valor enviado
 
 
 def get_formatted_sensors_data(folders_data):
@@ -139,7 +110,7 @@ def get_date_and_sensors_values_for_graph_by_folder(folder):
 
 
 def get_excel_all_folders(start_limit=0, end_limit=0):
-    all_folders_data = get_folder_filter(lambda fn, fd: True)
+    all_folders_data = get_all_folders()
     all_folders_formatted = []
     all_folders_data_info = {}
     for folders_data in all_folders_data:

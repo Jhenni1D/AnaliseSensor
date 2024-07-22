@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html class="bg-light bg-gradient" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Folders View</title>
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" rel="stylesheet">
+</head>
+
+<body class="bg-light bg-gradient">
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">SMAM</span>
+    </div>
+</nav>
+<hr>
+<div class="bg-info">
+    <div class="container text-center bg-light bg-gradient">
+
+        <div class="row border border-info rounded" style="margin: 5% 5% 5% 5%; height: 100%;">
+
+            <nav class="col p-2 nav-pills" style="margin-top: 3%">
+
+                {% for folder in all_folders %}
+                {% set index_item = all_folders.index(folder) %}
+                <div class="list-group" id=" list-{{folder[0]}}">
+                    <a class="list-group-item list-group-item-action nav-link {% if index_item==0
+                        %}active{% endif %}" id="item-name-{{index_item}}">{{folder[0]}}</a>
+                </div>
+                {% endfor %}
+            </nav>
+
+            <div class="col p-2">
+                {% for folder in all_folders %}
+                {% set index_item = all_folders.index(folder) %}
+                {% set folder_name = folder[0] %}
+                <div %} %}style="display: none;" endif id="folder-info-root-{{index_item}}" if index_item!=0 {% {%>
+                    <div class="scrollspy-{{folder[0]}}" data-bs-offset="{{all_folders.index(folder)}}"
+                         data-bs-spy="scroll" data-bs-target="#list-{{folder[0]}}"
+                         tabindex="{{all_folders.index(folder)}}">
+
+                        <h4 id="list-item-{{all_folders.index(folder)}}">{{folder[0]}}</h4>
+
+                        <form class="row align-items-center">
+
+                            <div class="col">
+                                <div class="accordion" id="accordion-{{folder[0]}}-sensors">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+
+                                            <button aria-controls="collapse-{{folder[0]}}-sensors" aria-expanded="false"
+                                                    class="accordion-button collapsed"
+                                                    data-bs-target="#collapse-{{folder[0]}}-sensors"
+                                                    data-bs-toggle="collapse"
+                                                    type="button">
+                                                Sensors
+                                            </button>
+
+                                        </h2>
+                                        <div class="accordion-collapse collapse" data-bs-parent="#accordion-{{folder[0]}}-sensors"
+                                             id="collapse-{{folder[0]}}-sensors">
+                                            <div class="accordion-body">
+                                                <div>
+                                                    {% set sensors = folder[1][folder[0]]["Sensores"] %}
+                                                    {% for sensor_info in sensors %}
+                                                    <div class="accordion"
+                                                         id="accordion-{{folder[0]}}-item-{{sensors.index(sensor_info)+1}}">
+                                                        <div class="accordion-item">
+                                                            <h2 class="accordion-header">
+                                                                <button aria-controls="collapse-{{folder[0]}}-item-{{sensors.index(sensor_info)+1}}"
+                                                                        aria-expanded="false" class="accordion-button collapsed"
+                                                                        data-bs-target="#collapse-{{folder[0]}}-item-{{sensors.index(sensor_info)+1}}"
+                                                                        data-bs-toggle="collapse"
+                                                                        type="button">
+                                                                    Item
+                                                                    {{sensors.index(sensor_info)+1}}
+                                                                </button>
+                                                            </h2>
+                                                            <div class="accordion-collapse collapse"
+                                                                 data-bs-parent="#accordion-{{folder[0]}}-item-{{sensors.index(sensor_info)+1}}"
+                                                                 id="collapse-{{folder[0]}}-item-{{sensors.index(sensor_info)+1}}">
+                                                                <div class="accordion-body">
+                                                                    {% for info in sensor_info %}
+                                                                    <div class="input-group mb-3">
+                                                                            <span class="input-group-text"
+                                                                                  id="inputGroup-sizing-default">{{info}}</span>
+                                                                        <input aria-describedby="inputGroup-sizing-default" aria-label="Sizing example input"
+                                                                               class="form-control"
+                                                                               disabled
+                                                                               type="text" value="{{sensor_info[info]}}">
+                                                                    </div>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4" style="margin: 15px 15px 15px 15px;">
+                                    <div class="form-check">
+                                        <input class="form-check-input" folder[1][folder[0]][
+                                               id="flexCheckCheckedDisabled-{{folder_name}}-{{index_item}}" if type="checkbox"
+                                               {%"completed"] %}checked{% endif %} disabled
+                                        style="margin-right: -50px;">
+                                        <label class="form-check-label" for="flexCheckCheckedDisabled">
+                                            Simulation Completed
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <button class="btn btn-primary mb-3" type="submit">Download in Excel</button>
+                                </div>
+                                <div class="col">
+                                    <a class="btn btn-info" href="/simulation/dashboard/{{folder_name}}"
+                                       target="_blank">Go to dashboard</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<script crossorigin="anonymous"
+        integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript">
+    var all_folders = JSON.parse("{{all_folders_dumped}}".replaceAll("&#34;", '"'))
+</script>
+<script src="{{ url_for('static', filename='js/folders_view.js') }}"></script>
+</body>
+
+</html>
