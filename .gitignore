@@ -49,3 +49,5 @@ VM/build/simulation/localpycs/pyimod03_ctypes.pyc
 VM/build/simulation/localpycs/pyimod04_pywin32.pyc
 VM/build/simulation/localpycs/struct.pyc
 /server/*_Data.xls
+/VM/folder_name.txt
+/VM/log-simulacao_*.txt
