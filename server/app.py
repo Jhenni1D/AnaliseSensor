@@ -85,11 +85,11 @@ def to_uncompleted_simulation_dashboard():
         return redirect(url_for("/"))
     return redirect(location=f"/uncompleted-simulation/dashboard/{folder_uncompleted[0][0]}")
 
-
+@app.route('/download/<filename>/<start>/<end>', methods=['GET'])
 @app.route('/download/<filename>', methods=['GET'])
 @app.route('/download/<filename>/', methods=['GET'])
-def download(filename):
-    get_excel_of_folder(filename)
+def download(filename, start=-1, end=-1):
+    get_excel_of_folder(filename, int(start), int(end))
     filename = filename + "_Data.xls" if ".xls" not in filename else filename
     return send_file(get_bytes_file(filename), mimetype='application/xls', as_attachment=True,
                      download_name=filename)

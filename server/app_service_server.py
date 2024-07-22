@@ -123,12 +123,16 @@ def get_excel_all_folders(start_limit=0, end_limit=0):
     get_excel_of_data("All_Sensors", all_folders_data_info)
 
 
-def get_excel_of_folder(folder, start_limit=0, end_limit=0):
+def get_excel_of_folder(folder, start_limit=-1, end_limit=-1):
     folder_data = get_folder_filter(lambda folder_name, folder_d: folder_name == folder)
     if len(folder_data) == 0:
         return
 
     folder_data = get_formatted_sensors_data(folder_data[0])
+    if start_limit < end_limit and start_limit > -1:
+        for key in folder_data:
+            folder_data[key] = folder_data[key][start_limit:end_limit+1]
+    print(folder_data)
     get_excel_of_data(folder, folder_data)
 
 

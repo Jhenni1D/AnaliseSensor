@@ -6,6 +6,8 @@ var currentMinSliderValue = 0;
 var currentMaxSliderValue = 100;
 
 var slider = document.getElementById('slider');
+let form = document.getElementById('form-download-data');
+
 var config = {
 	start: [minSliderValue, maxSliderValue],
 	connect: true,
@@ -38,6 +40,8 @@ noUiSlider.create(slider, config);
 slider.noUiSlider.on('update', function (value) {
 	currentMinSliderValue = parseInt(value[0]);
 	currentMaxSliderValue = parseInt(value[1]);
+	form.action = `/download/${folder_name}/${parseInt(value[0])}/${parseInt(value[1])}`;
+
 });
 
 function UpdateSlider() {
