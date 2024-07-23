@@ -1,5 +1,5 @@
-from flask_socketio import SocketIO
 from app_service_server import *
+from flask_socketio import SocketIO
 
 
 def create_io(app):
@@ -120,5 +120,9 @@ def create_io(app):
     @io.event
     def log_simulation(log_text):
         io.emit("log_simulation", log_text)
+
+    @io.event
+    def reset_simulation_status(status):
+        io.emit("reset_simulation_status", status)
 
     return io
