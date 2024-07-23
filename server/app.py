@@ -28,7 +28,7 @@ def folders_view():
 @app.route('/reset-simulation-data')
 def reset_simulation_data():
     io.emit("reset_simulation")
-    return "Simulation data deleteds!"
+    return ("", 204)
 
 
 @app.route('/store/new-simulation', methods=['POST'])
@@ -40,6 +40,7 @@ def store_and_init_new_simulation():
                                   "hora": hour, "data_hora": f"{date} {hour}"}
 
     folder_incompleted = get_folder_uncompleted()
+    stored = True
     if len(folder_incompleted) == 0:
         new_folder_name, new_folder = get_new_folder_info_template()
         new_folder[new_folder_name]["Sensores"] = [store_firebase_data]
@@ -48,6 +49,7 @@ def store_and_init_new_simulation():
         data["folder_name"] = new_folder_name
         print(f"criou pasta - Armazenou o data: {store_firebase_data}")
     else:
+        stored = False
         folder_name, folder_data = folder_incompleted[0]
         folder_data[folder_name]["Sensores"].append(store_firebase_data)
         print(f"Armazenou o data: {store_firebase_data}")
@@ -56,7 +58,9 @@ def store_and_init_new_simulation():
 
     print(f"data enviado para a VM: {data}")
     io.emit("insert_queue", data)
-    return "deu tudo certo"
+    response_status = {"status": "stored" if stored else "updated", "folder_name": data["folder_name"],
+                       "data_stored": store_firebase_data}
+    return response_status
 
 
 @app.route("/simulation/dashboard/<folder>")
