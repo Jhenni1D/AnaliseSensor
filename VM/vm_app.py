@@ -75,6 +75,7 @@ try:
         print("Iniciou o loop dos arquivos")
         img_file_name = "img_send.json"
         progress_file_name = "progress_simulation.txt"
+        simulation_controller.load_simulation()
         while True:
             simulation_state.files_running = True
             time.sleep(3)
@@ -107,6 +108,7 @@ try:
     def reset_simulation():
         simu = simulation_controller_executor.SimulationController()
         simu.reset()
+        sio.emit("reset_simulation_status", True)
         print('Arquivos de simulação Resetados!')
 
 
