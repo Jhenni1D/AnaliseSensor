@@ -23,6 +23,7 @@ class SimulationController:
         self.femm = FEMMSimulationController()
 
     def reset(self):
+        self.load_simulation()
         self.simulations = {
             "0": {"done": False, "range": 2, "in_queue": False},
             "1": {"done": False, "range": 3.2, "in_queue": False},
@@ -42,7 +43,12 @@ class SimulationController:
             if "simulation" in file and ".json" in file:
                 os.remove(f"./{file}")
             if f"log-simulacao_" in file:
-                os.remove(f"./{file}")
+                with open(f"./{file}", "w") as f:
+                    f.write("")
+            if "progress_simulation" in file:
+                with open(f"./{file}", "w") as f:
+                    f.write("0")
+
 
         with open("./simulation.json", "w") as file:
             file.write(json.dumps(self.simulations, indent=1))
