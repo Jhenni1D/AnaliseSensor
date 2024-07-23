@@ -1,6 +1,10 @@
 $(document).ready(function () {
+  var last_reset_status = false;
   let progress_simulation_element = document.querySelector("#progress");
+  let confirm_reset_button = document.querySelector("#confirm-reset");
+  const getId = id => document.getElementById(id);
 
+  confirm_reset_button.addEventListener('click', SendResetRequest);
   let m_images = {
     "M0": document.querySelector("#m0"),
     "M1": document.querySelector("#m1"),
@@ -226,6 +230,17 @@ $(document).ready(function () {
     corrent_chart.update();
   }
 
+  function SendResetRequest() {
+    last_reset_status = false;
+    let link = location.protocol + '//' + location.host + "/reset-simulation-data";
+    let xhttp = new XMLHttpRequest();
+    xhttp.onload = response => {
+      SetDefaultStatusResetSimulation();
+      setTimeout(SetStatusResetSimulation, 6000);
+    };
+    xhttp.open("GET", link, true);
+    xhttp.send();
+  }
 
   let socket = io();
 
@@ -276,13 +291,58 @@ $(document).ready(function () {
   });
 
   socket.on('log_simulation', log_text => {
-    document.getElementById("log-text").innerHTML = log_text;
-    if (log_text.toLowerCase().includes("exception") || log_text.toLowerCase().includes("error")) {
+    getId("log-text").innerHTML = log_text;
+    CheckErrorOnVMSimulation(log_text);
+  });
+
+  function CheckErrorOnVMSimulation(log) {
+    if (log.toLowerCase().includes("exception") || log.toLowerCase().includes("error")) {
       progress_simulation_element.classList.add("bg-danger");
+      getId("error-container").classList.remove("visually-hidden");
     }
-    else {
-      progress_simulation_element.classList.remove("bg-danger");
+  }
+
+  getId("modal-reset-confirm-button-ok").addEventListener('click', () => {
+    if (last_reset_status) {
+      setTimeout(() => {
+        getId("error-container").classList.add('visually-hidden');
+      }, 1000);
     }
+  });
+
+  function SetStatusResetSimulation() {
+    let statusMessage = `${(last_reset_status ? "success" : "fail")}-message`;
+
+    HiddenElement(getId("loading-icon"));
+    ShowElement(getId(statusMessage));
+
+    getId("modal-reset-confirm-title").innerHTML = "RESET STATUS"
+    getId("modal-reset-confirm-button-ok").removeAttribute("disabled");
+  }
+
+  function SetDefaultStatusResetSimulation() {
+    ShowElement(getId("loading-icon"));
+    HiddenElement(getId("success-message"));
+    HiddenElement(getId("fail-message"));
+
+    getId("modal-reset-confirm-title").innerHTML = "RESETING..."
+    getId("modal-reset-confirm-button-ok").setAttribute("disabled", "");
+  }
+
+  function ShowElement(element) {
+    element.classList.remove("visually-hidden");
+    element.classList.add("show");
+  }
+
+  function HiddenElement(element) {
+    element.classList.add("visually-hidden");
+    element.classList.remove("show");
+  }
+
+  socket.on('reset_simulation_status', status => {
+    last_reset_status = status;
+    clearTimeout(SetStatusResetSimulation);
+    setTimeout(SetStatusResetSimulation, 3000);
   });
 
   socket.on('disconnect', function () {
