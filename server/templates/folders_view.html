@@ -47,7 +47,8 @@
                             data-bs-offset="{{all_folders.index(folder)}}" class="scrollspy-{{folder[0]}}"
                             tabindex="{{all_folders.index(folder)}}">
                             <h4 id="list-item-{{all_folders.index(folder)}}">{{folder[0]}}</h4>
-                            <form class="row align-items-center" action="/download/{{folder_name}}">
+                            <form action="/download/{{folder_name}}/start/end" class="row align-items-center"
+                                  id="download-form-{{folder[0]}}">
                                 <div class="col">
                                     <div class="accordion" id="accordion-{{folder[0]}}-sensors">
                                         <div class="accordion-item">
@@ -115,8 +116,73 @@
                                             </label>
                                         </div>
                                     </div>
-                                    <div class="col">
-                                        <button type="submit" class="btn btn-primary mb-3">Download in Excel</button>
+                                    <div>
+                                        <div class="col">
+                                            <button class="btn btn-primary mb-3" data-bs-target="#modal-download-excel-{{folder_name}}" data-bs-toggle="modal"
+                                                    type="button">Download in
+                                                Excel
+                                            </button>
+                                        </div>
+                                        <div class="modal" id="modal-download-excel-{{folder_name}}" tabindex="-1">
+                                            <div class="modal-dialog modal-dialog-centered">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Select period</h5>
+                                                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
+                                                                type="button"></button>
+                                                    </div>
+                                                    <div class="modal-body justify-content-center">
+                                                        <div id="start-period">
+                                                            <div class="input-group mb-3">
+                                                                <label class="input-group-text"
+                                                                       for="start-date-{{folder[0]}}">Start
+                                                                    Date</label>
+                                                                <select class="form-select"
+                                                                        id="start-date-{{folder[0]}}">
+
+                                                                    {% set sensors = folder[1][folder_name]["Sensores"]
+                                                                    %}
+                                                                    {% for date_info in sensors %}
+                                                                    <option %} %}selected{% endif
+                                                                            if sensors.index(date_info)==0
+                                                                            value="{{sensors.index(date_info)}}"
+                                                                            {%>
+                                                                        {{date_info["data_hora"]}}
+                                                                    </option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div id="end-period">
+                                                            <div class="input-group mb-3">
+                                                                <label class="input-group-text"
+                                                                       for="end-date-{{folder[0]}}">End
+                                                                    Date</label>
+                                                                <select class="form-select" id="end-date-{{folder[0]}}">
+
+                                                                    {% set sensors = folder[1][folder_name]["Sensores"]
+                                                                    %}
+                                                                    {% for date_info in sensors %}
+                                                                    <option %} %}selected{% endif
+                                                                            if
+                                                                            sensors.index(date_info)==sensors|count-1 value="{{sensors.index(date_info)}}" {%>
+                                                                        {{date_info["data_hora"]}}
+                                                                    </option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <p>Choose a period to download.</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-secondary" data-bs-dismiss="modal"
+                                                                type="button">Close
+                                                        </button>
+                                                        <button class="btn btn-primary" type="submit">Download</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col">
                                         <a href="/simulation/dashboard/{{folder_name}}" target="_blank"
@@ -140,4 +206,5 @@
     </script>
     <script src="{{ url_for('static', filename='js/folders_view.js') }}"></script>
 </body>
+
 </html>
