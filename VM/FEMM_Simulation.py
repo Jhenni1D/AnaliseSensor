@@ -1,9 +1,11 @@
 import json
 import os
-import numpy as np
-import pandas as pd
+
 import femm
 import math
+import numpy as np
+import pandas as pd
+
 from log_handler import write_log, set_folder_log
 
 
@@ -163,13 +165,13 @@ class FEMMSimulationController():
         y4 = 1.59
         femm.mi_addblocklabel(x4, y4)  # Cria o ponto que receberá o material
         femm.mi_selectlabel(x4, y4)  # Seleciona o ponto criado
-        femm.mi_setblockprop('M-45 Steel', 1, 0, '<None>', 0, 1, 1)  # Define o material do ponto
+        femm.mi_setblockprop('M-45 Steel', 1, 0, '<None>', 0, 7, 1)  # Define o material do ponto
         femm.mi_clearselected()  # limpa a seleção, sempre colocar ele
         x5 = 0
         y5 = 0
         femm.mi_addblocklabel(x5, y5)  # Cria o ponto que receberá o material
         femm.mi_selectlabel(x5, y5)  # Seleciona o ponto criado
-        femm.mi_setblockprop('M-45 Steel', 1, 0, '<None>', 0, 1, 1)  # Define o material do ponto
+        femm.mi_setblockprop('M-45 Steel', 1, 0, '<None>', 0, 7, 1)  # Define o material do ponto
         femm.mi_clearselected()  # limpa a seleção, sempre colocar ele
 
     def criando_materiais_externo(self):
@@ -319,19 +321,19 @@ class FEMMSimulationController():
                 femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'C', 0, 1, 44)
                 femm.mi_clearselected()
             elif (k >= 3 and k <= 5) or (k >= 21 and k <= 23):
-                femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'A', 0, 1, -44)
+                femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'A', 0, 2, -44)
                 femm.mi_clearselected()
             elif (k >= 6 and k <= 8) or (k >= 24 and k <= 26):
-                femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'B', 0, 1, 44)
+                femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'B', 0, 3, 44)
                 femm.mi_clearselected()
             elif (k >= 9 and k <= 11) or (k >= 27 and k <= 29):
-                femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'C', 0, 1, -44)
+                femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'C', 0, 4, -44)
                 femm.mi_clearselected()
             elif (k >= 12 and k <= 14) or (k >= 30 and k <= 32):
-                femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'A', 0, 1, 44)
+                femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'A', 0, 5, 44)
                 femm.mi_clearselected()
             elif (k >= 15 and k <= 17) or (k >= 33 and k <= 35):
-                femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'B', 0, 1, -44)
+                femm.mi_setblockprop('Copper_' + str(k) + '_estator', 1, 0, 'B', 0, 6, -44)
                 femm.mi_clearselected()
             femm.mi_clearselected()
             progresso += 0.12  # tava dentro do for
@@ -348,7 +350,7 @@ class FEMMSimulationController():
             x3 = 3.6923 * math.cos(self.theta2 * self.degrau)
             y3 = 3.6923 * math.sin(self.theta2 * self.degrau)
             femm.mi_selectlabel(x3, y3)
-            femm.mi_setblockprop('Aluminio_rotor', 1, 0, '<None>', 0, 2, 1)
+            femm.mi_setblockprop('Aluminio_rotor', 1, 0, '<None>', 0, 7, 1)
             femm.mi_clearselected()
             progresso += 0.16
             self.save_progress_simulation(progresso)
@@ -384,8 +386,8 @@ class FEMMSimulationController():
         self.save_progress_simulation(progresso)
 
         # Cálculo do torque
-        femm.mo_seteditmode('group')
-        femm.mo_groupselectblock(2)  # Seleciona o grupo 2 (rotor)
+        # femm.mo_seteditmode('group')
+        femm.mo_groupselectblock(7)  # Seleciona o grupo 2 (rotor)
         torque = femm.mo_blockintegral(22)
         self.torques.append(torque)
 
@@ -594,7 +596,6 @@ class FEMMSimulationController():
             progresso += 0.16
             self.save_progress_simulation(progresso)
 
-        self.p_rotor.clear()
 
         progresso += 4.54
         self.save_progress_simulation(progresso)
@@ -603,8 +604,7 @@ class FEMMSimulationController():
 
         write_log("-Setando condições de contorno")
         write_log(f"-Valor da temperatura: {self.temperatura}")
-        temp_sensor = self.temperatura #32
-        femm.hi_addboundprop("Camisa", 2, 0, 0, 300, temp_sensor, 0)  # verificar esses 300
+        femm.hi_addboundprop("Camisa", 2, 0, 0, 300, self.temperatura, 0)  # verificar esses 300
         for j in range(36):
             m = j * 10
             theta1 = t1 + m
@@ -761,35 +761,11 @@ class FEMMSimulationController():
         np.savetxt(f"./{self.femm_generate_files}/torque{self.index_simulacao}.csv", df6, delimiter=",")
 
         self.save_data()
-
         self.p_rotor.clear()
         self.p_estator.clear()
 
         progresso += 4.54
         self.save_progress_simulation(progresso)
-
-
-# Para testar simulações
-
-# dados_teste= {
-#         0:{"A": 2.5, "B": 2.5, "C": 2.5},
-#         1:{"A": 3.7, "B": 3.7, "C": 3.75},
-#         2:{"A": 4, "B": 4.1, "C": 4},
-#         3:{"A": 4.4, "B": 4.3, "C": 4.4},
-#     }
-# femm_simulacao = FEMMSimulationController()
-# femm_simulacao.set_femm_atributes(ca=dados_teste[0]["A"], cb=dados_teste[0]["B"], cc=dados_teste[0]["C"],
-#                                      index=0,
-#                                      first=True,
-#                                      folder_name="TesteFEMM")
-#
-#
-# femm_simulacao.iniciar_femm()
-# for teste in dados_teste:
-#      femm_simulacao.set_femm_atributes(dados_teste[teste]["A"], dados_teste[teste]["B"], dados_teste[teste]["C"],teste,teste==0,teste)
-#      femm_simulacao.iniciar_femm()
-
-# TESTE DE SIMULAÇÃO COM PLANILHA DA JHENNI
 
 def teste_jhenni():
     df_corrente = pd.read_excel('./Planilha_Simulação.xlsx', sheet_name='RMS')
@@ -810,7 +786,7 @@ def teste_jhenni():
     for key in dados_teste:
         print("Vai iniciar a simulação pro item: ", key)
         femm_simulacao.set_femm_atributes(ca=dados_teste[key]["A"], cb=dados_teste[key]["B"], cc=dados_teste[key]["C"],
-                                          temperatura=36,
+                                          temperatura=32,
                                           index=key,
                                           first=True,
                                           folder_name="TesteFEMM")
