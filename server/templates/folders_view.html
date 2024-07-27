@@ -111,7 +111,8 @@
                                                 id="flexCheckCheckedDisabled-{{folder_name}}-{{index_item}}" {% if
                                                 folder[1][folder[0]]["completed"] %}checked{% endif %} disabled
                                                 style="margin-right: -50px;">
-                                            <label class="form-check-label" for="flexCheckCheckedDisabled">
+                                            <label class="form-check-label"
+                                                   for="flexCheckCheckedDisabled-{{folder_name}}-{{index_item}}">
                                                 Simulation Completed
                                             </label>
                                         </div>
@@ -145,8 +146,7 @@
                                                                     {% for date_info in sensors %}
                                                                     <option %} %}selected{% endif
                                                                             if sensors.index(date_info)==0
-                                                                            value="{{sensors.index(date_info)}}"
-                                                                            {%>
+                                                                            value="{{sensors.index(date_info)}}" {%>
                                                                         {{date_info["data_hora"]}}
                                                                     </option>
                                                                     {% endfor %}
@@ -165,9 +165,10 @@
                                                                     {% for date_info in sensors %}
                                                                     <option %} %}selected{% endif
                                                                             if
-                                                                            sensors.index(date_info)==sensors|count-1 value="{{sensors.index(date_info)}}" {%>
-                                                                        {{date_info["data_hora"]}}
-                                                                    </option>
+                                                                            sensors.index(date_info)==sensors|count-1
+                                                                            value="{{sensors.index(date_info)}}"
+                                                                            {%>
+
                                                                     {% endfor %}
                                                                 </select>
                                                             </div>
