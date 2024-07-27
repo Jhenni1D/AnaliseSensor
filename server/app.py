@@ -86,7 +86,7 @@ def uncompleted_simulation_dashboard(folder):
 def to_uncompleted_simulation_dashboard():
     folder_uncompleted = get_folder_uncompleted()
     if len(folder_uncompleted) == 0:
-        return redirect(url_for("/"))
+        return redirect(location="/")
     return redirect(location=f"/uncompleted-simulation/dashboard/{folder_uncompleted[0][0]}")
 
 @app.route('/download/<filename>/<start>/<end>', methods=['GET'])
