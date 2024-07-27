@@ -48,7 +48,7 @@
                             tabindex="{{all_folders.index(folder)}}">
                             <h4 id="list-item-{{all_folders.index(folder)}}">{{folder[0]}}</h4>
                             <form action="/download/{{folder_name}}/start/end" class="row align-items-center"
-                                  id="download-form-{{folder[0]}}">
+                                id="download-form-{{folder[0]}}">
                                 <div class="col">
                                     <div class="accordion" id="accordion-{{folder[0]}}-sensors">
                                         <div class="accordion-item">
@@ -112,15 +112,16 @@
                                                 folder[1][folder[0]]["completed"] %}checked{% endif %} disabled
                                                 style="margin-right: -50px;">
                                             <label class="form-check-label"
-                                                   for="flexCheckCheckedDisabled-{{folder_name}}-{{index_item}}">
+                                                for="flexCheckCheckedDisabled-{{folder_name}}-{{index_item}}">
                                                 Simulation Completed
                                             </label>
                                         </div>
                                     </div>
                                     <div>
                                         <div class="col">
-                                            <button class="btn btn-primary mb-3" data-bs-target="#modal-download-excel-{{folder_name}}" data-bs-toggle="modal"
-                                                    type="button">Download in
+                                            <button class="btn btn-primary mb-3"
+                                                data-bs-target="#modal-download-excel-{{folder_name}}"
+                                                data-bs-toggle="modal" type="button">Download in
                                                 Excel
                                             </button>
                                         </div>
@@ -129,26 +130,24 @@
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title">Select period</h5>
-                                                        <button aria-label="Close" class="btn-close" data-bs-dismiss="modal"
-                                                                type="button"></button>
+                                                        <button aria-label="Close" class="btn-close"
+                                                            data-bs-dismiss="modal" type="button"></button>
                                                     </div>
                                                     <div class="modal-body justify-content-center">
                                                         <div id="start-period">
                                                             <div class="input-group mb-3">
                                                                 <label class="input-group-text"
-                                                                       for="start-date-{{folder[0]}}">Start
+                                                                    for="start-date-{{folder[0]}}">Start
                                                                     Date</label>
                                                                 <select class="form-select"
-                                                                        id="start-date-{{folder[0]}}">
+                                                                    id="start-date-{{folder[0]}}">
 
                                                                     {% set sensors = folder[1][folder_name]["Sensores"]
                                                                     %}
                                                                     {% for date_info in sensors %}
-                                                                    <option %} %}selected{% endif
-                                                                            if sensors.index(date_info)==0
-                                                                            value="{{sensors.index(date_info)}}" {%>
-                                                                        {{date_info["data_hora"]}}
-                                                                    </option>
+                                                                    <option value="{{sensors.index(date_info)}}" {% if
+                                                                        sensors.index(date_info)==0 %}selected{% endif
+                                                                        %}>{{date_info["data_hora"]}}</option>
                                                                     {% endfor %}
                                                                 </select>
                                                             </div>
@@ -156,19 +155,17 @@
                                                         <div id="end-period">
                                                             <div class="input-group mb-3">
                                                                 <label class="input-group-text"
-                                                                       for="end-date-{{folder[0]}}">End
+                                                                    for="end-date-{{folder[0]}}">End
                                                                     Date</label>
                                                                 <select class="form-select" id="end-date-{{folder[0]}}">
 
                                                                     {% set sensors = folder[1][folder_name]["Sensores"]
                                                                     %}
                                                                     {% for date_info in sensors %}
-                                                                    <option %} %}selected{% endif
-                                                                            if
-                                                                            sensors.index(date_info)==sensors|count-1
-                                                                            value="{{sensors.index(date_info)}}"
-                                                                            {%>
-
+                                                                    <option value="{{sensors.index(date_info)}}" {% if
+                                                                        sensors.index(date_info)==sensors|count-1
+                                                                        %}selected{% endif %}>{{date_info["data_hora"]}}
+                                                                    </option>
                                                                     {% endfor %}
                                                                 </select>
                                                             </div>
@@ -177,7 +174,7 @@
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button class="btn btn-secondary" data-bs-dismiss="modal"
-                                                                type="button">Close
+                                                            type="button">Close
                                                         </button>
                                                         <button class="btn btn-primary" type="submit">Download</button>
                                                     </div>
