@@ -67,13 +67,14 @@ class SimulationController:
         msg = ""
         
         if is_simulation_done:
-            msg = f"Error: The simulation {actual_simulation} is DONE"
+            msg = f"The simulation {actual_simulation} is DONE"
         if is_simulation_in_range is False:
-            msg = f"Error: The range {range} is over what actual range {self.simulations[str(actual_simulation)]["range"]}"
+            msg = f"The range {range} is over what actual range {self.simulations[str(actual_simulation)]["range"]}"
         if is_range_in_limit is False:
-            msg = f"Error: range {range} is over the simulation limit: {self.LIMIT_RANGE}"
+            msg = f"range {range} is over the simulation limit: {self.LIMIT_RANGE}"
         
         if msg != "":
+            msg += "\nQueue index reseted!"
             print(msg)
             folder_name = self.simulations["folder_name"]
             write_log(msg, folder=folder_name)
@@ -124,6 +125,8 @@ class SimulationController:
             # Isso aqui serve pra ele iniciar a simulação apenas com o sensorA.
             # Devido a isso, todos os outros dados devem ser setados anteriormente.
             # SensorA deve ser enviado por último.
+            print("Irá resetar o último valor da queue!")
+            self.invalid_queue_reset()
             return
 
         try:
