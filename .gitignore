@@ -764,3 +764,10 @@ VM/build/simulation/localpycs/struct.pyc
 /VM/femm_exe/femm42/usage.nb
 /VM/build/change_hkey/warn-change_hkey.txt
 /VM/build/change_hkey/xref-change_hkey.html
+VM/__pycache__/app_service_VM.cpython-312.pyc
+VM/__pycache__/simulation_controller_executor.cpython-312.pyc
+VM/build/change_hkey/localpycs/pyimod01_archive.pyc
+VM/build/change_hkey/localpycs/pyimod02_importers.pyc
+VM/build/change_hkey/localpycs/pyimod03_ctypes.pyc
+VM/build/change_hkey/localpycs/pyimod04_pywin32.pyc
+VM/build/change_hkey/localpycs/struct.pyc
