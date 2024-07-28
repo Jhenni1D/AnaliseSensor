@@ -8,7 +8,7 @@ from datetime import date
 from requests import get, patch
 from xlwt import Workbook
 
-link_bd_base = "https://simulacao-femm-default-rtdb.firebaseio.com/"
+link_bd_base = "https://simulacao-femm-2-default-rtdb.firebaseio.com/"
 
 link_bd = link_bd_base + "/medicoes/{}/.json"
 link_bd_folders = link_bd.format("Pastas")
@@ -62,6 +62,8 @@ def register_new_folder(folder_data):
 
 def get_folder_filter(filter_folder):
     folders = get(link_bd_folders).json()
+    if folders is None:
+        return []
     folder_filtred = [[folder, {folder: folders[folder]}] for folder in folders if
                       filter_folder(folder, folders[folder])]
     return folder_filtred
