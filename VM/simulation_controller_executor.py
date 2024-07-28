@@ -19,7 +19,7 @@ class SimulationController:
             "index_queue": 0,
             "folder_name": ""
         }
-        self.LIMIT_RANGE = 5
+        self.LIMIT_RANGE = 15
         self.femm = FEMMSimulationController()
 
     def reset(self):
@@ -58,11 +58,25 @@ class SimulationController:
             self.simulations = json.loads(file.read())
 
     def is_can_start_simulation(self, range):  # quando as condições forem satisfestas
+        self.load_simulation()
         actual_simulation = self.simulations["actual_simulation"]
 
         is_simulation_done = self.simulations[str(actual_simulation)]["done"]
         is_simulation_in_range = range >= self.simulations[str(actual_simulation)]["range"]
         is_range_in_limit = range < self.LIMIT_RANGE
+        msg = ""
+        
+        if is_simulation_done:
+            msg = f"Error: The simulation {actual_simulation} is DONE"
+        if is_simulation_in_range is False:
+            msg = f"Error: The range {range} is over what actual range {self.simulations[str(actual_simulation)]["range"]}"
+        if is_range_in_limit is False:
+            msg = f"Error: range {range} is over the simulation limit: {self.LIMIT_RANGE}"
+        
+        if msg != "":
+            print(msg)
+            folder_name = self.simulations["folder_name"]
+            write_log(msg, folder=folder_name)
         return is_range_in_limit and is_simulation_done is False and is_simulation_in_range
 
     def is_can_enqueue(self, range):
