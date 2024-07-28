@@ -1,7 +1,6 @@
 import json
 
-from flask import Flask, request, send_file, render_template, redirect, url_for
-
+from flask import Flask, request, send_file, render_template, redirect
 from app_service_server import *
 from blueprints.json_api import create_bp
 from middleware.io import create_io
