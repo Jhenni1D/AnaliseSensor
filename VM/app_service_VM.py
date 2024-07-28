@@ -7,7 +7,7 @@ import datetime
 import json
 import os
 
-link_bd = "https://simulacao-femm-default-rtdb.firebaseio.com//medicoes/{}/.json"
+link_bd = "https://simulacao-femm-2-default-rtdb.firebaseio.com/medicoes/{}/.json"
 link_bd_folders = link_bd.format("Pastas")
 link_bd_image = "simulacao-femm.appspot.com"
 link_bd_image_gs = f"gs://{link_bd_image}"
