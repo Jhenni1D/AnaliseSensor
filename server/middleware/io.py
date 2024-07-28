@@ -125,4 +125,14 @@ def create_io(app):
     def reset_simulation_status(status):
         io.emit("reset_simulation_status", status)
 
+    @io.event
+    def status_vm():
+        io.emit("request_status_vm")
+        time.sleep(1)
+
+    @io.event
+    def request_status_vm():
+        io.emit("status_vm")
+        time.sleep(1)
+
     return io

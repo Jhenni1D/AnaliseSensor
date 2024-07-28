@@ -2,6 +2,9 @@ $(document).ready(function () {
   var last_reset_status = false;
   let progress_simulation_element = document.querySelector("#progress");
   let confirm_reset_button = document.querySelector("#confirm-reset");
+  let status_reset_simulation_timeout = null;
+  let status_vm_timeout = null;
+  let status_vm_element = document.getElementById("status-vm");
   const getId = id => document.getElementById(id);
 
   confirm_reset_button.addEventListener('click', SendResetRequest);
@@ -236,10 +239,15 @@ $(document).ready(function () {
     let xhttp = new XMLHttpRequest();
     xhttp.onload = response => {
       SetDefaultStatusResetSimulation();
-      setTimeout(SetStatusResetSimulation, 6000);
+      status_reset_simulation_timeout = setTimeout(SetStatusResetSimulation, 6000);
     };
     xhttp.open("GET", link, true);
     xhttp.send();
+  }
+
+  function SetStatusVM() {
+    status_vm_element.classList.remove("text-success");
+    status_vm_element.classList.add("text-danger");
   }
 
   let socket = io();
@@ -248,8 +256,16 @@ $(document).ready(function () {
     console.log('Connected!');
     socket.emit('progress_test');
     socket.emit('corrent_data_updater', folder_name)
+    socket.emit('status_vm');
   });
 
+  socket.on('status_vm', () => {
+    clearTimeout(status_vm_timeout);
+    status_vm_element.classList.remove("text-danger");
+    status_vm_element.classList.add("text-success");
+    status_vm_timeout = setTimeout(SetStatusVM, 2000);
+    socket.emit('status_vm');
+  });
 
   socket.on('update_image', function (data_updated) {
     dado = data_updated;
@@ -341,8 +357,8 @@ $(document).ready(function () {
 
   socket.on('reset_simulation_status', status => {
     last_reset_status = status;
-    clearTimeout(SetStatusResetSimulation);
-    setTimeout(SetStatusResetSimulation, 3000);
+    clearTimeout(status_reset_simulation_timeout);
+    status_reset_simulation_timeout = setTimeout(SetStatusResetSimulation, 3000);
   });
 
   socket.on('disconnect', function () {

@@ -28,6 +28,7 @@ try:
         print('connection established')
         sio.emit("ping")
         print("send ping")
+        sio.emit("status_vm")
 
 
     @sio.event
@@ -111,6 +112,11 @@ try:
         sio.emit("reset_simulation_status", True)
         print('Arquivos de simulação Resetados!')
 
+    
+    @sio.event
+    def request_status_vm():
+        print("respondeu o request_status_vm")
+        sio.emit("request_status_vm")
 
     @sio.event
     def disconnect():
