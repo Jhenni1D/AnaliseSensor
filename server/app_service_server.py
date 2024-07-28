@@ -82,6 +82,12 @@ def get_folder_uncompleted():
     return folder_uncompleted
 
 
+def get_folder_status_completed(folder):
+    folder_info = get_folder_filter(lambda folder_name, folder_d: folder_name == folder)
+    status = folder_info[0][1][folder_info[0][0]]["completed"]
+    return status
+
+
 def get_formatted_sensors_data(folders_data):
     folder_name, folder_data = folders_data
     sorted_sensors = sorted(folder_data[folder_name]['Sensores'], key=lambda d: d['data_hora'])
