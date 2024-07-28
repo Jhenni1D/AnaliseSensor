@@ -1,4 +1,13 @@
 $(document).ready(function () {
+  var last_reset_status = false;
+  let progress_simulation_element = document.querySelector("#progress");
+  let confirm_reset_button = document.querySelector("#confirm-reset");
+  let status_reset_simulation_timeout = null;
+  let status_vm_timeout = null;
+  let status_vm_element = document.getElementById("status-vm");
+  const getId = id => document.getElementById(id);
+
+  confirm_reset_button.addEventListener('click', SendResetRequest);
   let m_images = {
     "M0": document.querySelector("#m0"),
     "M1": document.querySelector("#m1"),
@@ -39,6 +48,24 @@ $(document).ready(function () {
       }
     });
 
+  slider.noUiSlider.on('update', function (value) {
+    corrent_chart.options.scales.x.min = parseInt(value[0]);
+    corrent_chart.options.scales.x.max = parseInt(value[1]);
+    corrent_chart.update();
+    for (graph in graph_data) {
+      if (graph.includes("Sensor") === false || graph.includes("SensorA") || graph.includes("SensorB") || graph.includes("SensorC")) {
+        continue;
+      }
+
+      if (charts_graphs[graph].data.length !== 0) {
+        charts_graphs[graph].options.scales.x.min = currentMinSliderValue;
+        charts_graphs[graph].options.scales.x.max = currentMaxSliderValue;
+        charts_graphs[graph].update();
+        continue;
+      }
+    }
+  });
+
   let elements_graph = {
     "SensorTensao": document.querySelector("#tensao"),
     "SensorTemp": document.querySelector("#temperatura"),
@@ -65,7 +92,7 @@ $(document).ready(function () {
 
   UpdateImages();
   RegisterActions();
-  setTimeout(InitGraph, 1000);
+  PlotGraphData();
 
   function CreateChart(canvas_element) {
     return new Chart(canvas_element,
@@ -85,8 +112,8 @@ $(document).ready(function () {
   }
 
   function UpdateImages() {
-    if (data_img.length !== 0) {
-      for (d of data_img) {
+    if (dado.length !== 0) {
+      for (d of dado) {
         if (d["name"] in m_images) {
           m_images[d["name"]].src = d["img"];
           m_images[d["name"]].classList.remove('placeholder')
@@ -206,30 +233,135 @@ $(document).ready(function () {
     corrent_chart.update();
   }
 
-  function InitGraph() {
-    slider.noUiSlider.on('update', function (value) {
-      corrent_chart.options.scales.x.min = parseInt(value[0]);
-      corrent_chart.options.scales.x.max = parseInt(value[1]);
-      corrent_chart.update();
-      for (graph in graph_data) {
-        if (graph.includes("Sensor") === false || graph.includes("SensorA") || graph.includes("SensorB") || graph.includes("SensorC")) {
-          continue;
-        }
-
-        if (charts_graphs[graph].data.length !== 0) {
-          charts_graphs[graph].options.scales.x.min = currentMinSliderValue;
-          charts_graphs[graph].options.scales.x.max = currentMaxSliderValue;
-          charts_graphs[graph].update();
-          continue;
-        }
-      }
-    });
-    PlotCorrentGraph();
-    PlotGraphData();
-    maxSliderValue = graph_data_cache['data_hora'].length - 1;
-    UpdateSlider();
+  function SendResetRequest() {
+    last_reset_status = false;
+    let link = location.protocol + '//' + location.host + "/reset-simulation-data";
+    let xhttp = new XMLHttpRequest();
+    xhttp.onload = response => {
+      SetDefaultStatusResetSimulation();
+      status_reset_simulation_timeout = setTimeout(SetStatusResetSimulation, 6000);
+    };
+    xhttp.open("GET", link, true);
+    xhttp.send();
   }
 
+  function SetStatusVM() {
+    status_vm_element.classList.remove("text-success");
+    status_vm_element.classList.add("text-danger");
+  }
+
+  let socket = io();
+
+  socket.on('connect', function () {
+    console.log('Connected!');
+    socket.emit('progress_test');
+    socket.emit('corrent_data_updater', folder_name)
+    socket.emit('status_vm');
+  });
+
+  socket.on('status_vm', () => {
+    clearTimeout(status_vm_timeout);
+    status_vm_element.classList.remove("text-danger");
+    status_vm_element.classList.add("text-success");
+    status_vm_timeout = setTimeout(SetStatusVM, 2000);
+    socket.emit('status_vm');
+  });
+
+  socket.on('update_image', function (data_updated) {
+    dado = data_updated;
+    UpdateImages();
+  });
 
 
+  socket.on('progress_value', function (prog_value) {
+    progress_simulation_element.style["width"] = `${prog_value}%`;
+    progress_simulation_element.innerHTML = `${prog_value}%`;
+  });
+
+
+  socket.on('corrent_data_updater', function (data) {
+    graph_data_cache = data;
+    if (graph_data === null) {
+      graph_data = data;
+      PlotCorrentGraph();
+      PlotGraphData();
+      maxSliderValue = data['data_hora'].length - 1;
+      UpdateSlider();
+      socket.emit("corrent_data_updater", folder_name);
+      return;
+    }
+
+    let need_update = graph_data['data_hora'].slice(-1)[0] !== data['data_hora'].slice(-1)[0]
+
+    if (need_update) {
+      for (key in data) {
+        graph_data[key].push(data[key].slice(-1)[0]);
+      }
+      PlotCorrentGraph();
+      PlotGraphData();
+      maxSliderValue = graph_data_cache['data_hora'].length - 1;
+      UpdateSlider();
+    }
+
+    socket.emit("corrent_data_updater", folder_name);
+  });
+
+  socket.on('log_simulation', log_text => {
+    getId("log-text").innerHTML = log_text;
+    CheckErrorOnVMSimulation(log_text);
+  });
+
+  function CheckErrorOnVMSimulation(log) {
+    if (log.toLowerCase().includes("exception") || log.toLowerCase().includes("error")) {
+      progress_simulation_element.classList.add("bg-danger");
+      getId("error-container").classList.remove("visually-hidden");
+    }
+  }
+
+  getId("modal-reset-confirm-button-ok").addEventListener('click', () => {
+    if (last_reset_status) {
+      setTimeout(() => {
+        getId("error-container").classList.add('visually-hidden');
+      }, 1000);
+    }
+  });
+
+  function SetStatusResetSimulation() {
+    let statusMessage = `${(last_reset_status ? "success" : "fail")}-message`;
+
+    HiddenElement(getId("loading-icon"));
+    ShowElement(getId(statusMessage));
+
+    getId("modal-reset-confirm-title").innerHTML = "RESET STATUS"
+    getId("modal-reset-confirm-button-ok").removeAttribute("disabled");
+  }
+
+  function SetDefaultStatusResetSimulation() {
+    ShowElement(getId("loading-icon"));
+    HiddenElement(getId("success-message"));
+    HiddenElement(getId("fail-message"));
+
+    getId("modal-reset-confirm-title").innerHTML = "RESETING..."
+    getId("modal-reset-confirm-button-ok").setAttribute("disabled", "");
+  }
+
+  function ShowElement(element) {
+    element.classList.remove("visually-hidden");
+    element.classList.add("show");
+  }
+
+  function HiddenElement(element) {
+    element.classList.add("visually-hidden");
+    element.classList.remove("show");
+  }
+
+  socket.on('reset_simulation_status', status => {
+    last_reset_status = status;
+    clearTimeout(status_reset_simulation_timeout);
+    status_reset_simulation_timeout = setTimeout(SetStatusResetSimulation, 3000);
+  });
+
+  socket.on('disconnect', function () {
+    console.log('Disconnected!');
+  });
 });

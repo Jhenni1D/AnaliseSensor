@@ -32,6 +32,24 @@
   <h1 class="display-6 d-flex justify-content-center" style="height: 80px;">Motor Monitoring and Analysis System</h1>
 
   <hr>
+  <div class="input-group mb-3">
+    <div id="status-vm" class="spinner-grow text-danger" style="width: 3rem; height: 3rem; margin-left: 10px;"
+      role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <span class="input-group-text" id="basic-addon1">VM Connected</span>
+  </div>
+  <hr>
+
+  <div style="margin-left: 15px; margin-right: 15px;">
+    <p class="fs-5">Analysis progress</p>
+    <div aria-label="Animated striped example" aria-valuemin="0" aria-valuenow="0" class="progress" role="progressbar"
+      aria-valuemax="100">
+      <div class="progress-bar progress-bar-striped progress-bar-animated" id="progress" style="width: 0%">
+        75%
+      </div>
+    </div>
+  </div>
 
   <div class="accordion" id="accordionExample" style="margin: 15px;">
     <div class="accordion-item">
@@ -254,11 +272,103 @@
     </div>
   </div>
 
+  <div class="accordion border border-success rounded" id="log-accordion-root" style="margin: 15px;">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button aria-controls="log-accordion" aria-expanded="false"
+          class="accordion-button collapsed p-3 bg-info bg-opacity-10" data-bs-target="#log-accordion"
+          data-bs-toggle="collapse" type="button">
+          Log Simulation
+        </button>
+      </h2>
+      <div class="accordion-collapse collapse" data-bs-parent="#log-accordion-root" id="log-accordion">
+        <div class="accordion-body">
+          <div class="visually-hidden" id="error-container">
+            <div class="alert alert-danger" role="alert">
+              Something wrong in Simulation Virtual Machine!
+            </div>
+            <div class="input-group mb-3">
+              <span class="input-group-text">Do you want reset VM files?</span>
+              <div aria-hidden="true" aria-labelledby="exampleModalToggleLabel" class="modal fade"
+                id="exampleModalToggle" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="exampleModalToggleLabel">RESET FILES CONFIRMATION</h1>
+                      <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                    </div>
+                    <div class="modal-body">
+                      Do you are sure want reset VM files? This action will regret simulation to initial stage!
+                    </div>
+                    <div class="modal-footer">
+                      <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                      <button class="btn btn-warning" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal"
+                        id="confirm-reset" type="submit">YES
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div aria-hidden="true" aria-labelledby="modal-reset-confirm-title" class="modal fade"
+                data-bs-backdrop="static" data-bs-keyboard="false" id="exampleModalToggle2" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5 justify-content-center" id="modal-reset-confirm-title">
+                        RESETING...</h1>
+                    </div>
+                    <div class="modal-body" id="reset-modal-confirm-body">
+
+                      <div class="text-center fade show" id="loading-icon">
+                        <div class="spinner-border" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+
+                      <div class="visually-hidden fade alert alert-success d-flex align-items-center"
+                        id="success-message" role="alert">
+                        <svg aria-label="Success:" class="bi flex-shrink-0 me-2" role="img">
+                          <use xlink:href="#check-circle-fill" />
+                        </svg>
+                        <div>
+                          VM Reseted with Succesfully!
+                        </div>
+                      </div>
+
+                      <div class="visually-hidden fade alert alert-danger d-flex align-items-center" id="fail-message"
+                        role="alert">
+                        <svg aria-label="Danger:" class="bi flex-shrink-0 me-2" role="img">
+                          <use xlink:href="#exclamation-triangle-fill" />
+                        </svg>
+                        <div>
+                          Something wrong happenned when try reset files!
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="modal-footer">
+                      <button class="btn btn-secondary" data-bs-dismiss="modal" disabled
+                        id="modal-reset-confirm-button-ok" type="button">OK
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-warning" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">RESET</button>
+            </div>
+          </div>
+          <textarea aria-label="With textarea" class="form-control" disabled id="log-text" style="height: 300px;">
+          </textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    var data_img = JSON.parse("{{data_img}}".replaceAll("&#39;", '"'))
+    var dado = JSON.parse("{{data}}".replaceAll("&#39;", '"'))
     var folder_name = "{{folder_name}}";
-    var graph_data = JSON.parse("{{graph_data}}".replaceAll("&#39;", '"'));
-    var graph_data_cache = graph_data;
+    var graph_data = null;
+    var graph_data_cache = null;
   </script>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -269,7 +379,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.min.js"></script>
   <script src="{{ url_for('static', filename='noSlider/dist/nouislider.js') }}"></script>
   <script src="{{ url_for('static', filename='js/slider_config.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/simulation_dashboard.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/uncompleted_simulation_dashboard.js') }}"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
     integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
     crossorigin="anonymous"></script>

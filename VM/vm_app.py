@@ -115,7 +115,6 @@ try:
     
     @sio.event
     def request_status_vm():
-        print("respondeu o request_status_vm")
         sio.emit("request_status_vm")
 
     @sio.event

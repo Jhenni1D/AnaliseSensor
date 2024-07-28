@@ -65,20 +65,26 @@ def store_and_init_new_simulation():
 @app.route("/simulation/dashboard/<folder>")
 def simulation_dashboard(folder):
     link_folder = f"https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/{folder}%2FM0.png"
-    folder_exist = get(link_folder).status_code.real != 404
-
-    if folder_exist:
-        return render_template("simulation_dashboard.html", data=get_image_data(folder), folder_name=folder)
-    return render_template("simulation_dashboard.html", data=[], folder_name=folder)
+    folder_completed = get_folder_status_completed(folder)
+    data_img = get_image_data(folder) if get(link_folder).status_code.real != 404 else []
+    
+    if folder_completed is False:
+        return redirect(location="/to/uncompleted-simulation/dashboard")
+    
+    graph_data_dumped = get_date_and_sensors_values_for_graph_by_folder(folder)
+    return render_template("simulation_dashboard.html", data_img=data_img, graph_data=graph_data_dumped, folder_name=folder)
 
 @app.route("/uncompleted-simulation/dashboard/<folder>")
 def uncompleted_simulation_dashboard(folder):
     link_folder = f"https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/{folder}%2FM0.png"
     folder_exist = get(link_folder).status_code.real != 404
 
+    if get_folder_status_completed(folder):
+        return redirect(location=f"/simulation/dashboard/{folder}")
+
     if folder_exist:
-        return render_template("simulation_dashboard.html", data=get_image_data(folder), folder_name=folder)
-    return render_template("simulation_dashboard.html", data=[], folder_name=folder)
+        return render_template("uncompleted_simulation_dashboard.html", data=get_image_data(folder), folder_name=folder)
+    return render_template("uncompleted_simulation_dashboard.html", data=[], folder_name=folder)
 
 
 @app.route("/to/uncompleted-simulation/dashboard")
