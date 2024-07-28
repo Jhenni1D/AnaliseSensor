@@ -334,6 +334,10 @@ $(document).ready(function () {
 
     getId("modal-reset-confirm-title").innerHTML = "RESET STATUS"
     getId("modal-reset-confirm-button-ok").removeAttribute("disabled");
+
+    if (last_reset_status) {
+      progress_simulation_element.classList.remove("bg-danger");
+    }
   }
 
   function SetDefaultStatusResetSimulation() {
