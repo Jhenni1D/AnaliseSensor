@@ -17,6 +17,10 @@ $(document).ready(function () {
     badgeButtons[item]["button"].addEventListener("click", ResetBadge);
   }
 
+  getId("log-button").addEventListener("click", evt => {
+    SetShowLogBadge(false);
+  });
+
   confirm_reset_button.addEventListener('click', SendResetRequest);
 
   let m_images = {
@@ -126,6 +130,16 @@ $(document).ready(function () {
       badgeButtons[key]["badge"].classList.remove("hide");
       badgeButtons[key]["badge"].classList.add("show");
     }
+  }
+
+  function SetShowLogBadge(show) {
+    if (show) {
+      getId("log-button").getElementsByTagName("span")[0].classList.remove("hide");
+      getId("log-button").getElementsByTagName("span")[0].classList.add("show");
+      return;
+    }
+    getId("log-button").getElementsByTagName("span")[0].classList.remove("show");
+    getId("log-button").getElementsByTagName("span")[0].classList.add("hide");
   }
 
   function CreateChart(canvas_element) {
@@ -295,7 +309,7 @@ $(document).ready(function () {
   }
 
   function SetStatusResetSimulation() {
-    let statusMessage = `${(last_reset_status ? "success" : "fail")} -message`;
+    let statusMessage = `${(last_reset_status ? "success" : "fail")}-message`;
 
     HiddenElement(getId("loading-icon"));
     ShowElement(getId(statusMessage));
@@ -318,11 +332,19 @@ $(document).ready(function () {
   }
 
   function ShowElement(element) {
+    if (element === null) {
+      console.log("ShowElement - Element is null!");
+      return;
+    }
     element.classList.remove("visually-hidden");
     element.classList.add("show");
   }
 
   function HiddenElement(element) {
+    if (element === null) {
+      console.log("HiddenElement - Element is null!");
+      return;
+    }
     element.classList.add("visually-hidden");
     element.classList.remove("show");
   }
@@ -385,6 +407,9 @@ $(document).ready(function () {
   });
 
   socket.on('log_simulation', log_text => {
+    if (getId("log-text").innerHTML !== log_text && getId("log-button").getAttribute("aria-expanded") === "false") {
+      SetShowLogBadge(true);
+    }
     getId("log-text").innerHTML = log_text;
     CheckErrorOnVMSimulation(log_text);
   });

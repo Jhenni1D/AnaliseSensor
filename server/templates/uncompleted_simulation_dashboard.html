@@ -291,8 +291,13 @@
       <h2 class="accordion-header">
         <button aria-controls="log-accordion" aria-expanded="false"
           class="accordion-button collapsed p-3 bg-info bg-opacity-10" data-bs-target="#log-accordion"
-          data-bs-toggle="collapse" type="button">
+          data-bs-toggle="collapse" type="button" id="log-button">
           Log Simulation
+          <span
+            class="position-absolute top-0 start-1 translate-middle p-2 bg-danger border border-light rounded-circle fade hide">
+            <span class="visually-hidden">Log Received</span>
+          </span>
+
         </button>
       </h2>
       <div class="accordion-collapse collapse" data-bs-parent="#log-accordion-root" id="log-accordion">
