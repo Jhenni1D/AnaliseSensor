@@ -35,74 +35,49 @@ def create_io(app):
             {
                 "type": "M",
                 "name": "M0",
-                "img": "M0"
+                "img": "/static/image_test/M0.png"
             },
             {
                 "type": "M",
                 "name": "M1",
-                "img": "M1"
+                "img": "/static/image_test/M1.png"
             },
             {
                 "type": "M",
                 "name": "M2",
-                "img": "M2"
+                "img": "/static/image_test/M2.png"
             },
             {
                 "type": "M",
                 "name": "M3",
-                "img": "M3"
+                "img": "/static/image_test/M3.png"
             },
             {
                 "type": "T",
                 "name": "T0",
-                "img": "T0"
+                "img": "/static/image_test/T0.png"
             },
             {
                 "type": "T",
                 "name": "T1",
-                "img": "T1"
+                "img": "/static/image_test/T1.png"
             },
             {
                 "type": "T",
                 "name": "T2",
-                "img": "T2"
+                "img": "/static/image_test/T2.png"
             },
             {
                 "type": "T",
                 "name": "T3",
-                "img": "T3"
-            },
-            {
-                "type": "TERMICO",
-                "name": "TERMICO",
-                "img": "TERMICO"
-            },
-            {
-                "type": "TEMPERATURA",
-                "name": "TEMPERATURA",
-                "img": "TEMPERATURA"
-            },
-            {
-                "type": "TENSAO",
-                "name": "TENSAO",
-                "img": "TENSAO"
-            },
-            {
-                "type": "VELOCIDADE",
-                "name": "VELOCIDADE",
-                "img": "VELOCIDADE"
-            },
-            {
-                "type": "EFICIENCIA",
-                "name": "EFICIENCIA",
-                "img": "EFICIENCIA"
+                "img": "/static/image_test/T3.png"
             }
         ]
         for d in range(len(data)):
             while progress_value < 100:
                 io.emit("progress_value", round(progress_value, 2))
                 progress_value += 1
-                time.sleep(0.01)
+                time.sleep(0.05)
             progress_value = 0
             io.emit("update_image", data[0:d + 1])
         io.emit("update_image", data)
