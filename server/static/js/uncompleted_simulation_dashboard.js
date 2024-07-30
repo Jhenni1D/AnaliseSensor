@@ -7,7 +7,18 @@ $(document).ready(function () {
   let status_vm_element = document.getElementById("status-vm");
   const getId = id => document.getElementById(id);
 
+  badgeButtons = {
+    "emm": { "button": getId("emm"), "badge": getId("emm").getElementsByTagName("span")[0] },
+    "ms": { "button": getId("ms"), "badge": getId("ms").getElementsByTagName("span")[0] },
+    "ts": { "button": getId("ts"), "badge": getId("ts").getElementsByTagName("span")[0] },
+  }
+
+  for (item in badgeButtons) {
+    badgeButtons[item]["button"].addEventListener("click", ResetBadge);
+  }
+
   confirm_reset_button.addEventListener('click', SendResetRequest);
+
   let m_images = {
     "M0": document.querySelector("#m0"),
     "M1": document.querySelector("#m1"),
@@ -21,6 +32,7 @@ $(document).ready(function () {
     "T2": document.querySelector("#t2"),
     "T3": document.querySelector("#t3")
   }
+
 
   let corrent_chart = new Chart(document.querySelector("#corrente"),
     {
@@ -94,6 +106,28 @@ $(document).ready(function () {
   RegisterActions();
   PlotGraphData();
 
+  function ResetBadge(evt) {
+    if (IsAccordionCollapsed(evt.target.id) == false) {
+      span_element = evt.target.getElementsByTagName("span")[0];
+      span_element.classList.remove("show");
+      span_element.classList.add("hide");
+      span_element.innerHTML = "0";
+    }
+  }
+
+  function IsAccordionCollapsed(key) {
+    return badgeButtons[key]["button"].getAttribute("aria-expanded") === "false";
+  }
+
+  function UpdateBadge(key) {
+    let isCollapsed = IsAccordionCollapsed(key);
+    if (isCollapsed) {
+      badgeButtons[key]["badge"].innerHTML = parseInt(badgeButtons[key]["badge"].innerHTML) + 1;
+      badgeButtons[key]["badge"].classList.remove("hide");
+      badgeButtons[key]["badge"].classList.add("show");
+    }
+  }
+
   function CreateChart(canvas_element) {
     return new Chart(canvas_element,
       {
@@ -114,14 +148,17 @@ $(document).ready(function () {
   function UpdateImages() {
     if (dado.length !== 0) {
       for (d of dado) {
-        if (d["name"] in m_images) {
-          m_images[d["name"]].src = d["img"];
-          m_images[d["name"]].classList.remove('placeholder')
-        }
-
-        if (d["name"] in t_images) {
-          t_images[d["name"]].src = d["img"];
-          t_images[d["name"]].classList.remove('placeholder')
+        let img_name = d["name"];
+        let src_img = d["img"]
+        let img_element = img_name in m_images ? m_images[img_name] : img_name in t_images ? t_images[img_name] : null;
+        let key = img_name in m_images ? "ms" : img_name in t_images ? "ts" : null;
+        if (img_element !== null && img_element.src.includes(src_img) == false) {
+          img_element.src = src_img;
+          img_element.classList.remove('placeholder');
+          if (key !== null) {
+            UpdateBadge(key);
+            IsAccordionCollapsed(key);
+          }
         }
       }
     }
@@ -250,67 +287,6 @@ $(document).ready(function () {
     status_vm_element.classList.add("text-danger");
   }
 
-  let socket = io();
-
-  socket.on('connect', function () {
-    console.log('Connected!');
-    socket.emit('progress_test');
-    socket.emit('corrent_data_updater', folder_name)
-    socket.emit('status_vm');
-  });
-
-  socket.on('status_vm', () => {
-    clearTimeout(status_vm_timeout);
-    status_vm_element.classList.remove("text-danger");
-    status_vm_element.classList.add("text-success");
-    status_vm_timeout = setTimeout(SetStatusVM, 2000);
-    socket.emit('status_vm');
-  });
-
-  socket.on('update_image', function (data_updated) {
-    dado = data_updated;
-    UpdateImages();
-  });
-
-
-  socket.on('progress_value', function (prog_value) {
-    progress_simulation_element.style["width"] = `${prog_value}%`;
-    progress_simulation_element.innerHTML = `${prog_value}%`;
-  });
-
-
-  socket.on('corrent_data_updater', function (data) {
-    graph_data_cache = data;
-    if (graph_data === null) {
-      graph_data = data;
-      PlotCorrentGraph();
-      PlotGraphData();
-      maxSliderValue = data['data_hora'].length - 1;
-      UpdateSlider();
-      socket.emit("corrent_data_updater", folder_name);
-      return;
-    }
-
-    let need_update = graph_data['data_hora'].slice(-1)[0] !== data['data_hora'].slice(-1)[0]
-
-    if (need_update) {
-      for (key in data) {
-        graph_data[key].push(data[key].slice(-1)[0]);
-      }
-      PlotCorrentGraph();
-      PlotGraphData();
-      maxSliderValue = graph_data_cache['data_hora'].length - 1;
-      UpdateSlider();
-    }
-
-    socket.emit("corrent_data_updater", folder_name);
-  });
-
-  socket.on('log_simulation', log_text => {
-    getId("log-text").innerHTML = log_text;
-    CheckErrorOnVMSimulation(log_text);
-  });
-
   function CheckErrorOnVMSimulation(log) {
     if (log.toLowerCase().includes("exception") || log.toLowerCase().includes("error")) {
       progress_simulation_element.classList.add("bg-danger");
@@ -318,16 +294,8 @@ $(document).ready(function () {
     }
   }
 
-  getId("modal-reset-confirm-button-ok").addEventListener('click', () => {
-    if (last_reset_status) {
-      setTimeout(() => {
-        getId("error-container").classList.add('visually-hidden');
-      }, 1000);
-    }
-  });
-
   function SetStatusResetSimulation() {
-    let statusMessage = `${(last_reset_status ? "success" : "fail")}-message`;
+    let statusMessage = `${(last_reset_status ? "success" : "fail")} -message`;
 
     HiddenElement(getId("loading-icon"));
     ShowElement(getId(statusMessage));
@@ -358,6 +326,76 @@ $(document).ready(function () {
     element.classList.add("visually-hidden");
     element.classList.remove("show");
   }
+
+
+  let socket = io();
+
+  socket.on('connect', function () {
+    console.log('Connected!');
+    socket.emit('progress_test');
+    socket.emit('corrent_data_updater', folder_name)
+    socket.emit('status_vm');
+  });
+
+  socket.on('status_vm', () => {
+    clearTimeout(status_vm_timeout);
+    status_vm_element.classList.remove("text-danger");
+    status_vm_element.classList.add("text-success");
+    status_vm_timeout = setTimeout(SetStatusVM, 2000);
+    socket.emit('status_vm');
+  });
+
+  socket.on('update_image', function (data_updated) {
+    dado = data_updated;
+    UpdateImages();
+  });
+
+
+  socket.on('progress_value', function (prog_value) {
+    progress_simulation_element.style["width"] = `${prog_value}% `;
+    progress_simulation_element.innerHTML = `${prog_value}% `;
+  });
+
+  socket.on('corrent_data_updater', function (data) {
+    graph_data_cache = data;
+    if (graph_data === null) {
+      graph_data = data;
+      PlotCorrentGraph();
+      PlotGraphData();
+      maxSliderValue = data['data_hora'].length - 1;
+      UpdateSlider();
+      socket.emit("corrent_data_updater", folder_name);
+      return;
+    }
+
+    let need_update = graph_data['data_hora'].slice(-1)[0] !== data['data_hora'].slice(-1)[0]
+
+    if (need_update) {
+      for (key in data) {
+        graph_data[key].push(data[key].slice(-1)[0]);
+      }
+      PlotCorrentGraph();
+      PlotGraphData();
+      maxSliderValue = graph_data_cache['data_hora'].length - 1;
+      UpdateSlider();
+      UpdateBadge("emm");
+    }
+
+    socket.emit("corrent_data_updater", folder_name);
+  });
+
+  socket.on('log_simulation', log_text => {
+    getId("log-text").innerHTML = log_text;
+    CheckErrorOnVMSimulation(log_text);
+  });
+
+  getId("modal-reset-confirm-button-ok").addEventListener('click', () => {
+    if (last_reset_status) {
+      setTimeout(() => {
+        getId("error-container").classList.add('visually-hidden');
+      }, 1000);
+    }
+  });
 
   socket.on('reset_simulation_status', status => {
     last_reset_status = status;
