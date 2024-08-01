@@ -5,13 +5,13 @@ import os
 import time
 from datetime import date
 
-from requests import get, patch
+from requests import get, patch, delete
 from xlwt import Workbook
 
 link_bd_base = "https://simulacao-femm-2-default-rtdb.firebaseio.com/"
 
-link_bd = link_bd_base + "/medicoes/{}/.json"
-link_bd_folders = link_bd.format("Pastas")
+link_bd = link_bd_base + "/medicoes/Pastas/{}.json"
+link_bd_folders = link_bd.format("")
 link_bd_image = "simulacao-femm.appspot.com"
 link_bd_image_gs = f"gs://{link_bd_image}"
 
@@ -174,6 +174,9 @@ def get_bytes_file(filename):
     os.remove(file_path)
     return return_data
 
+
+def firebase_delete_folder(folder):
+    delete(link_bd.format(folder))
 
 def get_image_data(pasta):
     link_all_folders_imgs = "https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/"

@@ -112,5 +112,11 @@ def download_all_data():
                      download_name=all_data_file_name)
 
 
+@app.route('/delete/<folder>', methods=['DELETE'])
+def delete_folder(folder):
+    firebase_delete_folder(folder)
+    return "", 204
+
+
 if __name__ == "__main__":
     io.run(app, host="0.0.0.0", port=8080, allow_unsafe_werkzeug=True)
