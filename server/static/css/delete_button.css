@@ -1,0 +1,44 @@
+.btn2 {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: 1px solid #cccccc; /* lighten(gray, 24%) */
+  height: 48px;
+  padding: 0 24px 0 16px;
+  letter-spacing: 0.25px;
+  border-radius: 24px;
+  cursor: pointer;
+}
+
+.btn2:focus {
+  outline: none;
+}
+
+.btn2 .mdi {
+  margin-right: 8px;
+}
+
+.btn2-delete {
+  font-size: 16px;
+  color: red;
+}
+
+.btn2-delete > .mdi-delete-empty {
+  display: none;
+}
+
+.btn2-delete:hover {
+  background-color: #ffcccc; /* lighten(red, 48%) */
+}
+
+.btn2-delete:hover > .mdi-delete-empty {
+  display: block;
+}
+
+.btn2-delete:hover > .mdi-delete {
+  display: none;
+}
+
+.btn2-delete:focus {
+  box-shadow: 0 0 0 4px #ff9999; /* lighten(red, 40%) */
+}
