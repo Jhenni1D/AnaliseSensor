@@ -773,3 +773,6 @@ VM/build/change_hkey/localpycs/pyimod04_pywin32.pyc
 VM/build/change_hkey/localpycs/struct.pyc
 /VM/femm_files/temp.edge
 /vs-code-workspace.code-workspace
+/VM/build/
+/VM/dist/
+/VM/vm_app.spec
