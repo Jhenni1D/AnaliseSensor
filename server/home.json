@@ -1,10 +1,19 @@
 {
-  "GET /folders_view": "Para visualizar todos os dados já simulados e também baixar em formato Excel.",
-  "GET /reset-simulation-data": "Reseta os dados de simulação da máquina virtual.",
-  "POST /store/new-simulation": "Rota para enviar os dados de simulações.",
-  "GET /simulation/dashboard/{folder}": "Vai para o dashboard da <b>pasta</b> informada.",
-  "GET /uncompleted-simulation/dashboard/{folder}": "Vai para o dashboard da <b>pasta</b> onde será atualizada enquanto a simulação roda.",
-  "GET /to/uncompleted-simulation/dashboard": "Redireciona para a última pasta que ainda está tendo a simulação sendo feita.",
-  "GET /download/{folder}": "Passando o nome da pasta, então os dados dos sensores daquela pasta é baixado em formato Excel.",
-  "GET /download-all": "Baixa todas as informações de todas as pastas em um arquivo Excel."
+  "routes": {
+    "GET /folders_view": "Para visualizar todos os dados já simulados e também baixar em formato Excel.",
+    "GET /reset-simulation-data": "Reseta os dados de simulação da máquina virtual.",
+    "POST /store/new-simulation": "Rota para enviar os dados de simulações.",
+    "GET /simulation/dashboard/{folder}": "Vai para o dashboard da <b>pasta</b> informada.",
+    "GET /uncompleted-simulation/dashboard/{folder}": "Vai para o dashboard da <b>pasta</b> onde será atualizada enquanto a simulação roda.",
+    "GET /to/uncompleted-simulation/dashboard": "Redireciona para a última pasta que ainda está tendo a simulação sendo feita.",
+    "GET /download/{folder}": "Passando o nome da pasta, então os dados dos sensores daquela pasta é baixado em formato Excel.",
+    "GET /download-all": "Baixa todas as informações de todas as pastas em um arquivo Excel.",
+    "POST /delete/{folder}": "Deleta uma pasta",
+    "POST /complete/{folder}": "Marca uma pasta como conluída"
+  },
+  "api": {
+    "/show-data/.json": "Retorna todos os dados do firebase.",
+    "/last-simulation-data/.json": "Retorna a última pasta.",
+    "/uncompleted-simulation/.json": "Retorna o nome da pasta que está com sua simulação incompleta."
+  }
 }
