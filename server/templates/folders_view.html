@@ -122,7 +122,7 @@
                                     </div>
                                     <div>
                                         <div class="col">
-                                            <button class="btn btn-primary mb-3"
+                                            <button class="btn btn-primary mb-3 btn-w"
                                                 data-bs-target="#modal-download-excel-{{folder_name}}"
                                                 data-bs-toggle="modal" type="button">Download in
                                                 Excel
@@ -192,7 +192,7 @@
                                     </div>
                                     <div class="col">
                                         <a href="/simulation/dashboard/{{folder_name}}" target="_blank"
-                                            class="btn btn-info" role="button">Go
+                                            class="btn btn-info mb-3 btn-w" role="button">Go
                                             to dashboard</a>
                                     </div>
                                     <div>
@@ -219,40 +219,16 @@
                                                                     data-bs-dismiss="modal" type="button">NO</button>
 
                                                                 <button class="btn btn-danger"
-                                                                    data-bs-target="#delete-modal-{{folder_name}}2"
-                                                                    data-bs-toggle="modal" id="confirm-reset">DELETE
+                                                                    data-bs-target="#delete-modal-finish"
+                                                                    data-bs-toggle="modal">DELETE
                                                                 </button>
 
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div aria-hidden="true" aria-labelledby="modal-reset-confirm-title"
-                                                    class="modal fade" data-bs-backdrop="static"
-                                                    data-bs-keyboard="false" id="delete-modal-{{folder_name}}2"
-                                                    tabindex="-1">
-                                                    <div class="modal-dialog modal-dialog-centered">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h1 class="modal-title fs-5 justify-content-center"
-                                                                    id="modal-reset-confirm-title">
-                                                                    DELETE STATUS</h1>
-                                                            </div>
-                                                            <div class="modal-body" id="reset-modal-confirm-body">
-                                                                Folder Deleted!
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                <button class="btn btn-secondary"
-                                                                    data-bs-dismiss="modal"
-                                                                    id="modal-reset-confirm-button-ok" type="button">OK
-                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </form>
-                                            <button class="btn btn-delete btn2 mb-3"
+                                            <button class="btn btn-delete btn2 mb-3 btn-w"
                                                 data-bs-target="#delete-modal-{{folder_name}}" data-bs-toggle="modal">
                                                 <span class="mdi mdi-delete mdi-24px"></span>
                                                 <span class="mdi mdi-delete-empty mdi-24px"></span>
@@ -269,6 +245,26 @@
             </div>
         </div>
     </div>
+
+    <div aria-hidden="true" aria-labelledby="modal-reset-confirm-title" class="modal fade" data-bs-backdrop="static"
+        data-bs-keyboard="false" id="delete-modal-finish" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 justify-content-center" id="modal-reset-confirm-title">
+                        DELETE STATUS</h1>
+                </div>
+                <div class="modal-body" id="reset-modal-confirm-body">
+                    Folder Deleted!
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="modal-delete-status-button-ok" type="button">OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
         integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
         crossorigin="anonymous"></script>

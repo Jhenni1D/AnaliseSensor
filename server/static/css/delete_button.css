@@ -1,11 +1,13 @@
+.btn-w {
+  width: 180px;
+}
+
 .btn2 {
   background: none;
   border: 1px solid #cccccc; /* lighten(gray, 24%) */
   height: 40px;
-  width: 130px;
   padding: 0 24px 0 16px;
   letter-spacing: 0.25px;
-  margin-top: 10px;
   cursor: pointer;
 }
 

@@ -2,12 +2,17 @@
 console.log(all_folders)
 let default_action = "/download/folder_name/start/end"
 
+let modal_status_button_ok = document.getElementById("modal-delete-status-button-ok");
 let items_names_elements = []
 let content_folders = {}
 let last_item_name = null;
 let start_date_values = []
 let end_date_values = []
 let current_folder = "";
+
+modal_status_button_ok.addEventListener("click", () => {
+    window.location.reload(true);
+});
 
 for (i in all_folders) {
     items_names_elements.push(document.getElementById("item-name-" + i));
