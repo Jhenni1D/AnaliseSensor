@@ -112,7 +112,7 @@ def download_all_data():
                      download_name=all_data_file_name)
 
 
-@app.route('/delete/<folder>', methods=['DELETE'])
+@app.route('/delete/<folder>', methods=['POST'])
 def delete_folder(folder):
     firebase_delete_folder(folder)
     return "", 204
