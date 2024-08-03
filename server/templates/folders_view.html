@@ -46,6 +46,7 @@
                     {% for folder in all_folders %}
                     {% set index_item = all_folders.index(folder) %}
                     {% set folder_name = folder[0] %}
+
                     <div id="folder-info-root-{{index_item}}" {% if index_item!=0 %}style="display: none;" {% endif %}>
                         <div data-bs-spy="scroll" data-bs-target="#list-{{folder[0]}}"
                             data-bs-offset="{{all_folders.index(folder)}}" class="scrollspy-{{folder[0]}}"
@@ -236,6 +237,47 @@
                                             </button>
                                         </div>
                                     </div>
+                                    <div>
+                                        <div class="col">
+                                            <form action="/complete/{{folder_name}}" method="post">
+                                                <div aria-hidden="true"
+                                                    aria-labelledby="complete-modal-{{folder_name}}Label"
+                                                    class="modal fade" id="complete-modal-{{folder_name}}"
+                                                    tabindex="-1">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h1 class="modal-title fs-5"
+                                                                    id="complete-modal-{{folder_name}}Label">
+                                                                    SET COMPLETE FOLDER CONFIRMATION</h1>
+                                                                <button aria-label="Close" class="btn-close"
+                                                                    data-bs-dismiss="modal" type="button"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Are you sure you want to mark this folder as Completed?
+                                                                This will prevent it from receiving further updates!
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal" type="button">NO</button>
+
+                                                                <button class="btn btn-success"
+                                                                    data-bs-target="#complete-modal-finish"
+                                                                    data-bs-toggle="modal">SET COMPLETE
+                                                                </button>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <button class="btn btn-success mb-3 btn-w"
+                                                data-bs-target="#complete-modal-{{folder_name}}" data-bs-toggle="modal"
+                                                {% if folder[1][folder[0]]["completed"] %}hidden{% endif %}>
+                                                SET COMPLETED
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -259,6 +301,25 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" id="modal-delete-status-button-ok" type="button">OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="modal-complete-confirm-title" class="modal fade" data-bs-backdrop="static"
+        data-bs-keyboard="false" id="complete-modal-finish" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 justify-content-center" id="modal-complete-confirm-title">
+                        SET COMPLETE STATUS</h1>
+                </div>
+                <div class="modal-body" id="complete-modal-confirm-body">
+                    The folder has been marked as completed!
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="modal-complete-status-button-ok" type="button">OK
                     </button>
                 </div>
             </div>

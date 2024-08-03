@@ -178,6 +178,11 @@ def get_bytes_file(filename):
 def firebase_delete_folder(folder):
     delete(link_bd.format(folder))
 
+def firebase_set_completed_folder(folder):
+    folder_info = get_folder_filter(lambda folder_name, folder_d: folder_name == folder)
+    folder_info[0][1][folder_info[0][0]]["completed"] = True
+    patch(link_bd.format(folder), json=folder_info[0][1][folder])
+
 def get_image_data(pasta):
     link_all_folders_imgs = "https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/"
     all_folders = get(link_all_folders_imgs).json()['items']
