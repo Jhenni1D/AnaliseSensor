@@ -97,7 +97,8 @@ def get_formatted_sensors_data(folders_data):
         for key in keys:
             if key not in data_graph:
                 data_graph[key] = []
-            data_graph[key].append(data[key])
+            if key in data:
+                data_graph[key].append(data[key])
     del data_graph['data']
     del data_graph['hora']
     return data_graph
