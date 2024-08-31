@@ -354,7 +354,7 @@ $(document).ready(function () {
 
   socket.on('connect', function () {
     console.log('Connected!');
-    socket.emit('progress_test');
+    //socket.emit('progress_test');
     socket.emit('corrent_data_updater', folder_name)
   });
 
@@ -369,7 +369,6 @@ $(document).ready(function () {
     dado = data_updated;
     UpdateImages();
   });
-
 
   socket.on('progress_value', function (prog_value) {
     progress_simulation_element.style["width"] = `${prog_value}% `;
