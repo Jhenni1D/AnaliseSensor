@@ -1,3 +1,5 @@
+from time import sleep
+
 from app_service_server import *
 from flask_socketio import SocketIO
 
@@ -90,7 +92,7 @@ def create_io(app):
     @io.event
     def corrent_data_updater(folder):
         io.emit("corrent_data_updater", get_date_and_sensors_values_for_graph_by_folder(folder))
-        time.sleep(1)
+        sleep(1)
 
     @io.event
     def log_simulation(log_text):
@@ -103,11 +105,11 @@ def create_io(app):
     @io.event
     def status_vm():
         io.emit("request_status_vm")
-        time.sleep(1)
+        sleep(1)
 
     @io.event
     def request_status_vm():
         io.emit("status_vm")
-        time.sleep(1)
+        sleep(1)
 
     return io
