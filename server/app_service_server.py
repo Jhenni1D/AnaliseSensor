@@ -115,6 +115,12 @@ def get_date_and_sensors_values_for_graph_by_folder(folder):
     folder_data = get_folder_filter(lambda fn, fd: fn == folder)
     if len(folder_data) == 0:
         return {}
+    return get_date_and_sensors_values_for_graph(folder_data)
+
+
+def get_date_and_sensors_values_for_graph(folder_data):
+    if len(folder_data) == 0:
+        return {}
     return get_formatted_sensors_data(folder_data[0])
 
 

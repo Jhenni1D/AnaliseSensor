@@ -384,7 +384,6 @@ $(document).ready(function () {
       PlotGraphData();
       maxSliderValue = data['data_hora'].length - 1;
       UpdateSlider();
-      socket.emit("corrent_data_updater", folder_name);
       return;
     }
 
@@ -400,8 +399,6 @@ $(document).ready(function () {
       UpdateSlider();
       UpdateBadge("emm");
     }
-
-    socket.emit("corrent_data_updater", folder_name);
   });
 
   socket.on('log_simulation', log_text => {

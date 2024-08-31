@@ -57,6 +57,7 @@ def store_and_init_new_simulation():
 
     print(f"data enviado para a VM: {data}")
     io.emit("insert_queue", data)
+    io.emit("corrent_data_updater", get_date_and_sensors_values_for_graph(folder_incompleted))
     response_status = {"status": "stored" if stored else "updated", "folder_name": data["folder_name"],
                        "data_stored": store_firebase_data}
     return response_status
