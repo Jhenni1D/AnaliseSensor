@@ -3,6 +3,7 @@ import os
 import queue
 import subprocess
 import time
+
 import socketio
 
 import simulation_controller_executor
@@ -23,12 +24,15 @@ simulation_state = LoopState()
 try:
     @sio.event
     def connect():
-        sio.emit("start_att_img")
-        sio.emit("start_simulation_loop")
-        print('connection established')
         sio.emit("ping")
         print("send ping")
+
+        sio.emit("send_img_loop")
+        sio.emit("simulation_loop")
+        print('Loops starteds')
+
         sio.emit("request_status_vm")
+        print('status vM started')
 
     @sio.event
     def pong():
@@ -41,67 +45,78 @@ try:
         is_can_enqueue = simulation_controller.is_can_enqueue(data["SensorA"])
         if is_can_enqueue:
             queue.put(data)
-            simulation_controller.update_queue(data["folder_name"])
             print("Inseriu elemento na fila, elementos na fila:", queue.qsize(), " | dados:", data)
+            simulation_controller.update_queue(data["folder_name"])
+
 
 
     @sio.event
     def simulation_loop():
+
         if simulation_state.simulation_running:
-            print("Loop simulação já está rodando!")
             return
-        while True:
+
+        time.sleep(2)
+
+        while not queue.empty():
             simulation_state.simulation_running = True
-            while not queue.empty():
-                data = queue.get()
-                print('Irá iniciar simulação com os dados:', data)
-                args = f"./simulation_controller_executor.exe \"{json.dumps(data).replace('"', "'")}\""
-                # args_test = f"./.vm-venv/Scripts/python ./simulation_controller_executor.py \"{json.dumps(data).replace('"', "'")}\""
-                # args = args_test
-                with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as proc:
-                    try:
-                        stdout_simulation = proc.stdout.read().decode()
-                    except Exception as e:
-                        print("Exception in stout of simulation.exe")
-                        stdout_simulation = proc.stdout.read().decode("latin-1")
-                    print(f"LOG DO PROCESSo: \n---\n{stdout_simulation}\n---\n")
+            data = queue.get()
+            print('Irá iniciar simulação com os dados:', data)
+            args = f"./simulation_controller_executor.exe \"{json.dumps(data).replace('"', "'")}\""
+            args_test = f"./.vm-venv/Scripts/python ./simulation_controller_executor.py \"{json.dumps(data).replace('"', "'")}\""
+            args = args_test
+            with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as proc:
+                try:
+                    stdout_simulation = proc.stdout.read().decode()
+                except Exception as e:
+                    print("Exception in stout of simulation.exe")
+                    stdout_simulation = proc.stdout.read().decode("latin-1")
+                print(f"LOG DO PROCESSo: \n---\n{stdout_simulation}\n---\n")
+        simulation_state.simulation_running = False
+        try:
+            sio.emit("simulation_loop")
+        except:
+            pass
 
 
     @sio.event
     def send_img_loop():
-        if simulation_state.files_running:
-            print("Loop dos arquivos já está rodando!")
-            return
-        print("Iniciou o loop dos arquivos")
+        time.sleep(3)
         img_file_name = "img_send.json"
         progress_file_name = "progress_simulation.txt"
         simulation_controller.load_simulation()
-        while True:
-            simulation_state.files_running = True
-            time.sleep(3)
-            dir_list = os.listdir("./")
-            if img_file_name in dir_list:
-                try:
-                    with open(img_file_name) as file:
-                        sio.emit('request_update_image', json.loads(file.read()))
-                    os.remove(img_file_name)
-                except Exception as ex:
-                    print(f"Quebrou ao tentar abrir arquivo das imagens:\n{ex}")
 
-            if progress_file_name in dir_list:
-                try:
-                    with open(progress_file_name) as file:
-                        sio.emit('progress', file.read())
-                except Exception as ex:
-                    print(f"Quebrou ao tentar abrir arquivo progress:\n{ex}")
+        dir_list = os.listdir("./")
+        if img_file_name in dir_list:
+            try:
+                with open(img_file_name) as file:
+                    sio.emit('request_update_image', json.loads(file.read()))
+                os.remove(img_file_name)
+            except Exception as ex:
+                simulation_state.files_running = False
+                print(f"Quebrou ao tentar abrir arquivo das imagens:\n{ex}")
 
-            log_file = f"log-simulacao_{simulation_controller.simulations["folder_name"]}.txt"
-            if log_file in dir_list:
-                try:
-                    with open(f"./{log_file}", encoding="utf-8") as file:
-                        sio.emit('log_simulation', file.read())
-                except Exception as ex:
-                    print(f"Quebrou ao tentar abrir o arquivo de log:\n {ex}")
+        if progress_file_name in dir_list:
+            try:
+                with open(progress_file_name) as file:
+                    sio.emit('progress', file.read())
+            except Exception as ex:
+                simulation_state.files_running = False
+                print(f"Quebrou ao tentar abrir arquivo progress:\n{ex}")
+
+        log_file = f"log-simulacao_{simulation_controller.simulations["folder_name"]}.txt"
+        if log_file in dir_list:
+            try:
+                with open(f"./{log_file}", encoding="utf-8") as file:
+                    sio.emit('log_simulation', file.read())
+            except Exception as ex:
+                simulation_state.files_running = False
+                print(f"Quebrou ao tentar abrir o arquivo de log:\n {ex}")
+
+        try:
+            sio.emit("send_img_loop")
+        except:
+            pass
 
 
     @sio.event
@@ -115,7 +130,10 @@ try:
     @sio.event
     def request_status_vm():
         time.sleep(2)
-        sio.emit("request_status_vm")
+        try:
+            sio.emit("request_status_vm")
+        except:
+            pass
 
 
     @sio.event

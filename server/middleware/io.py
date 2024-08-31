@@ -8,11 +8,13 @@ def create_io(app):
     io = SocketIO(app)
 
     @io.event
-    def start_att_img():
+    def send_img_loop():
+        sleep(1)
         io.emit("send_img_loop")
 
     @io.event
-    def start_simulation_loop():
+    def simulation_loop():
+        sleep(1)
         io.emit("simulation_loop")
 
     @io.event
