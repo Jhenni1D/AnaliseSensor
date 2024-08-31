@@ -30,7 +30,6 @@ try:
         print("send ping")
         sio.emit("status_vm")
 
-
     @sio.event
     def pong():
         print("receive pong")
@@ -112,17 +111,19 @@ try:
         sio.emit("reset_simulation_status", True)
         print('Arquivos de simulação Resetados!')
 
-    
+
     @sio.event
     def request_status_vm():
+        time.sleep(2)
         sio.emit("request_status_vm")
+
 
     @sio.event
     def disconnect():
         print('disconnected from server')
 
 
-    sio.connect("https://server-sensor.fly.dev/", wait_timeout=20)
+    sio.connect("https://server-sensor.fly.dev/")  # https://server-sensor.fly.dev/ | http://localhost:8080/
     sio.wait()
 except Exception as e:
     print(e)
