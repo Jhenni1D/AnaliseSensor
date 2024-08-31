@@ -1,15 +1,17 @@
 # Funções serviços dos aplicativos
-from firebase_admin import credentials, initialize_app, storage
-from log_handler import write_log
-from requests import get, patch
-from datetime import date
 import datetime
 import json
 import os
+from datetime import date
+
+from firebase_admin import credentials, initialize_app, storage
+from requests import get, patch
+
+from log_handler import write_log
 
 link_bd = "https://simulacao-femm-2-default-rtdb.firebaseio.com/medicoes/{}/.json"
 link_bd_folders = link_bd.format("Pastas")
-link_bd_image = "simulacao-femm.appspot.com"
+link_bd_image = "simulacao-femm-2.appspot.com"
 link_bd_image_gs = f"gs://{link_bd_image}"
 
 
@@ -41,7 +43,7 @@ def send_simulation_images_to_firebase(folder):
 
 def upload_blob(folder):
     try:
-        cred = credentials.Certificate("./cred_firebase_server.json")
+        cred = credentials.Certificate("./cred_firebase_VM.json")
         initialize_app(cred, {'storageBucket': f'{link_bd_image}/'})
     except:
         print("ERRO AO INICIALIZAR APP FIREBASE")
