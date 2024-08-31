@@ -363,7 +363,7 @@ $(document).ready(function () {
     clearTimeout(status_vm_timeout);
     status_vm_element.classList.remove("text-danger");
     status_vm_element.classList.add("text-success");
-    status_vm_timeout = setTimeout(SetStatusVM, 2000);
+    status_vm_timeout = setTimeout(SetStatusVM, 4000);
     socket.emit('status_vm');
   });
 
