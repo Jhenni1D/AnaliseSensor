@@ -28,7 +28,7 @@ try:
         print('connection established')
         sio.emit("ping")
         print("send ping")
-        sio.emit("status_vm")
+        sio.emit("request_status_vm")
 
     @sio.event
     def pong():

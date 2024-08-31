@@ -91,8 +91,8 @@ def create_io(app):
 
     @io.event
     def corrent_data_updater(folder):
+        sleep(2)
         io.emit("corrent_data_updater", get_date_and_sensors_values_for_graph_by_folder(folder))
-        sleep(1)
 
     @io.event
     def log_simulation(log_text):
@@ -103,13 +103,8 @@ def create_io(app):
         io.emit("reset_simulation_status", status)
 
     @io.event
-    def status_vm():
-        io.emit("request_status_vm")
-        sleep(1)
-
-    @io.event
     def request_status_vm():
-        io.emit("status_vm")
+        io.emit("request_status_vm")
         sleep(1)
 
     return io

@@ -356,15 +356,13 @@ $(document).ready(function () {
     console.log('Connected!');
     socket.emit('progress_test');
     socket.emit('corrent_data_updater', folder_name)
-    socket.emit('status_vm');
   });
 
-  socket.on('status_vm', () => {
+  socket.on('request_status_vm', () => {
     clearTimeout(status_vm_timeout);
     status_vm_element.classList.remove("text-danger");
     status_vm_element.classList.add("text-success");
     status_vm_timeout = setTimeout(SetStatusVM, 4000);
-    socket.emit('status_vm');
   });
 
   socket.on('update_image', function (data_updated) {
