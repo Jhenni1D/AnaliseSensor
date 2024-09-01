@@ -109,4 +109,9 @@ def create_io(app):
         io.emit("request_status_vm")
         sleep(1)
 
+    @io.event
+    def completed_simulation():
+        io.emit("completed_simulation")
+        sleep(1)
+
     return io

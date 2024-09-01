@@ -22,7 +22,7 @@ class SimulationController:
         self.LIMIT_RANGE = 15
         self.femm = FEMMSimulationController()
 
-    def reset(self):
+    def reset(self, clear_log=True):
         self.load_simulation()
         self.simulations = {
             "0": {"done": False, "range": 2, "in_queue": False},
@@ -42,7 +42,7 @@ class SimulationController:
         for file in os.listdir("./"):
             if "simulation" in file and ".json" in file:
                 os.remove(f"./{file}")
-            if f"log-simulacao_" in file:
+            if f"log-simulacao_" in file and clear_log:
                 with open(f"./{file}", "w") as f:
                     f.write("")
             if "progress_simulation" in file:
@@ -142,14 +142,12 @@ class SimulationController:
             print(msg)
             write_log(f"\n{msg}")
 
-        sensorB = -1
-        sensorC = -1
         try:
             write_log(
                 f"# INICIO DA SIMULAÇÃO {self.simulations['actual_simulation']}: {get_formatted_date()}_{get_formatted_hour()}\n",
                 folder=self.simulations["folder_name"])
             write_log(
-                f"# MEDICAO_A: {range_sensorA} | B: {sensorB} | C: {sensorC}")
+                f"# MEDICAO_A: {range_sensorA} | B: {range_sensorB} | C: {range_sensorC}")
             self.femm.set_femm_atributes(ca=range_sensorA, cb=range_sensorB, cc=range_sensorC, temperatura=temp,
                                          index=self.simulations["actual_simulation"],
                                          first=self.simulations["actual_simulation"] == 0,
@@ -157,7 +155,7 @@ class SimulationController:
         except Exception as e:
             msg = f"Exception in get SensorB/C and set femm attributes: {e.args}"
             print(msg)
-            write_log(f"\n# MEDICAO_A: {range_sensorA} | B: {sensorB} | C: {sensorC}\n{msg}")
+            write_log(f"\n# MEDICAO_A: {range_sensorA} | B: {range_sensorB} | C: {range_sensorC}\n{msg}")
         finished_simulation_correctaly = False
         try:
             self.femm.iniciar_femm()
@@ -186,7 +184,6 @@ class SimulationController:
                 print("simulation finished")
                 if self.simulations["actual_simulation"] == 5:
                     set_completed_simulation()
-                    self.reset()
                     write_log(f"\n# FINALIZOU AS SIMULAÇÕES PARA A PASTA: {self.simulations['folder_name']}")
             else:
                 print("FEMM simulation not completed!")
@@ -198,6 +195,11 @@ class SimulationController:
             print(msg)
             write_log(f"\n{msg}")
 
+    def is_completed_last_simulation(self):
+        self.load_simulation()
+        is_completed = self.simulations["actual_simulation"] == 5
+        self.reset(clear_log=False)
+        return is_completed
 
 def main(args):
     s = SimulationController()

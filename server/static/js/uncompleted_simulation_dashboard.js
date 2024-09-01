@@ -422,6 +422,11 @@ $(document).ready(function () {
     status_reset_simulation_timeout = setTimeout(SetStatusResetSimulation, 3000);
   });
 
+  socket.on('completed_simulation', () => {
+    console.log("Simulação foi completada!");
+    window.location.reload(true);
+  });
+
   socket.on('disconnect', function () {
     console.log('Disconnected!');
   });
