@@ -12,8 +12,12 @@ link_bd_base = "https://simulacao-femm-2-default-rtdb.firebaseio.com/"
 
 link_bd = link_bd_base + "/medicoes/Pastas/{}.json"
 link_bd_folders = link_bd.format("")
-link_bd_image = "simulacao-femm.appspot.com"
+link_bd_image = "simulacao-femm-2.appspot.com"
 link_bd_image_gs = f"gs://{link_bd_image}"
+link_bd_all_images = f"https://firebasestorage.googleapis.com/v0/b/{link_bd_image}/o/"
+link_bd_get_image_folder = link_bd_all_images + "{folder}%2F"
+link_bd_get_image = link_bd_get_image_folder + "{img}.png?alt=media"
+link_bd_get_image_check_folder = link_bd_get_image_folder + "M0.png?alt=media"
 
 
 def get_date_formatted():
@@ -167,10 +171,6 @@ def get_excel_of_data(file_name, data):
     wb.save(f'{file_name}_Data.xls')
 
 
-def check_and_get_img(link, folder_img, all_folders):
-    img_link = link if folder_img in all_folders else "https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif"
-    return img_link
-
 
 def get_bytes_file(filename):
     file_path = f"./{filename}"
@@ -190,11 +190,18 @@ def firebase_set_completed_folder(folder):
     folder_info[0][1][folder_info[0][0]]["completed"] = True
     patch(link_bd.format(folder), json=folder_info[0][1][folder])
 
+
+def check_and_get_img(link, folder_img, all_folders):
+    img_link = link if folder_img in all_folders else "https://cdn.dribbble.com/users/386433/screenshots/1689880/placehold.gif"
+    return img_link
+
+
+def check_images_exist(folder):
+    return get(link_bd_get_image_check_folder.format(folder=folder)).status_code.real != 404
+
 def get_image_data(pasta):
-    link_all_folders_imgs = "https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/"
-    all_folders = get(link_all_folders_imgs).json()['items']
+    all_folders = get(link_bd_all_images).json()['items']
     all_folders = [data_img['name'] for data_img in all_folders]
-    link = f"https://firebasestorage.googleapis.com/v0/b/simulacao-femm.appspot.com/o/{pasta}%2F{'{}'}.png?alt=media"
     data = [
         {
             "type": "M",
@@ -243,5 +250,6 @@ def get_image_data(pasta):
         }
     ]
     for d in data:
-        d["img"] = check_and_get_img(link.format(d["name"]), f'{pasta}/{d["name"]}.png', all_folders)
+        d["img"] = check_and_get_img(link_bd_get_image.format(folder=pasta, img=d["name"]), f'{pasta}/{d["name"]}.png',
+                                     all_folders)
     return data
