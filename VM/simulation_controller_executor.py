@@ -53,6 +53,11 @@ class SimulationController:
         with open("./simulation.json", "w") as file:
             file.write(json.dumps(self.simulations, indent=1))
 
+    def reset_progress_simulation(self):
+        with open(f"./progress_simulation.txt", "w") as f:
+            f.write("0")
+
+
     def load_simulation(self):
         with open("./simulation.json") as file:
             self.simulations = json.loads(file.read())
@@ -132,8 +137,7 @@ class SimulationController:
         try:
             if self.simulations["actual_simulation"] == 0 and self.is_folder_exist() is False:
                 os.mkdir(self.simulations["folder_name"])
-                write_log(f"-Criou pasta com o nome: {self.simulations['folder_name']}\n",
-                          folder=self.simulations["folder_name"], create=True)
+                write_log(f"-Criou pasta com o nome: {self.simulations['folder_name']}\n")
 
                 with open("./folder_name.txt", "w") as file:
                     file.write(self.simulations["folder_name"])
@@ -188,18 +192,28 @@ class SimulationController:
             else:
                 print("FEMM simulation not completed!")
                 self.load_simulation()
-                self.invalid_queue_reset()
+                self.reset_progress_simulation()
 
         except Exception as e:
             msg = f"Exception in finalize: {e.args}"
             print(msg)
             write_log(f"\n{msg}")
+            self.load_simulation()
+            self.reset_progress_simulation()
 
     def is_completed_last_simulation(self):
         self.load_simulation()
         is_completed = self.simulations["actual_simulation"] == 5
         self.reset(clear_log=False)
         return is_completed
+
+    def get_current_simulation_index(self):
+        self.load_simulation()
+        return str(self.simulations["actual_simulation"])
+
+    def is_simulation_completed(self, simulation_index):
+        self.load_simulation()
+        return self.simulations[simulation_index]["done"]
 
 def main(args):
     s = SimulationController()
