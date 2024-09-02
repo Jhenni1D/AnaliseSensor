@@ -7,13 +7,20 @@ import time
 import socketio
 
 import simulation_controller_executor
+from log_handler import write_log, set_folder_log
 
 
 class LoopState:
-
+    MAX_RETRY_SIMULATION = 3
     def __init__(self):
         self.simulation_running = False
         self.files_running = False
+        self.current_retry_simulation = 0
+
+    def is_max_retry(self) -> bool:
+        is_max_retry = self.current_retry_simulation <= LoopState.MAX_RETRY_SIMULATION
+        self.current_retry_simulation += 1
+        return is_max_retry
 
 
 sio = socketio.Client()
@@ -63,17 +70,29 @@ def simulation_loop():
     while not queue.empty():
         simulation_state.simulation_running = True
         data = queue.get()
-        print('Irá iniciar simulação com os dados:', data)
-        args = f"./simulation_controller_executor.exe \"{json.dumps(data).replace('"', "'")}\""
-        # args_test = f"./.vm-venv/Scripts/python ./simulation_controller_executor.py \"{json.dumps(data).replace('"', "'")}\""
-        # args = args_test
-        with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as proc:
-            try:
-                stdout_simulation = proc.stdout.read().decode()
-            except Exception as e:
-                print("Exception in stout of simulation.exe")
-                stdout_simulation = proc.stdout.read().decode("latin-1")
-            print(f"LOG DO PROCESSo: \n---\n{stdout_simulation}\n---\n")
+        simulation_completed = False
+        current_simulation_index = simulation_controller.get_current_simulation_index()
+        set_folder_log(data["folder_name"])
+        msg = f'Irá iniciar simulação com os dados: {data}'
+        print(msg)
+        write_log(msg)
+        retry_count = 1
+        while simulation_completed is False:
+            msg = f"Tentativa: {retry_count}"
+            print(msg)
+            write_log(msg)
+            args = f"./simulation_controller_executor.exe \"{json.dumps(data).replace('"', "'")}\""
+            args_test = f"./.vm-venv/Scripts/python ./simulation_controller_executor.py \"{json.dumps(data).replace('"', "'")}\""
+            args = args_test
+            with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as proc:
+                try:
+                    stdout_simulation = proc.stdout.read().decode()
+                except Exception as e:
+                    print("Exception in stout of simulation.exe")
+                    stdout_simulation = proc.stdout.read().decode("latin-1")
+                print(f"LOG DO PROCESSo: \n---\n{stdout_simulation}\n---\n")
+            simulation_completed = simulation_controller.is_simulation_completed(current_simulation_index)
+            retry_count += 1
 
     if simulation_controller.is_completed_last_simulation():
         sio.emit("completed_simulation")
