@@ -11,11 +11,13 @@ from log_handler import write_log, set_folder_log
 
 
 class LoopState:
-    MAX_RETRY_SIMULATION = 3
+    MAX_RETRY_SIMULATION = 6
     def __init__(self):
         self.simulation_running = False
         self.files_running = False
         self.current_retry_simulation = 0
+        self.simulation_process: subprocess.Popen[bytes] = None
+        self.cancel_simulation = False
 
     def is_max_retry(self) -> bool:
         is_max_retry = self.current_retry_simulation <= LoopState.MAX_RETRY_SIMULATION
@@ -24,10 +26,10 @@ class LoopState:
 
 
 sio = socketio.Client()
-queue = queue.Queue()
+data_queue = queue.Queue()
 simulation_controller = simulation_controller_executor.SimulationController()
 simulation_state = LoopState()
-
+link_server = "https://server-sensor.fly.dev/"  # https://server-sensor.fly.dev/ | http://localhost:8080/
 
 @sio.event
 def connect():
@@ -46,8 +48,9 @@ def insert_queue(data):
     simulation_controller.load_simulation()
     is_can_enqueue = simulation_controller.is_can_enqueue(data["SensorA"])
     if is_can_enqueue:
-        queue.put(data)
-        print("Inseriu elemento na fila, elementos na fila:", queue.qsize(), " | dados:", data)
+        data["link"] = link_server
+        data_queue.put(data)
+        print("Inseriu elemento na fila, elementos na fila:", data_queue.qsize(), " | dados:", data)
         simulation_controller.update_queue(data["folder_name"])
 
 
@@ -65,11 +68,20 @@ def disconnect():
 
 
 @sio.event
+def cancel():
+    simulation_state.cancel_simulation = True
+    sio.emit("cancel_confirmation")
+    global data_queue
+    data_queue = queue.Queue()
+    reset_simulation()
+
+
+@sio.event
 def simulation_loop():
     time.sleep(1)
-    while not queue.empty():
+    while not data_queue.empty():
         simulation_state.simulation_running = True
-        data = queue.get()
+        data = data_queue.get()
         simulation_completed = False
         current_simulation_index = simulation_controller.get_current_simulation_index()
         set_folder_log(data["folder_name"])
@@ -77,19 +89,26 @@ def simulation_loop():
         print(msg)
         write_log(msg)
         retry_count = 1
-        while simulation_completed is False:
+        while simulation_completed is False and simulation_state.cancel_simulation is False:
             msg = f"Tentativa: {retry_count}"
             print(msg)
             write_log(msg)
+
+            if retry_count > 0 and retry_count % LoopState.MAX_RETRY_SIMULATION == 0:
+                write_log(
+                    f"\n# Tentativas ultrapassou o limite de {LoopState.MAX_RETRY_SIMULATION}, permitindo cancelamento!\n")
+                sio.emit("enable_cancel")
+
             args = f"./simulation_controller_executor.exe \"{json.dumps(data).replace('"', "'")}\""
-            args_test = f"./.vm-venv/Scripts/python ./simulation_controller_executor.py \"{json.dumps(data).replace('"', "'")}\""
-            args = args_test
-            with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE) as proc:
+            # args_test = f"./.vm-venv/Scripts/python ./simulation_controller_executor.py \"{json.dumps(data).replace('"', "'")}\""
+            # args = args_test
+            with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True) as proc:
                 try:
-                    stdout_simulation = proc.stdout.read().decode()
+                    simulation_state.simulation_process = proc
+                    stdout_simulation = proc.stdout.read()
                 except Exception as e:
                     print("Exception in stout of simulation.exe")
-                    stdout_simulation = proc.stdout.read().decode("latin-1")
+                    stdout_simulation = proc.stdout.read()
                 print(f"LOG DO PROCESSo: \n---\n{stdout_simulation}\n---\n")
             simulation_completed = simulation_controller.is_simulation_completed(current_simulation_index)
             retry_count += 1
@@ -97,6 +116,7 @@ def simulation_loop():
     if simulation_controller.is_completed_last_simulation():
         sio.emit("completed_simulation")
 
+    simulation_state.cancel_simulation = False
     simulation_state.simulation_running = False
     try:
         sio.emit("simulation_loop")
@@ -154,7 +174,7 @@ def request_status_vm():
             pass
 
 
-sio.connect("https://server-sensor.fly.dev/")  # https://server-sensor.fly.dev/ | http://localhost:8080/
+sio.connect(link_server)
 
 while True:
     send_img_loop()

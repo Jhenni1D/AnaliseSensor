@@ -2,6 +2,7 @@ $(document).ready(function () {
   var last_reset_status = false;
   let progress_simulation_element = document.querySelector("#progress");
   let confirm_reset_button = document.querySelector("#confirm-reset");
+  let continue_simulation_button = document.querySelector("#continue-simulation");
   let status_reset_simulation_timeout = null;
   let status_vm_timeout = null;
   let status_vm_element = document.getElementById("status-vm");
@@ -20,6 +21,8 @@ $(document).ready(function () {
   getId("log-button").addEventListener("click", evt => {
     SetShowLogBadge(false);
   });
+
+  continue_simulation_button.addEventListener("click", DisableCancelButton);
 
   confirm_reset_button.addEventListener('click', SendResetRequest);
 
@@ -286,7 +289,7 @@ $(document).ready(function () {
 
   function SendResetRequest() {
     last_reset_status = false;
-    let link = location.protocol + '//' + location.host + "/reset-simulation-data";
+    let link = location.protocol + '//' + location.host + "/cancel";
     let xhttp = new XMLHttpRequest();
     xhttp.onload = response => {
       SetDefaultStatusResetSimulation();
@@ -301,11 +304,12 @@ $(document).ready(function () {
     status_vm_element.classList.add("text-danger");
   }
 
-  function CheckErrorOnVMSimulation(log) {
-    if (log.toLowerCase().includes("exception") || log.toLowerCase().includes("error")) {
-      progress_simulation_element.classList.add("bg-danger");
+  function EnableCancelButton() {
       getId("error-container").classList.remove("visually-hidden");
-    }
+  }
+
+  function DisableCancelButton() {
+    getId("error-container").classList.add("visually-hidden");
   }
 
   function SetStatusResetSimulation() {
@@ -405,7 +409,10 @@ $(document).ready(function () {
       SetShowLogBadge(true);
     }
     getId("log-text").innerHTML = log_text;
-    CheckErrorOnVMSimulation(log_text);
+  });
+
+  socket.on('enable_cancel_button', () => {
+    EnableCancelButton();
   });
 
   getId("modal-reset-confirm-button-ok").addEventListener('click', () => {
@@ -416,10 +423,10 @@ $(document).ready(function () {
     }
   });
 
-  socket.on('reset_simulation_status', status => {
-    last_reset_status = status;
+  socket.on('cancel_confirmation', () => {
     clearTimeout(status_reset_simulation_timeout);
-    status_reset_simulation_timeout = setTimeout(SetStatusResetSimulation, 3000);
+    last_reset_status = true;
+    SetStatusResetSimulation();
   });
 
   socket.on('completed_simulation', () => {

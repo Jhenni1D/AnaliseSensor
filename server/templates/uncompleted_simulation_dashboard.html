@@ -307,17 +307,17 @@
               Something wrong in Simulation Virtual Machine!
             </div>
             <div class="input-group mb-3">
-              <span class="input-group-text">Do you want reset VM files?</span>
+              <span class="input-group-text">Do you want cancel simulations on VM?</span>
               <div aria-hidden="true" aria-labelledby="exampleModalToggleLabel" class="modal fade"
                 id="exampleModalToggle" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                   <div class="modal-content">
                     <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="exampleModalToggleLabel">RESET FILES CONFIRMATION</h1>
+                      <h1 class="modal-title fs-5" id="exampleModalToggleLabel">CANCEL SIMULATIONS CONFIRMATION</h1>
                       <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
                     </div>
                     <div class="modal-body">
-                      Do you are sure want reset VM files? This action will regret simulation to initial stage!
+                      Do you are sure want CANCEL all simulations? This action will regret simulation to initial stage!
                     </div>
                     <div class="modal-footer">
                       <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
@@ -334,7 +334,7 @@
                   <div class="modal-content">
                     <div class="modal-header">
                       <h1 class="modal-title fs-5 justify-content-center" id="modal-reset-confirm-title">
-                        RESETING...</h1>
+                        CANCELING...</h1>
                     </div>
                     <div class="modal-body" id="reset-modal-confirm-body">
 
@@ -350,7 +350,7 @@
                           <use xlink:href="#check-circle-fill" />
                         </svg>
                         <div>
-                          VM Reseted with Succesfully!
+                          Simulations Cancelled with Successfully!
                         </div>
                       </div>
 
@@ -360,7 +360,7 @@
                           <use xlink:href="#exclamation-triangle-fill" />
                         </svg>
                         <div>
-                          Something wrong happenned when try reset files!
+                          Something wrong happened when try cancel simulations!
                         </div>
                       </div>
 
@@ -373,7 +373,8 @@
                   </div>
                 </div>
               </div>
-              <button class="btn btn-warning" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">RESET</button>
+              <button class="btn btn-danger" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">CANCEL</button>
+              <button class="btn btn-secondary" id="continue-simulation">CONTINUE</button>
             </div>
           </div>
           <textarea aria-label="With textarea" class="form-control" disabled id="log-text" style="height: 300px;">

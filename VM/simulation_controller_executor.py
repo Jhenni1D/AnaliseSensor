@@ -2,6 +2,9 @@ import random
 import sys
 import time
 
+import femm
+import socketio
+
 from FEMM_Simulation import FEMMSimulationController
 from app_service_VM import *
 from log_handler import write_log
@@ -215,11 +218,21 @@ class SimulationController:
         self.load_simulation()
         return self.simulations[simulation_index]["done"]
 
+
 def main(args):
+    sio = socketio.Client()
     s = SimulationController()
+    print(args)
     try:
         data = json.loads(args[1].replace("\'", '\"'))
         print(f"Irá iniciar a simulação com os dados: {data}")
+
+        @sio.event
+        def cancel():
+            print("Cancel required")
+            femm.closefemm()
+
+        sio.connect(data["link"])
         s.start_simulation(data["SensorA"], data["SensorB"], data["SensorC"], data["SensorTemp"])
     except Exception as e:
         print("Excpetion in main:", e.args, "\n\n", args)

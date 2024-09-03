@@ -123,5 +123,11 @@ def complete_folder(folder):
     return "", 204
 
 
+@app.route('/cancel')
+def cancel():
+    io.emit("cancel")
+    return "canceled"
+
+
 if __name__ == "__main__":
     io.run(app, host="0.0.0.0", port=8080, allow_unsafe_werkzeug=True)

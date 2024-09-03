@@ -114,4 +114,12 @@ def create_io(app):
         io.emit("completed_simulation")
         sleep(1)
 
+    @io.event
+    def enable_cancel():
+        io.emit("enable_cancel_button")
+
+    @io.event
+    def cancel_confirmation():
+        io.emit("cancel_confirmation")
+
     return io
