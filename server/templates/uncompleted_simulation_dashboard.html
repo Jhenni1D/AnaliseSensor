@@ -321,7 +321,7 @@
                     </div>
                     <div class="modal-footer">
                       <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
-                      <button class="btn btn-warning" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal"
+                      <button class="btn btn-danger" data-bs-target="#exampleModalToggle2" data-bs-toggle="modal"
                         id="confirm-reset" type="submit">YES
                       </button>
                     </div>
@@ -373,8 +373,56 @@
                   </div>
                 </div>
               </div>
+              <div aria-hidden="true" aria-labelledby="modal-reset-confirm-title" class="modal fade"
+                   data-bs-backdrop="static" data-bs-keyboard="false" id="exampleModalToggle3" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5 justify-content-center" id="modal-cancel-continue-title">
+                        CANCELING...</h1>
+                    </div>
+                    <div class="modal-body" id="modal-cancel-continue-body">
+
+                      <div class="text-center fade show" id="loading-cancel-continue-icon">
+                        <div class="spinner-border" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+
+                      <div class="visually-hidden fade alert alert-success d-flex align-items-center"
+                           id="success-continue-message" role="alert">
+                        <svg aria-label="Success:" class="bi flex-shrink-0 me-2" role="img">
+                          <use xlink:href="#check-circle-fill"/>
+                        </svg>
+                        <div>
+                          Simulations will retry!
+                        </div>
+                      </div>
+
+                      <div class="visually-hidden fade alert alert-danger d-flex align-items-center"
+                           id="fail-cancel-continue-message"
+                           role="alert">
+                        <svg aria-label="Danger:" class="bi flex-shrink-0 me-2" role="img">
+                          <use xlink:href="#exclamation-triangle-fill"/>
+                        </svg>
+                        <div>
+                          Something wrong happened when try to continue simulations!
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="modal-footer">
+                      <button class="btn btn-secondary" data-bs-dismiss="modal" disabled
+                              id="modal-cancel-continue-confirm-button-ok" type="button">OK
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <button class="btn btn-danger" data-bs-target="#exampleModalToggle" data-bs-toggle="modal">CANCEL</button>
-              <button class="btn btn-secondary" id="continue-simulation">CONTINUE</button>
+              <button class="btn btn-secondary" data-bs-target="#exampleModalToggle3" data-bs-toggle="modal"
+                      id="continue-simulation">CONTINUE
+              </button>
             </div>
           </div>
           <textarea aria-label="With textarea" class="form-control" disabled id="log-text" style="height: 300px;">

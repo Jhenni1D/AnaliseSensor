@@ -67,20 +67,23 @@ def store_and_init_new_simulation():
 @app.route("/simulation/dashboard/<folder>")
 def simulation_dashboard(folder):
     folder_completed = get_folder_status_completed(folder)
-    
+
     if folder_completed is False:
         return redirect(location="/to/uncompleted-simulation/dashboard")
-    
+
     graph_data_dumped = get_date_and_sensors_values_for_graph_by_folder(folder)
     return render_template("simulation_dashboard.html",
                            data_img=[] if check_images_exist(folder) is False else get_image_data(folder),
                            graph_data=graph_data_dumped, folder_name=folder)
 
+
 @app.route("/uncompleted-simulation/dashboard/<folder>")
 def uncompleted_simulation_dashboard(folder):
-    if get_folder_status_completed(folder):
+    status_folder = get_folder_status_completed(folder)
+    if status_folder:
         return redirect(location=f"/simulation/dashboard/{folder}")
-
+    if status_folder is None:
+        return "Folder not found", 404
     if check_images_exist(folder):
         return render_template("uncompleted_simulation_dashboard.html", data=get_image_data(folder), folder_name=folder)
     return render_template("uncompleted_simulation_dashboard.html", data=[], folder_name=folder)
@@ -92,6 +95,7 @@ def to_uncompleted_simulation_dashboard():
     if len(folder_uncompleted) == 0:
         return redirect(location="/")
     return redirect(location=f"/uncompleted-simulation/dashboard/{folder_uncompleted[0][0]}")
+
 
 @app.route('/download/<filename>/<start>/<end>', methods=['GET'])
 @app.route('/download/<filename>', methods=['GET'])
@@ -121,12 +125,6 @@ def delete_folder(folder):
 def complete_folder(folder):
     firebase_set_completed_folder(folder)
     return "", 204
-
-
-@app.route('/cancel')
-def cancel():
-    io.emit("cancel")
-    return "canceled"
 
 
 if __name__ == "__main__":

@@ -44,14 +44,16 @@ class SimulationController:
             os.remove(f"./femm_generate_files/{file}")
         for file in os.listdir("./"):
             if "simulation" in file and ".json" in file:
-                os.remove(f"./{file}")
+                try:
+                    os.remove(f"./{file}")
+                except:
+                    pass
             if f"log-simulacao_" in file and clear_log:
                 with open(f"./{file}", "w") as f:
                     f.write("")
             if "progress_simulation" in file:
                 with open(f"./{file}", "w") as f:
                     f.write("0")
-
 
         with open("./simulation.json", "w") as file:
             file.write(json.dumps(self.simulations, indent=1))
@@ -60,10 +62,12 @@ class SimulationController:
         with open(f"./progress_simulation.txt", "w") as f:
             f.write("0")
 
-
     def load_simulation(self):
-        with open("./simulation.json") as file:
-            self.simulations = json.loads(file.read())
+        try:
+            with open("./simulation.json") as file:
+                self.simulations = json.loads(file.read())
+        except:
+            pass
 
     def is_can_start_simulation(self, range):  # quando as condições forem satisfestas
         self.load_simulation()
@@ -73,14 +77,14 @@ class SimulationController:
         is_simulation_in_range = range >= self.simulations[str(actual_simulation)]["range"]
         is_range_in_limit = range < self.LIMIT_RANGE
         msg = ""
-        
+
         if is_simulation_done:
             msg = f"The simulation {actual_simulation} is DONE"
         if is_simulation_in_range is False:
             msg = f"The range {range} is over what actual range {self.simulations[str(actual_simulation)]["range"]}"
         if is_range_in_limit is False:
             msg = f"range {range} is over the simulation limit: {self.LIMIT_RANGE}"
-        
+
         if msg != "":
             msg += "\nQueue index reseted!"
             print(msg)

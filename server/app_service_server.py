@@ -5,7 +5,7 @@ import os
 import time
 from datetime import date
 
-from requests import get, patch, delete
+from requests import Session
 from xlwt import Workbook
 
 link_bd_base = "https://simulacao-femm-2-default-rtdb.firebaseio.com/"
@@ -18,6 +18,8 @@ link_bd_all_images = f"https://firebasestorage.googleapis.com/v0/b/{link_bd_imag
 link_bd_get_image_folder = link_bd_all_images + "{folder}%2F"
 link_bd_get_image = link_bd_get_image_folder + "{img}.png?alt=media"
 link_bd_get_image_check_folder = link_bd_get_image_folder + "M0.png?alt=media"
+
+session = Session()
 
 
 def get_date_formatted():
@@ -61,11 +63,11 @@ def get_new_folder_info_template():
 
 
 def register_new_folder(folder_data):
-    patch(link_bd_folders, json=folder_data)
+    session.patch(link_bd_folders, json=folder_data)
 
 
 def get_folder_filter(filter_folder):
-    folders = get(link_bd_folders).json()
+    folders = session.get(link_bd_folders, stream=True).json()
     if folders is None:
         return []
     folder_filtred = [[folder, {folder: folders[folder]}] for folder in folders if
@@ -88,6 +90,8 @@ def get_folder_uncompleted():
 
 def get_folder_status_completed(folder):
     folder_info = get_folder_filter(lambda folder_name, folder_d: folder_name == folder)
+    if len(folder_info) == 0:
+        return None
     status = folder_info[0][1][folder_info[0][0]]["completed"]
     return status
 
@@ -150,7 +154,7 @@ def get_excel_of_folder(folder, start_limit=-1, end_limit=-1):
     folder_data = get_formatted_sensors_data(folder_data[0])
     if start_limit < end_limit and start_limit > -1:
         for key in folder_data:
-            folder_data[key] = folder_data[key][start_limit:end_limit+1]
+            folder_data[key] = folder_data[key][start_limit:end_limit + 1]
     print(folder_data)
     get_excel_of_data(folder, folder_data)
 
@@ -171,7 +175,6 @@ def get_excel_of_data(file_name, data):
     wb.save(f'{file_name}_Data.xls')
 
 
-
 def get_bytes_file(filename):
     file_path = f"./{filename}"
     return_data = io.BytesIO()
@@ -183,12 +186,13 @@ def get_bytes_file(filename):
 
 
 def firebase_delete_folder(folder):
-    delete(link_bd.format(folder))
+    session.delete(link_bd.format(folder))
+
 
 def firebase_set_completed_folder(folder):
     folder_info = get_folder_filter(lambda folder_name, folder_d: folder_name == folder)
     folder_info[0][1][folder_info[0][0]]["completed"] = True
-    patch(link_bd.format(folder), json=folder_info[0][1][folder])
+    session.patch(link_bd.format(folder), json=folder_info[0][1][folder])
 
 
 def check_and_get_img(link, folder_img, all_folders):
@@ -197,10 +201,11 @@ def check_and_get_img(link, folder_img, all_folders):
 
 
 def check_images_exist(folder):
-    return get(link_bd_get_image_check_folder.format(folder=folder)).status_code.real != 404
+    return session.get(link_bd_get_image_check_folder.format(folder=folder)).status_code.real != 404
+
 
 def get_image_data(pasta):
-    all_folders = get(link_bd_all_images).json()['items']
+    all_folders = session.get(link_bd_all_images).json()['items']
     all_folders = [data_img['name'] for data_img in all_folders]
     data = [
         {

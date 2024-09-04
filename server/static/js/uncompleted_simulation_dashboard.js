@@ -24,7 +24,7 @@ $(document).ready(function () {
 
   continue_simulation_button.addEventListener("click", DisableCancelButton);
 
-  confirm_reset_button.addEventListener('click', SendResetRequest);
+  confirm_reset_button.addEventListener('click', SendCancelRequest);
 
   let m_images = {
     "M0": document.querySelector("#m0"),
@@ -287,21 +287,11 @@ $(document).ready(function () {
     corrent_chart.update();
   }
 
-  function SendResetRequest() {
+  function SendCancelRequest() {
+    SetDefaultStatusResetSimulation();
     last_reset_status = false;
-    let link = location.protocol + '//' + location.host + "/cancel";
-    let xhttp = new XMLHttpRequest();
-    xhttp.onload = response => {
-      SetDefaultStatusResetSimulation();
-      status_reset_simulation_timeout = setTimeout(SetStatusResetSimulation, 6000);
-    };
-    xhttp.open("GET", link, true);
-    xhttp.send();
-  }
-
-  function SetStatusVM() {
-    status_vm_element.classList.remove("text-success");
-    status_vm_element.classList.add("text-danger");
+    status_reset_simulation_timeout = setTimeout(SetStatusResetSimulation, 6000);
+    socket.emit("cancel_simulation_response", true);
   }
 
   function EnableCancelButton() {
@@ -309,22 +299,47 @@ $(document).ready(function () {
   }
 
   function DisableCancelButton() {
-    getId("error-container").classList.add("visually-hidden");
+    last_reset_status = false;
+    status_reset_simulation_timeout = setTimeout(SetStatusContinueSimulation, 6000);
+    socket.emit("cancel_simulation_response", false);
+    //getId("error-container").classList.add("visually-hidden"); aa
+  }
+
+  function SetStatusVM() {
+    status_vm_element.classList.remove("text-success");
+    status_vm_element.classList.add("text-danger");
   }
 
   function SetStatusResetSimulation() {
     let statusMessage = `${(last_reset_status ? "success" : "fail")}-message`;
-
+    let statusMessage2 = `${(last_reset_status ? "success" : "fail")}-continue-message`;
     HiddenElement(getId("loading-icon"));
+    HiddenElement(getId("loading-cancel-continue-icon"));
     ShowElement(getId(statusMessage));
+    ShowElement(getId(statusMessage2));
 
     getId("modal-reset-confirm-title").innerHTML = "RESET STATUS"
     getId("modal-reset-confirm-button-ok").removeAttribute("disabled");
+    getId("modal-cancel-continue-confirm-button-ok").removeAttribute("disabled");
 
     if (last_reset_status) {
       progress_simulation_element.classList.remove("bg-danger");
     }
   }
+
+  function SetStatusContinueSimulation() {
+    let statusMessage = `${(last_reset_status ? "success" : "fail")}-continue-message`;
+    HiddenElement(getId("loading-cancel-continue-icon"));
+    ShowElement(getId(statusMessage));
+
+    getId("modal-reset-confirm-title").innerHTML = "CONTINUE SIMULATION STATUS"
+    getId("modal-cancel-continue-confirm-button-ok").removeAttribute("disabled");
+
+    if (last_reset_status) {
+      progress_simulation_element.classList.remove("bg-danger");
+    }
+  }
+
 
   function SetDefaultStatusResetSimulation() {
     ShowElement(getId("loading-icon"));
@@ -423,10 +438,19 @@ $(document).ready(function () {
     }
   });
 
-  socket.on('cancel_confirmation', () => {
+  getId("modal-cancel-continue-confirm-button-ok").addEventListener('click', () => {
+    if (last_reset_status) {
+      setTimeout(() => {
+        getId("error-container").classList.add('visually-hidden');
+      }, 1000);
+    }
+  });
+
+  socket.on('cancel_simulation_received_response', () => {
     clearTimeout(status_reset_simulation_timeout);
     last_reset_status = true;
     SetStatusResetSimulation();
+    SetStatusContinueSimulation();
   });
 
   socket.on('completed_simulation', () => {

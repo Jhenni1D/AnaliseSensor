@@ -16,8 +16,8 @@ class LoopState:
         self.simulation_running = False
         self.files_running = False
         self.current_retry_simulation = 0
-        self.simulation_process: subprocess.Popen[bytes] = None
         self.cancel_simulation = False
+        self.waiting_cancel_confirmation = False
 
     def is_max_retry(self) -> bool:
         is_max_retry = self.current_retry_simulation <= LoopState.MAX_RETRY_SIMULATION
@@ -68,12 +68,15 @@ def disconnect():
 
 
 @sio.event
-def cancel():
-    simulation_state.cancel_simulation = True
-    sio.emit("cancel_confirmation")
-    global data_queue
-    data_queue = queue.Queue()
-    reset_simulation()
+def cancel_simulation_response(cancel: bool):
+    print("É pra cancelar?", cancel)
+    simulation_state.cancel_simulation = cancel
+    simulation_state.waiting_cancel_confirmation = False
+    sio.emit("cancel_simulation_received_response")
+    if cancel:
+        global data_queue
+        data_queue = queue.Queue()
+        reset_simulation()
 
 
 @sio.event
@@ -98,10 +101,19 @@ def simulation_loop():
                 write_log(
                     f"\n# Tentativas ultrapassou o limite de {LoopState.MAX_RETRY_SIMULATION}, permitindo cancelamento!\n")
                 sio.emit("enable_cancel")
+                simulation_state.waiting_cancel_confirmation = True
+                while simulation_state.waiting_cancel_confirmation:
+                    pass
+
+            if simulation_state.cancel_simulation:
+                break
 
             args = f"./simulation_controller_executor.exe \"{json.dumps(data).replace('"', "'")}\""
-            # args_test = f"./.vm-venv/Scripts/python ./simulation_controller_executor.py \"{json.dumps(data).replace('"', "'")}\""
-            # args = args_test
+
+            if "local" in link_server:
+                args_test = f"./.vm-venv/Scripts/python ./simulation_controller_executor.py \"{json.dumps(data).replace('"', "'")}\""
+                args = args_test
+
             with subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True) as proc:
                 try:
                     simulation_state.simulation_process = proc
@@ -174,7 +186,13 @@ def request_status_vm():
             pass
 
 
-sio.connect(link_server)
+connected_on_server = False
+while connected_on_server is False:
+    try:
+        sio.connect(link_server)
+        connected_on_server = True
+    except:
+        pass
 
 while True:
     send_img_loop()

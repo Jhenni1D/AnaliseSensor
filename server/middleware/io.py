@@ -119,7 +119,11 @@ def create_io(app):
         io.emit("enable_cancel_button")
 
     @io.event
-    def cancel_confirmation():
-        io.emit("cancel_confirmation")
+    def cancel_simulation_received_response():
+        io.emit("cancel_simulation_received_response")
+
+    @io.event
+    def cancel_simulation_response(cancel):
+        io.emit("cancel_simulation_response", cancel)
 
     return io
